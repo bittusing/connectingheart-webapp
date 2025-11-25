@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { Button } from '../components/common/Button'
 import { TextInput } from '../components/forms/TextInput'
 import { useChangePassword } from '../hooks/useChangePassword'
@@ -20,6 +21,9 @@ export const ChangePasswordPage = () => {
   const [form, setForm] = useState(initialFormState)
   const [toast, setToast] = useState<ToastState>(null)
   const [fieldError, setFieldError] = useState<string | null>(null)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const { changePassword, isUpdating } = useChangePassword()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,35 +115,77 @@ export const ChangePasswordPage = () => {
           onSubmit={handleSubmit}
           className="space-y-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
         >
-          <TextInput
-            label="Current Password"
-            type="password"
-            name="currentPassword"
-            autoComplete="current-password"
-            required
-            value={form.currentPassword}
-            onChange={handleChange}
-          />
-          <TextInput
-            label="New Password"
-            type="password"
-            name="newPassword"
-            autoComplete="new-password"
-            required
-            value={form.newPassword}
-            onChange={handleChange}
-            hint={passwordStrengthHint}
-          />
-          <div className="space-y-2">
+          <div className="relative">
             <TextInput
-              label="Confirm Password"
-              type="password"
-              name="confirmPassword"
-              autoComplete="new-password"
+              label="Current Password"
+              type={showCurrentPassword ? 'text' : 'password'}
+              name="currentPassword"
+              autoComplete="current-password"
               required
-              value={form.confirmPassword}
+              value={form.currentPassword}
               onChange={handleChange}
             />
+            <button
+              type="button"
+              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+              className="absolute right-4 top-[38px] text-slate-400 transition hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+              aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
+            >
+              {showCurrentPassword ? (
+                <EyeSlashIcon className="h-5 w-5" />
+              ) : (
+                <EyeIcon className="h-5 w-5" />
+              )}
+            </button>
+          </div>
+          <div className="relative">
+            <TextInput
+              label="New Password"
+              type={showNewPassword ? 'text' : 'password'}
+              name="newPassword"
+              autoComplete="new-password"
+              required
+              value={form.newPassword}
+              onChange={handleChange}
+              hint={passwordStrengthHint}
+            />
+            <button
+              type="button"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+              className="absolute right-4 top-[38px] text-slate-400 transition hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+              aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+            >
+              {showNewPassword ? (
+                <EyeSlashIcon className="h-5 w-5" />
+              ) : (
+                <EyeIcon className="h-5 w-5" />
+              )}
+            </button>
+          </div>
+          <div className="space-y-2">
+            <div className="relative">
+              <TextInput
+                label="Confirm Password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                autoComplete="new-password"
+                required
+                value={form.confirmPassword}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-[38px] text-slate-400 transition hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? (
+                  <EyeSlashIcon className="h-5 w-5" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" />
+                )}
+              </button>
+            </div>
             {fieldError && <p className="text-xs font-semibold text-rose-500">{fieldError}</p>}
           </div>
           <Button size="lg" fullWidth type="submit" disabled={isUpdating}>

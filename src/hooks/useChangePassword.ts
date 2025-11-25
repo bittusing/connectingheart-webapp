@@ -21,7 +21,7 @@ export const useChangePassword = () => {
       setIsUpdating(true)
       try {
         const response = await api.patch<ChangePasswordPayload, ChangePasswordResponse>(
-          '/api/auth/changePassword',
+          'auth/changePassword',
           payload,
         )
         return response
