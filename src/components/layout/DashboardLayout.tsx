@@ -9,16 +9,19 @@ import {
   UserGroupIcon,
   CreditCardIcon,
 } from '@heroicons/react/24/outline'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { DashboardSidebar } from '../dashboard/DashboardSidebar'
 import { NotificationCountProvider } from '../../context/NotificationCountContext'
 import { useNotificationCounts } from '../../hooks/useNotificationCounts'
 
 export const DashboardLayout = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { counts, loading, refetch } = useNotificationCounts()
   const notificationCount = counts.total || 0
+  const isProfileViewPage = location.pathname.startsWith('/dashboard/profile/')
+  const showBottomNav = !isProfileViewPage
 
   // Close mobile menu on window resize to desktop and handle body scroll
   useEffect(() => {
@@ -143,7 +146,9 @@ export const DashboardLayout = () => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 px-4 py-8 pb-28 lg:px-6 lg:py-12 lg:pb-12">
+        <main
+          className={`flex-1 px-4 py-8 ${showBottomNav ? 'pb-28' : 'pb-12'} lg:px-6 lg:py-12 lg:pb-12`}
+        >
           <Outlet />
         </main>
       </div>
@@ -153,27 +158,29 @@ export const DashboardLayout = () => {
   return (
     <NotificationCountProvider counts={counts} loading={loading} refetch={refetch}>
       {LayoutContent}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white shadow-[0_-8px_24px_rgba(0,0,0,0.08)] dark:border-slate-800 dark:bg-slate-900 lg:hidden">
-        <div className="mx-auto grid max-w-4xl grid-cols-5 gap-1 px-2 py-2">
-          {mobileNavItems.map((item) => (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              className={({ isActive }) =>
-                [
-                  'flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[10px] font-medium transition',
-                  isActive
-                    ? 'bg-pink-50 text-pink-600 dark:bg-pink-900/20 dark:text-pink-300'
-                    : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800',
-                ].join(' ')
-              }
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="leading-tight">{item.label}</span>
-            </NavLink>
-          ))}
-        </div>
-      </nav>
+      {showBottomNav && (
+        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white shadow-[0_-8px_24px_rgba(0,0,0,0.08)] dark:border-slate-800 dark:bg-slate-900 lg:hidden">
+          <div className="mx-auto grid max-w-4xl grid-cols-5 gap-1 px-2 py-2">
+            {mobileNavItems.map((item) => (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                className={({ isActive }) =>
+                  [
+                    'flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[10px] font-medium transition',
+                    isActive
+                      ? 'bg-pink-50 text-pink-600 dark:bg-pink-900/20 dark:text-pink-300'
+                      : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800',
+                  ].join(' ')
+                }
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="leading-tight">{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        </nav>
+      )}
     </NotificationCountProvider>
   )
 }

@@ -193,8 +193,14 @@ export const ProfileViewPage = () => {
 
         showToast(errorMessage, isAlreadyUnlocked ? 'success' : 'error')
 
+        setIsUnlockModalOpen(false)
+
         if (typeof unlockError !== 'string' && unlockError?.redirectToMembership) {
-          navigate('/dashboard/membership')
+          // Small delay to ensure toast is visible before redirect
+          setTimeout(() => {
+            navigate('/dashboard/membership')
+          }, 500)
+          return
         }
         return
       }
