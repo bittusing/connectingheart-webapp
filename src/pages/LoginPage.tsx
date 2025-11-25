@@ -1,27 +1,68 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { Button } from '../components/common/Button'
 import { AuthCard } from '../components/forms/AuthCard'
 import { TextInput } from '../components/forms/TextInput'
+import { Toast } from '../components/common/Toast'
 import { useApiClient } from '../hooks/useApiClient'
 import type { AuthResponse } from '../types/auth'
+
+type ToastMessage = {
+  id: string
+  message: string
+  variant: 'success' | 'error'
+}
 
 export const LoginPage = () => {
   const api = useApiClient()
   const navigate = useNavigate()
   const [phoneNumber, setMobile] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
     'idle',
   )
-  const [message, setMessage] = useState<string | null>(null)
+  const [toasts, setToasts] = useState<ToastMessage[]>([])
+
+  const showToast = (message: string, variant: 'success' | 'error') => {
+    const id = globalThis.crypto?.randomUUID() ?? `${Date.now()}`
+    setToasts((prev) => [...prev, { id, message, variant }])
+  }
+
+  const dismissToast = (toastId: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== toastId))
+  }
+
+  const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) {
+      const errorMessage = error.message
+      
+      // Parse API error messages
+      if (errorMessage.includes('password') || errorMessage.toLowerCase().includes('incorrect password')) {
+        return 'Incorrect password. Please try again.'
+      }
+      if (errorMessage.includes('phone') || errorMessage.includes('mobile') || errorMessage.includes('number')) {
+        return 'Invalid mobile number. Please check and try again.'
+      }
+      if (errorMessage.includes('not found') || errorMessage.includes('does not exist')) {
+        return 'Mobile number not found. Please check and try again.'
+      }
+      if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+        return 'Invalid credentials. Please check your mobile number and password.'
+      }
+      
+      // Remove "API " prefix if present
+      return errorMessage.replace(/^API \d+:?\s*/, '').trim() || 'Login failed. Please try again.'
+    }
+    return 'Login failed. Please try again.'
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setStatus('loading')
-    setMessage(null)
+    
     try {
-      // Add /api/ prefix if not already present
       const loginPath = `auth/login`
       const response = await api.post<{ phoneNumber: string; password: string }, AuthResponse>(
         loginPath,
@@ -31,25 +72,24 @@ export const LoginPage = () => {
       // Store token in localStorage
       if (response.token) {
         window.localStorage.setItem('connectingheart-token', response.token)
-        // Optionally store user ID
         if (response.id) {
           window.localStorage.setItem('connectingheart-user-id', response.id)
         }
       }
 
       setStatus('success')
-      setMessage(response.message || 'Redirecting you to your dashboard...')
+      const successMessage = response.message || 'Login successful! Redirecting to dashboard...'
+      showToast(successMessage, 'success')
 
       // Navigate based on screenName or default to dashboard
       const redirectPath = response.screenName === 'dashboard' ? '/dashboard' : '/dashboard'
       setTimeout(() => {
         navigate(redirectPath, { replace: true })
-      }, 1000)
+      }, 1500)
     } catch (error) {
       setStatus('error')
-      const errorMessage =
-        error instanceof Error ? error.message : 'Login failed. Please try again.'
-      setMessage(errorMessage)
+      const errorMessage = getErrorMessage(error)
+      showToast(errorMessage, 'error')
     }
   }
 
@@ -81,26 +121,47 @@ export const LoginPage = () => {
               value={phoneNumber}
               onChange={(event) => setMobile(event.target.value)}
             />
-            <TextInput
-              label="Password"
-              type="password"
-              required
-              placeholder="••••••••"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
+            <div className="relative">
+              <TextInput
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-[38px] text-slate-400 transition hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" />
+                )}
+              </button>
+            </div>
             <Button type="submit" size="lg" disabled={status === 'loading'}>
               {status === 'loading' ? 'Signing in...' : 'Sign in'}
             </Button>
-            {message && (
-              <p
-                className={`text-sm ${status === 'error' ? 'text-red-500' : 'text-emerald-500'}`}
-              >
-                {message}
-              </p>
-            )}
           </form>
         </AuthCard>
+      </div>
+      
+      {/* Toast Notifications */}
+      <div className="pointer-events-none fixed top-6 right-6 z-50 space-y-3">
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            variant={toast.variant}
+            onClose={() => dismissToast(toast.id)}
+            duration={toast.variant === 'error' ? 4000 : 2000}
+            className="pointer-events-auto"
+          />
+        ))}
       </div>
     </section>
   )

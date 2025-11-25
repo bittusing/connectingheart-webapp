@@ -36,12 +36,36 @@ export const useApiClient = () => {
       })
 
       if (!response.ok) {
-        const errorPayload = await response.text()
-        throw new Error(
-          `API ${response.status}: ${
-            errorPayload || response.statusText || 'Unknown error'
-          }`,
-        )
+        let errorMessage = response.statusText || 'Unknown error'
+        
+        // Try to read error response as JSON first, then fallback to text
+        const contentType = response.headers.get('content-type')
+        const isJson = contentType?.includes('application/json')
+        
+        try {
+          if (isJson) {
+            const errorPayload = await response.json()
+            // Handle structured error responses
+            if (errorPayload.message) {
+              errorMessage = errorPayload.message
+            } else if (errorPayload.err?.msg) {
+              errorMessage = errorPayload.err.msg
+            } else if (errorPayload.error) {
+              errorMessage = errorPayload.error
+            } else if (typeof errorPayload === 'string') {
+              errorMessage = errorPayload
+            }
+          } else {
+            const errorText = await response.text()
+            if (errorText) {
+              errorMessage = errorText
+            }
+          }
+        } catch {
+          // If parsing fails, use default error message
+        }
+        
+        throw new Error(`API ${response.status}: ${errorMessage}`)
       }
 
       if (response.status === 204) {
