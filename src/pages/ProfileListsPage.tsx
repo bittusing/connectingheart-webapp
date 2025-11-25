@@ -215,4 +215,60 @@ export const ProfileVisitorsPage = () => (
     endpoint="dashboard/getProfileVisitors"
   />
 )
+export const InterestReceivedPage = () => (
+  <ProfileListTemplate
+    title="Interests Received"
+    subtitle="Profiles that have sent you interest."
+    endpoint="interest/getInterestReceived"
+  />
+)
+export const InterestSentPage = () => (
+  <ProfileListTemplate
+    title="Interests Sent"
+    subtitle="Profiles you have sent interest to."
+    endpoint="interest/getInterestSent"
+  />
+)
+export const UnlockedProfilesPage = () => (
+  <ProfileListTemplate
+    title="Unlocked Profiles"
+    subtitle="Profiles you have unlocked to view contact details."
+    endpoint="dashboard/getUnlockedProfiles"
+  />
+)
+export const IDeclinedPage = () => (
+  <ProfileListTemplate
+    title="I Declined"
+    subtitle="Profiles whose interest you have declined."
+    endpoint="interest/getIDeclined"
+  />
+)
+export const TheyDeclinedPage = () => (
+  <ProfileListTemplate
+    title="They Declined"
+    subtitle="Profiles that declined your interest."
+    endpoint="interest/getTheyDeclined"
+  />
+)
+export const ShortlistedProfilesPage = () => (
+  <ProfileListTemplate
+    title="Shortlisted Profiles"
+    subtitle="Profiles you have saved for later review."
+    endpoint="dashboard/getShortlistedProfiles"
+  />
+)
+export const IgnoredProfilesPage = () => (
+  <ProfileListTemplate
+    title="Ignored Profiles"
+    subtitle="Profiles you have chosen to ignore."
+    endpoint="dashboard/getIgnoredProfiles"
+  />
+)
+export const BlockedProfilesPage = () => (
+  <ProfileListTemplate
+    title="Blocked Profiles"
+    subtitle="Profiles you have blocked from contacting you."
+    endpoint="dashboard/getBlockedProfiles"
+  />
+)
 

@@ -83,9 +83,9 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
       </div>
 
       <div className="flex flex-1 flex-col items-center space-y-1 text-slate-600 dark:text-slate-300">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+        {/* <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
           <span className="line-clamp-1">{profile.id}</span>
-        </p>
+        </p> */}
         <p className="text-base font-semibold text-slate-900 dark:text-white">{profile.name}</p>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           {profile.age} yrs • {profile.height}

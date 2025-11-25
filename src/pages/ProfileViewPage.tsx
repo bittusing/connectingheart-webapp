@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   PaperAirplaneIcon,
   PhoneIcon,
@@ -13,7 +13,9 @@ import {
 } from '@heroicons/react/24/outline'
 import { useProfileDetail } from '../hooks/useProfileDetail'
 import { useProfileActions } from '../hooks/useProfileActions'
+import { useUnlockProfile } from '../hooks/useUnlockProfile'
 import { Toast } from '../components/common/Toast'
+import { ConfirmModal } from '../components/forms/ConfirmModal'
 
 
 type TabType = 'basic' | 'family' | 'kundali' | 'match'
@@ -77,6 +79,7 @@ const CriticalField = ({ label, value }: { label: string; value?: string }) => {
 
 export const ProfileViewPage = () => {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<TabType>('basic')
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { profile, loading, error } = useProfileDetail(id)
@@ -89,14 +92,17 @@ export const ProfileViewPage = () => {
     unignoreProfile,
     pendingAction,
   } = useProfileActions()
+  const { unlockProfile, isUnlocking } = useUnlockProfile()
   const [toasts, setToasts] = useState<ToastMessage[]>([])
   const [hasSentInterest, setHasSentInterest] = useState(false)
   const [isShortlisted, setIsShortlisted] = useState(false)
   const [isIgnored, setIsIgnored] = useState(false)
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
 
   const handleAction = (action: string) => {
-    // TODO: Wire up API calls
-    console.log(`Action: ${action} for profile ${id}`)
+    if (action === 'contact') {
+      setIsUnlockModalOpen(true)
+    }
   }
 
   const showToast = (message: string, variant: ToastVariant) => {
@@ -152,6 +158,54 @@ export const ProfileViewPage = () => {
           ? err.message.replace('API ', '') || 'Unable to unsend interest.'
           : 'Unable to unsend interest.'
       showToast(message, 'error')
+    }
+  }
+
+  const handleUnlockCancel = () => {
+    if (!isUnlocking) {
+      setIsUnlockModalOpen(false)
+    }
+  }
+
+  const handleUnlockContact = async () => {
+    if (!profileClientId) {
+      showToast('Profile information unavailable. Please refresh and try again.', 'error')
+      setIsUnlockModalOpen(false)
+      return
+    }
+
+    if (isUnlocking) return
+
+    try {
+      const response = await unlockProfile(profileClientId)
+
+      if (response.code === 'CH400') {
+        const unlockError = response.err
+        const isAlreadyUnlocked =
+          typeof unlockError === 'string' && unlockError.toLowerCase().includes('already unlocked')
+
+        const errorMessage =
+          typeof unlockError === 'string'
+            ? unlockError
+            : unlockError?.msg ||
+              response.message ||
+              'Please renew your membership in order to unlock further profiles.'
+
+        showToast(errorMessage, isAlreadyUnlocked ? 'success' : 'error')
+
+        if (typeof unlockError !== 'string' && unlockError?.redirectToMembership) {
+          navigate('/dashboard/membership')
+        }
+        return
+      }
+
+      showToast(response.message ?? 'Profile unlocked successfully.', 'success')
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message.replace('API ', '') || 'Unable to unlock profile.' : 'Unable to unlock profile.'
+      showToast(message, 'error')
+    } finally {
+      setIsUnlockModalOpen(false)
     }
   }
 
@@ -598,6 +652,16 @@ export const ProfileViewPage = () => {
           </button>
         </div>
       </div>
+
+      <ConfirmModal
+        open={isUnlockModalOpen}
+        title="Do you want to unlock this profile?"
+        description="This will cost you 1 heart coin!"
+        cancelLabel="Cancel"
+        confirmLabel={isUnlocking ? 'Please wait...' : 'OK'}
+        onCancel={handleUnlockCancel}
+        onConfirm={handleUnlockContact}
+      />
 
       <div className="pointer-events-none fixed top-6 right-6 z-50 space-y-3">
         {toasts.map((toast) => (

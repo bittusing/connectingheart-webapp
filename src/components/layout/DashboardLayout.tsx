@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { BellAlertIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { DashboardSidebar } from '../dashboard/DashboardSidebar'
 
 export const DashboardLayout = () => {
+  const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Close mobile menu on window resize to desktop and handle body scroll
@@ -98,12 +99,14 @@ export const DashboardLayout = () => {
             </div>
             <div className="flex items-center gap-3">
               <button
+                onClick={() => navigate('/dashboard/search')}
                 className="rounded-full bg-white/15 p-2 text-white transition hover:bg-white/25"
                 aria-label="Search"
               >
                 <MagnifyingGlassIcon className="h-5 w-5" />
               </button>
               <button
+                onClick={() => navigate('/dashboard/notification')}
                 className="rounded-full bg-white/15 p-2 text-white transition hover:bg-white/25"
                 aria-label="Notifications"
               >

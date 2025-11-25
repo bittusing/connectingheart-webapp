@@ -15,7 +15,7 @@ export const Toast = ({
   message,
   variant = 'success',
   onClose,
-  duration = 2000,
+  duration = 1000,
   className,
 }: ToastProps) => {
   useEffect(() => {

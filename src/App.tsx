@@ -4,7 +4,19 @@ import { DashboardLayout } from './components/layout/DashboardLayout'
 import { DashboardPage } from './pages/DashboardPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
-import { AllProfilesPage, DailyRecommendationsPage, ProfileVisitorsPage } from './pages/ProfileListsPage'
+import {
+  AllProfilesPage,
+  DailyRecommendationsPage,
+  ProfileVisitorsPage,
+  InterestReceivedPage,
+  InterestSentPage,
+  UnlockedProfilesPage,
+  IDeclinedPage,
+  TheyDeclinedPage,
+  ShortlistedProfilesPage,
+  IgnoredProfilesPage,
+  BlockedProfilesPage,
+} from './pages/ProfileListsPage'
 import { PolicyPage } from './pages/PolicyPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { MembershipPage } from './pages/MembershipPage'
@@ -18,6 +30,7 @@ import { SearchResultsPage } from './pages/SearchResultsPage'
 import { TermsConditionsPage } from './pages/TermsConditionsPage'
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
 import { VerificationPendingPage } from './pages/VerificationPendingPage'
+import { NotificationPage } from './pages/NotificationPage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 
 function App() {
@@ -33,11 +46,20 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="dashboard/notification" element={<NotificationPage />} />
           <Route path="dashboard/search" element={<SearchPage />} />
           <Route path="dashboard/search/results" element={<SearchResultsPage />} />
           <Route path="dashboard/profiles" element={<AllProfilesPage />} />
           <Route path="dashboard/recommendations" element={<DailyRecommendationsPage />} />
           <Route path="dashboard/visitors" element={<ProfileVisitorsPage />} />
+          <Route path="dashboard/interestreceived" element={<InterestReceivedPage />} />
+          <Route path="dashboard/interestsent" element={<InterestSentPage />} />
+          <Route path="dashboard/unlockedprofiles" element={<UnlockedProfilesPage />} />
+          <Route path="dashboard/ideclined" element={<IDeclinedPage />} />
+          <Route path="dashboard/theydeclined" element={<TheyDeclinedPage />} />
+          <Route path="dashboard/shortlist" element={<ShortlistedProfilesPage />} />
+          <Route path="dashboard/ignored" element={<IgnoredProfilesPage />} />
+          <Route path="dashboard/blocked" element={<BlockedProfilesPage />} />
           <Route path="dashboard/profile/:id" element={<ProfileViewPage />} />
           <Route path="dashboard/membership" element={<MembershipPage />} />
           <Route path="dashboard/security" element={<ChangePasswordPage />} />

@@ -26,8 +26,8 @@ export const navItems: NavItem[] = [
 export const statTiles: StatTile[] = [
   { label: 'Acceptance', value: 0, description: 'Matches accepted this week' },
   { label: 'Just joined', value: 1, description: 'New prospects today' },
-  { label: 'Shortlisted', value: 6, description: 'Saved for later' },
-  { label: 'Premium leads', value: 12, description: 'Highlighted to you' },
+  // { label: 'Shortlisted', value: 6, description: 'Saved for later' },
+  // { label: 'Premium leads', value: 12, description: 'Highlighted to you' },
 ]
 
 export const sections: DashboardSection[] = [
