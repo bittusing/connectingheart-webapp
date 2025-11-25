@@ -1,15 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { Button } from '../components/common/Button'
 import { TextInput } from '../components/forms/TextInput'
+import { Toast } from '../components/common/Toast'
 import { useChangePassword } from '../hooks/useChangePassword'
-
-type ToastVariant = 'success' | 'error'
-
-type ToastState = {
-  message: string
-  variant: ToastVariant
-} | null
 
 const initialFormState = {
   currentPassword: '',
@@ -19,7 +13,9 @@ const initialFormState = {
 
 export const ChangePasswordPage = () => {
   const [form, setForm] = useState(initialFormState)
-  const [toast, setToast] = useState<ToastState>(null)
+  const [toasts, setToasts] = useState<
+    Array<{ id: string; message: string; variant: 'success' | 'error' }>
+  >([])
   const [fieldError, setFieldError] = useState<string | null>(null)
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -31,17 +27,14 @@ export const ChangePasswordPage = () => {
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const showToast = (message: string, variant: ToastVariant) => {
-    setToast({ message, variant })
+  const showToast = (message: string, variant: 'success' | 'error') => {
+    const id = globalThis.crypto?.randomUUID() ?? `${Date.now()}`
+    setToasts((prev) => [...prev, { id, message, variant }])
   }
 
-  useEffect(() => {
-    if (!toast) {
-      return undefined
-    }
-    const timer = window.setTimeout(() => setToast(null), 4000)
-    return () => window.clearTimeout(timer)
-  }, [toast])
+  const dismissToast = (toastId: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== toastId))
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -55,8 +48,8 @@ export const ChangePasswordPage = () => {
     setFieldError(null)
     try {
       const response = await changePassword({
-        currentPassword: form.currentPassword,
-        newPassword: form.newPassword,
+        current_password: form.currentPassword,
+        new_password: form.newPassword,
       })
       showToast(response?.message ?? 'Password updated successfully.', 'success')
       setForm(initialFormState)
@@ -193,32 +186,18 @@ export const ChangePasswordPage = () => {
           </Button>
         </form>
       </section>
-      {toast && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <div
-            role="status"
-            aria-live="polite"
-            className={`flex items-start gap-3 rounded-2xl px-5 py-4 text-sm shadow-2xl ${
-              toast.variant === 'success'
-                ? 'bg-emerald-500/90 text-white'
-                : 'bg-rose-500/90 text-white'
-            }`}
-          >
-            <div className="flex-1">
-              <p className="font-semibold">{toast.variant === 'success' ? 'Success' : 'Heads up'}</p>
-              <p>{toast.message}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setToast(null)}
-              className="rounded-full p-1 text-white/80 transition hover:bg-white/20 hover:text-white"
-              aria-label="Close notification"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="pointer-events-none fixed top-6 right-6 z-50 space-y-3">
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            variant={toast.variant}
+            onClose={() => dismissToast(toast.id)}
+            duration={toast.variant === 'error' ? 4000 : 2000}
+            className="pointer-events-auto"
+          />
+        ))}
+      </div>
     </>
   )
 }

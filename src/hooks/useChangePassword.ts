@@ -2,8 +2,8 @@ import { useCallback, useState } from 'react'
 import { useApiClient } from './useApiClient'
 
 type ChangePasswordPayload = {
-  currentPassword: string
-  newPassword: string
+  current_password: string
+  new_password: string
 }
 
 type ChangePasswordResponse = {
