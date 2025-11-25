@@ -51,8 +51,20 @@ export const useProfiles = (
         setAllProfiles(transformedProfiles)
       }
       // Handle wrapped response (e.g., All Profiles, Daily Recommendations)
-      else if (response.status === 'success' && response.filteredProfiles) {
-        const transformedProfiles = transformApiProfiles(response.filteredProfiles)
+      else if (response.status === 'success') {
+        let profilesToTransform: ApiProfile[] = []
+        
+        if (response.filteredProfiles) {
+          profilesToTransform = response.filteredProfiles
+        } else if (response.shortlistedProfilesData) {
+          profilesToTransform = response.shortlistedProfilesData
+        } else if (response.ignoreListData) {
+          profilesToTransform = response.ignoreListData
+        } else {
+          throw new Error(response.message || 'No profile data found in response')
+        }
+        
+        const transformedProfiles = transformApiProfiles(profilesToTransform)
         setAllProfiles(transformedProfiles)
       } else {
         throw new Error(response.message || 'Failed to fetch profiles')

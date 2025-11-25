@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { BellAlertIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { DashboardSidebar } from '../dashboard/DashboardSidebar'
+import { NotificationCountContext } from '../../context/NotificationCountContext'
 
 export const DashboardLayout = () => {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const countContext = useContext(NotificationCountContext)
+  const notificationCount = countContext?.counts.total || 0
 
   // Close mobile menu on window resize to desktop and handle body scroll
   useEffect(() => {
@@ -107,10 +110,15 @@ export const DashboardLayout = () => {
               </button>
               <button
                 onClick={() => navigate('/dashboard/notification')}
-                className="rounded-full bg-white/15 p-2 text-white transition hover:bg-white/25"
+                className="relative rounded-full bg-white/15 p-2 text-white transition hover:bg-white/25"
                 aria-label="Notifications"
               >
                 <BellAlertIcon className="h-5 w-5" />
+                {notificationCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs font-semibold text-white">
+                    {notificationCount > 9 ? '9+' : notificationCount}
+                  </span>
+                )}
               </button>
             </div>
           </div>

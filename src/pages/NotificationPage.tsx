@@ -7,23 +7,43 @@ import {
   NoSymbolIcon,
 } from '@heroicons/react/24/outline'
 import { SparklesIcon } from '@heroicons/react/24/solid'
+import { useNotificationCountContext } from '../context/NotificationCountContext'
 
 type NotificationCategory = {
   id: string
   label: string
   route: string
+  count: number
   icon: React.ReactNode
   color: string
 }
 
 export const NotificationPage = () => {
   const navigate = useNavigate()
+  let counts = {
+    interestReceived: 0,
+    interestSent: 0,
+    unlockedProfiles: 0,
+    iDeclined: 0,
+    theyDeclined: 0,
+    shortlisted: 0,
+    ignored: 0,
+    blocked: 0,
+  }
+
+  try {
+    const context = useNotificationCountContext()
+    counts = context.counts
+  } catch {
+    // Context not available, use default counts
+  }
 
   const categories: NotificationCategory[] = [
     {
       id: 'interest-received',
       label: 'Interests Received',
       route: '/dashboard/interestreceived',
+      count: counts.interestReceived,
       icon: (
         <div className="relative">
           <HeartIcon className="h-8 w-8 text-pink-500" />
@@ -36,6 +56,7 @@ export const NotificationPage = () => {
       id: 'interest-sent',
       label: 'Interests Sent',
       route: '/dashboard/interestsent',
+      count: counts.interestSent,
       icon: <HeartIcon className="h-8 w-8 text-pink-500" />,
       color: 'hover:bg-pink-50 dark:hover:bg-pink-900/20',
     },
@@ -43,6 +64,7 @@ export const NotificationPage = () => {
       id: 'unlocked-profiles',
       label: 'Unlocked Profiles',
       route: '/dashboard/unlockedprofiles',
+      count: counts.unlockedProfiles,
       icon: (
         <div className="relative">
           <HeartIcon className="h-8 w-8 text-pink-500" />
@@ -55,6 +77,7 @@ export const NotificationPage = () => {
       id: 'i-declined',
       label: 'I Declined',
       route: '/dashboard/ideclined',
+      count: counts.iDeclined,
       icon: (
         <div className="relative">
           <HeartIcon className="h-8 w-8 text-orange-500" />
@@ -67,6 +90,7 @@ export const NotificationPage = () => {
       id: 'they-declined',
       label: 'They Declined',
       route: '/dashboard/theydeclined',
+      count: counts.theyDeclined,
       icon: (
         <svg
           className="h-8 w-8 text-pink-500"
@@ -85,6 +109,7 @@ export const NotificationPage = () => {
       id: 'shortlisted',
       label: 'Shortlisted Profiles',
       route: '/dashboard/shortlist',
+      count: counts.shortlisted,
       icon: (
         <div className="relative">
           <FlagIcon className="h-8 w-8 text-red-500" />
@@ -97,6 +122,7 @@ export const NotificationPage = () => {
       id: 'ignored',
       label: 'Ignored Profiles',
       route: '/dashboard/ignored',
+      count: counts.ignored,
       icon: (
         <div className="relative">
           <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-yellow-400" />
@@ -111,6 +137,7 @@ export const NotificationPage = () => {
       id: 'blocked',
       label: 'Blocked Profiles',
       route: '/dashboard/blocked',
+      count: counts.blocked,
       icon: (
         <div className="relative">
           <div className="h-8 w-8 rounded-full bg-red-500" />
@@ -146,6 +173,11 @@ export const NotificationPage = () => {
             <span className="flex-1 text-base font-medium text-slate-900 dark:text-white">
               {category.label}
             </span>
+            {category.count > 0 && (
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-xs font-semibold text-white">
+                {category.count > 9 ? '9+' : category.count}
+              </span>
+            )}
             <svg
               className="h-5 w-5 text-slate-400"
               fill="none"

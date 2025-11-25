@@ -3,7 +3,10 @@ export type ApiProfileResponse = {
   code: string
   status: string
   message: string
-  filteredProfiles: ApiProfile[]
+  filteredProfiles?: ApiProfile[]
+  shortlistedProfilesData?: ApiProfile[]
+  ignoreListData?: ApiProfile[]
+  notificationCount?: number
 }
 
 export type ApiProfile = {

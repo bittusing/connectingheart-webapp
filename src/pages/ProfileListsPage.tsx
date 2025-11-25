@@ -5,11 +5,18 @@ import { Pagination } from '../components/dashboard/Pagination'
 import { useProfileActions } from '../hooks/useProfileActions'
 import { Toast } from '../components/common/Toast'
 
+type SingleButtonConfig = {
+  label: string
+  icon?: React.ReactNode
+  actionType: 'unsend-interest' | 'unshortlist' | 'unignore'
+}
+
 type ProfileListTemplateProps = {
   title: string
   subtitle: string
   endpoint: string
   note?: string
+  singleButton?: SingleButtonConfig
 }
 
 type ToastVariant = 'success' | 'error'
@@ -20,12 +27,26 @@ type ToastMessage = {
   variant: ToastVariant
 }
 
-const ProfileListTemplate = ({ title, subtitle, endpoint, note }: ProfileListTemplateProps) => {
+const ProfileListTemplate = ({
+  title,
+  subtitle,
+  endpoint,
+  note,
+  singleButton,
+}: ProfileListTemplateProps) => {
   const [currentPage, setCurrentPage] = useState(1)
   const { profiles, loading, error, totalProfiles, totalPages, refetch } = useProfiles(endpoint, {
     page: currentPage,
   })
-  const { sendInterest, shortlistProfile, ignoreProfile, pendingAction } = useProfileActions()
+  const {
+    sendInterest,
+    shortlistProfile,
+    ignoreProfile,
+    unsendInterest,
+    unshortlistProfile,
+    unignoreProfile,
+    pendingAction,
+  } = useProfileActions()
   const [toasts, setToasts] = useState<ToastMessage[]>([])
 
   const handlePageChange = (page: number) => {
@@ -83,6 +104,41 @@ const ProfileListTemplate = ({ title, subtitle, endpoint, note }: ProfileListTem
         err instanceof Error
           ? err.message.replace('API ', '') || 'Unable to ignore profile.'
           : 'Unable to ignore profile.'
+      showToast(message, 'error')
+    }
+  }
+
+  const handleSingleButtonAction = async (profileId: string) => {
+    if (!singleButton) return
+
+    try {
+      let response
+      let successMessage = ''
+
+      switch (singleButton.actionType) {
+        case 'unsend-interest':
+          response = await unsendInterest(profileId)
+          successMessage = response?.message ?? 'Interest cancelled successfully.'
+          break
+        case 'unshortlist':
+          response = await unshortlistProfile(profileId)
+          successMessage = response?.message ?? 'Profile removed from shortlist successfully.'
+          break
+        case 'unignore':
+          response = await unignoreProfile(profileId)
+          successMessage = response?.message ?? 'Profile removed from ignored list successfully.'
+          break
+        default:
+          throw new Error('Unknown action type')
+      }
+
+      showToast(successMessage, 'success')
+      await refetch({ silent: true })
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message.replace('API ', '') || `Unable to ${singleButton.label.toLowerCase()}.`
+          : `Unable to ${singleButton.label.toLowerCase()}.`
       showToast(message, 'error')
     }
   }
@@ -155,9 +211,19 @@ const ProfileListTemplate = ({ title, subtitle, endpoint, note }: ProfileListTem
               <ProfileActionCard
                 key={profile.id}
                 profile={profile}
-                onSendInterest={handleSendInterest}
-                onShortlist={handleShortlist}
-                onIgnore={handleIgnore}
+                onSendInterest={singleButton ? undefined : handleSendInterest}
+                onShortlist={singleButton ? undefined : handleShortlist}
+                onIgnore={singleButton ? undefined : handleIgnore}
+                singleButton={
+                  singleButton
+                    ? {
+                        label: singleButton.label,
+                        icon: singleButton.icon,
+                        onClick: handleSingleButtonAction,
+                        actionType: singleButton.actionType,
+                      }
+                    : undefined
+                }
                 pendingActionType={pendingAction?.type}
                 pendingProfileId={pendingAction?.profileId}
               />
@@ -215,60 +281,75 @@ export const ProfileVisitorsPage = () => (
     endpoint="dashboard/getProfileVisitors"
   />
 )
+
+
+
 export const InterestReceivedPage = () => (
   <ProfileListTemplate
     title="Interests Received"
     subtitle="Profiles that have sent you interest."
-    endpoint="interest/getInterestReceived"
+    endpoint="interest/getInterests"
   />
 )
 export const InterestSentPage = () => (
   <ProfileListTemplate
     title="Interests Sent"
     subtitle="Profiles you have sent interest to."
-    endpoint="interest/getInterestSent"
+    endpoint="dashboard/getMyInterestedProfiles"
+    singleButton={{
+      label: 'Cancel Interest',
+      actionType: 'unsend-interest',
+    }}
   />
 )
 export const UnlockedProfilesPage = () => (
   <ProfileListTemplate
     title="Unlocked Profiles"
     subtitle="Profiles you have unlocked to view contact details."
-    endpoint="dashboard/getUnlockedProfiles"
+    endpoint="dashboard/getMyUnlockedProfiles"
   />
 )
 export const IDeclinedPage = () => (
   <ProfileListTemplate
     title="I Declined"
     subtitle="Profiles whose interest you have declined."
-    endpoint="interest/getIDeclined"
+    endpoint="dashboard/getMyDeclinedProfiles"
   />
 )
 export const TheyDeclinedPage = () => (
   <ProfileListTemplate
     title="They Declined"
     subtitle="Profiles that declined your interest."
-    endpoint="interest/getTheyDeclined"
+    endpoint="dashboard/getUsersWhoHaveDeclinedMe"
   />
 )
 export const ShortlistedProfilesPage = () => (
   <ProfileListTemplate
     title="Shortlisted Profiles"
     subtitle="Profiles you have saved for later review."
-    endpoint="dashboard/getShortlistedProfiles"
+    endpoint="dashboard/getMyShortlistedProfiles"
+    singleButton={{
+      label: 'Remove from Shortlist',
+      actionType: 'unshortlist',
+    }}
   />
 )
 export const IgnoredProfilesPage = () => (
   <ProfileListTemplate
     title="Ignored Profiles"
     subtitle="Profiles you have chosen to ignore."
-    endpoint="dashboard/getIgnoredProfiles"
+    endpoint="dashboard/getAllIgnoredProfiles"
+    singleButton={{
+      label: 'Remove',
+      actionType: 'unignore',
+    }}
   />
 )
 export const BlockedProfilesPage = () => (
   <ProfileListTemplate
     title="Blocked Profiles"
     subtitle="Profiles you have blocked from contacting you."
-    endpoint="dashboard/getBlockedProfiles"
+    endpoint="dashboard/getMyBlockedProfiles"
   />
 )
 

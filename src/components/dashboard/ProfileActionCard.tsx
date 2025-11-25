@@ -1,12 +1,21 @@
 import { useNavigate } from 'react-router-dom'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 import type { ProfileCardData } from '../../types/dashboard'
 import type { ProfileActionType } from '../../hooks/useProfileActions'
+
+type SingleButtonConfig = {
+  label: string
+  icon?: React.ReactNode
+  onClick: (profileId: string) => void
+  actionType: ProfileActionType
+}
 
 type ProfileActionCardProps = {
   profile: ProfileCardData
   onSendInterest?: (profileId: string) => void
   onShortlist?: (profileId: string) => void
   onIgnore?: (profileId: string) => void
+  singleButton?: SingleButtonConfig
   pendingActionType?: ProfileActionType | null
   pendingProfileId?: string | null
 }
@@ -22,6 +31,7 @@ export const ProfileActionCard = ({
   onSendInterest,
   onShortlist,
   onIgnore,
+  singleButton,
   pendingActionType,
   pendingProfileId,
 }: ProfileActionCardProps) => {
@@ -51,6 +61,13 @@ export const ProfileActionCard = ({
     }
 
     console.log(`Unhandled action: ${actionKey} for profile ${profile.id}`)
+  }
+
+  const handleSingleButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (singleButton) {
+      singleButton.onClick(profile.id)
+    }
   }
 
   return (
@@ -97,29 +114,46 @@ export const ProfileActionCard = ({
           <p className="text-xs text-white/70">{profile.location}</p>
         </div>
       </div>
-      <div className="grid grid-cols-3 divide-x divide-slate-200 text-center text-xs uppercase tracking-widest dark:divide-slate-800">
-        {actionButtons.map((action) => {
-          const isPending =
-            pendingActionType === action.key && pendingProfileId === profile.id
+      {singleButton ? (
+        <div className="border-t border-slate-200 dark:border-slate-800">
+          <button
+            onClick={handleSingleButtonClick}
+            disabled={
+              pendingActionType === singleButton.actionType && pendingProfileId === profile.id
+            }
+            className="flex w-full items-center justify-center gap-2 py-3 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-red-900/20"
+          >
+            {singleButton.icon || <XMarkIcon className="h-5 w-5" />}
+            {pendingActionType === singleButton.actionType && pendingProfileId === profile.id
+              ? 'Please wait...'
+              : singleButton.label}
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 divide-x divide-slate-200 text-center text-xs uppercase tracking-widest dark:divide-slate-800">
+          {actionButtons.map((action) => {
+            const isPending =
+              pendingActionType === action.key && pendingProfileId === profile.id
 
-          return (
-            <button
-              key={action.label}
-              onClick={(e) => handleActionClick(e, action.key)}
-              disabled={
-                (action.key === 'send-interest' && !onSendInterest) ||
-                (action.key === 'shortlist' && !onShortlist) ||
-                (action.key === 'ignore' && !onIgnore) ||
-                isPending
-              }
-              className="flex flex-col items-center gap-1 py-3 text-slate-600 transition hover:bg-pink-50 hover:text-pink-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-800"
-            >
-              <span className="text-base">{action.icon}</span>
-              {isPending ? 'Please wait...' : action.label}
-            </button>
-          )
-        })}
-      </div>
+            return (
+              <button
+                key={action.label}
+                onClick={(e) => handleActionClick(e, action.key)}
+                disabled={
+                  (action.key === 'send-interest' && !onSendInterest) ||
+                  (action.key === 'shortlist' && !onShortlist) ||
+                  (action.key === 'ignore' && !onIgnore) ||
+                  isPending
+                }
+                className="flex flex-col items-center gap-1 py-3 text-slate-600 transition hover:bg-pink-50 hover:text-pink-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                <span className="text-base">{action.icon}</span>
+                {isPending ? 'Please wait...' : action.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
     </article>
   )
 }
