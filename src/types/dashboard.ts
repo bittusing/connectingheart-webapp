@@ -32,6 +32,8 @@ export type StatTile = {
   value: number | string
   description?: string
   trend?: 'up' | 'down' | 'neutral'
+  href?: string
+  onClick?: () => void
 }
 
 // Profile card data structure

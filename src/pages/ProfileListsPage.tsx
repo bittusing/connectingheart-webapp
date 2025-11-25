@@ -352,4 +352,11 @@ export const BlockedProfilesPage = () => (
     endpoint="dashboard/getMyBlockedProfiles"
   />
 )
+export const JustJoinedPage = () => (
+  <ProfileListTemplate
+    title="Just Joined"
+    subtitle="New profiles that recently joined the platform."
+    endpoint="dashboard/getjustJoined"
+  />
+)
 

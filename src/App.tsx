@@ -16,6 +16,7 @@ import {
   ShortlistedProfilesPage,
   IgnoredProfilesPage,
   BlockedProfilesPage,
+  JustJoinedPage,
 } from './pages/ProfileListsPage'
 import { PolicyPage } from './pages/PolicyPage'
 import { RegisterPage } from './pages/RegisterPage'
@@ -53,6 +54,7 @@ function App() {
           <Route path="dashboard/profiles" element={<AllProfilesPage />} />
           <Route path="dashboard/recommendations" element={<DailyRecommendationsPage />} />
           <Route path="dashboard/visitors" element={<ProfileVisitorsPage />} />
+          <Route path="dashboard/justjoined" element={<JustJoinedPage />} />
           <Route path="dashboard/interestreceived" element={<InterestReceivedPage />} />
           <Route path="dashboard/interestsent" element={<InterestSentPage />} />
           <Route path="dashboard/unlockedprofiles" element={<UnlockedProfilesPage />} />
