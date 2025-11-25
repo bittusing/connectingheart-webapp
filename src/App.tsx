@@ -31,6 +31,7 @@ import { TermsConditionsPage } from './pages/TermsConditionsPage'
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
 import { VerificationPendingPage } from './pages/VerificationPendingPage'
 import { NotificationPage } from './pages/NotificationPage'
+import { MyProfilePage } from './pages/MyProfilePage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
           <Route path="dashboard/shortlist" element={<ShortlistedProfilesPage />} />
           <Route path="dashboard/ignored" element={<IgnoredProfilesPage />} />
           <Route path="dashboard/blocked" element={<BlockedProfilesPage />} />
+          <Route path="dashboard/myprofile" element={<MyProfilePage />} />
           <Route path="dashboard/profile/:id" element={<ProfileViewPage />} />
           <Route path="dashboard/membership" element={<MembershipPage />} />
           <Route path="dashboard/security" element={<ChangePasswordPage />} />

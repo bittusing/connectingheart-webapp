@@ -1,14 +1,24 @@
-import { useEffect, useState, useContext } from 'react'
-import { BellAlertIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import {
+  BellAlertIcon,
+  MagnifyingGlassIcon,
+  Bars3Icon,
+  XMarkIcon,
+  HomeIcon,
+  SparklesIcon,
+  UserGroupIcon,
+  CreditCardIcon,
+} from '@heroicons/react/24/outline'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { DashboardSidebar } from '../dashboard/DashboardSidebar'
-import { NotificationCountContext } from '../../context/NotificationCountContext'
+import { NotificationCountProvider } from '../../context/NotificationCountContext'
+import { useNotificationCounts } from '../../hooks/useNotificationCounts'
 
 export const DashboardLayout = () => {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const countContext = useContext(NotificationCountContext)
-  const notificationCount = countContext?.counts.total || 0
+  const { counts, loading, refetch } = useNotificationCounts()
+  const notificationCount = counts.total || 0
 
   // Close mobile menu on window resize to desktop and handle body scroll
   useEffect(() => {
@@ -52,19 +62,27 @@ export const DashboardLayout = () => {
     }
   }, [sidebarOpen])
 
-  return (
-    <div className="flex min-h-screen bg-slate-50">
+  const mobileNavItems = [
+    { label: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+    { label: 'Search', href: '/dashboard/search', icon: MagnifyingGlassIcon },
+    { label: 'Daily Picks', href: '/dashboard/recommendations', icon: SparklesIcon },
+    { label: 'Profiles', href: '/dashboard/profiles', icon: UserGroupIcon },
+    { label: 'Membership', href: '/dashboard/membership', icon: CreditCardIcon },
+  ]
+
+  const LayoutContent = (
+    <div className="flex min-h-screen bg-slate-50 pb-20 lg:pb-0">
       {/* Desktop Sidebar - Always visible on left */}
       <aside className="hidden lg:block lg:w-72 lg:flex-shrink-0">
         <div className="fixed left-0 top-0 h-screen w-72 overflow-y-auto bg-slate-900 p-6 text-slate-200">
-          <DashboardSidebar />
+          <DashboardSidebar showUserProfile={true} />
         </div>
       </aside>
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/50 transition-opacity lg:hidden"
+          className="fixed inset-0 z-[55] bg-black/50 transition-opacity lg:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />
@@ -72,7 +90,7 @@ export const DashboardLayout = () => {
 
       {/* Mobile sidebar drawer */}
       <div
-        className={`mobile-sidebar fixed inset-y-0 left-0 z-50 w-72 transform overflow-y-auto bg-slate-900 p-6 text-slate-200 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`mobile-sidebar fixed inset-y-0 left-0 z-[60] w-72 transform overflow-y-auto bg-slate-900 p-6 text-slate-200 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -83,7 +101,7 @@ export const DashboardLayout = () => {
         >
           <XMarkIcon className="h-6 w-6" />
         </button>
-        <DashboardSidebar />
+        <DashboardSidebar showUserProfile={true} />
       </div>
 
       {/* Main content area */}
@@ -125,11 +143,38 @@ export const DashboardLayout = () => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 px-4 py-8 lg:px-6 lg:py-12">
+        <main className="flex-1 px-4 py-8 pb-28 lg:px-6 lg:py-12 lg:pb-12">
           <Outlet />
         </main>
       </div>
     </div>
+  )
+
+  return (
+    <NotificationCountProvider counts={counts} loading={loading} refetch={refetch}>
+      {LayoutContent}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white shadow-[0_-8px_24px_rgba(0,0,0,0.08)] dark:border-slate-800 dark:bg-slate-900 lg:hidden">
+        <div className="mx-auto grid max-w-4xl grid-cols-5 gap-1 px-2 py-2">
+          {mobileNavItems.map((item) => (
+            <NavLink
+              key={item.href}
+              to={item.href}
+              className={({ isActive }) =>
+                [
+                  'flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[10px] font-medium transition',
+                  isActive
+                    ? 'bg-pink-50 text-pink-600 dark:bg-pink-900/20 dark:text-pink-300'
+                    : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800',
+                ].join(' ')
+              }
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="leading-tight">{item.label}</span>
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+    </NotificationCountProvider>
   )
 }
 

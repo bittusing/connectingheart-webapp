@@ -20,23 +20,7 @@ type NotificationCategory = {
 
 export const NotificationPage = () => {
   const navigate = useNavigate()
-  let counts = {
-    interestReceived: 0,
-    interestSent: 0,
-    unlockedProfiles: 0,
-    iDeclined: 0,
-    theyDeclined: 0,
-    shortlisted: 0,
-    ignored: 0,
-    blocked: 0,
-  }
-
-  try {
-    const context = useNotificationCountContext()
-    counts = context.counts
-  } catch {
-    // Context not available, use default counts
-  }
+  const { counts } = useNotificationCountContext()
 
   const categories: NotificationCategory[] = [
     {

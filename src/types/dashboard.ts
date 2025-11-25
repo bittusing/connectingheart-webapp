@@ -62,7 +62,7 @@ export type UserProfileSummary = {
   name: string
   avatar?: string | null
   completionPercentage: number
-  membershipTier?: 'Free' | 'Essential' | 'Signature' | 'Elite Concierge'
+  membershipTier?: string
   lookingFor?: string
   lookingForAvatar?: string | null
 }
