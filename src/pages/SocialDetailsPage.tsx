@@ -156,11 +156,23 @@ export const SocialDetailsPage = () => {
   }
 
   const getPickerOptions = (field: PickerField): string[] => {
+    // Map current religion label to its lookup code (e.g. "Hindu" -> "hin")
+    const currentReligionCode =
+      lookupData.religion?.find((r) => r.label === formData.religion)?.value ??
+      formData.religion.toLowerCase().slice(0, 3)
+
     switch (field) {
       case 'motherTongue':
         return lookupData.motherTongue?.map((m) => m.label) || ['Hindi', 'English', 'Tamil', 'Telugu']
       case 'caste':
-        return lookupData.casts?.map((c) => c.label) || ['Brahmin', 'Rajput', 'Kayastha']
+        return (
+          lookupData.casts
+            ?.filter((c) => {
+              const anyCast = c as unknown as { religion?: string }
+              return !anyCast.religion || anyCast.religion === currentReligionCode
+            })
+            .map((c) => c.label) || ['Brahmin', 'Rajput', 'Kayastha']
+        )
       case 'horoscope':
         return lookupData.horoscopes?.map((h) => h.label) || ['Aries', 'Leo', 'Pisces']
       case 'manglik':
@@ -193,7 +205,10 @@ export const SocialDetailsPage = () => {
         break
       }
       case 'caste': {
-        const selected = lookupData.casts?.find((c) => c.label === value)
+        const normalizedValue = value.trim().toLowerCase()
+        const selected = lookupData.casts?.find(
+          (c) => c.label.trim().toLowerCase() === normalizedValue,
+        )
         setFormData((prev) => ({ ...prev, cast: selected?.value || value }))
         break
       }
@@ -212,8 +227,16 @@ export const SocialDetailsPage = () => {
   }
 
   const maritalOptions =
-    lookupData.maritalStatus?.map((m) => m.label) || ['Never married', 'Divorced', 'Widowed', 'Annulled', 'Pending divorce']
-  const religionOptions = ['Hindu', 'Muslim', 'Christian', 'Sikh', 'Buddhist', 'Jain', 'Parsi', 'Others']
+    lookupData.maritalStatus?.map((m) => m.label) || [
+      'Never married',
+      'Divorced',
+      'Widowed',
+      'Annulled',
+      'Pending divorce',
+    ]
+
+  const religionOptions =
+    lookupData.religion?.map((r) => r.label) || ['Hindu', 'Muslim', 'Christian', 'Sikh', 'Buddhist', 'Jain', 'Parsi', 'Others']
 
   const renderPickerModal = () => {
     if (!activePicker) return null

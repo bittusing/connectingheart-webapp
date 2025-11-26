@@ -631,7 +631,7 @@ export const PersonalDetailsPage = () => {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-100 bg-white/90 p-5 shadow-inner">
+          {/* <div className="rounded-3xl border border-slate-100 bg-white/90 p-5 shadow-inner">
             <button
               type="button"
               className="flex w-full items-center justify-between text-left"
@@ -763,7 +763,7 @@ export const PersonalDetailsPage = () => {
                 />
               </div>
             )}
-          </div>
+          </div> */}
 
           <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
             <button

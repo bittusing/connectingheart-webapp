@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/common/Button'
-import { FormPageLayout } from '../components/forms/FormPageLayout'
 import { useApiClient } from '../hooks/useApiClient'
 import { useUpdateLastActiveScreen } from '../hooks/useUpdateLastActiveScreen'
 import { useUserProfile } from '../hooks/useUserProfile'
@@ -296,15 +295,31 @@ export const PartnerPreferencesPage = () => {
 
   if (profileLoading || pageLoading) {
     return (
-      <FormPageLayout title="Partner Preferences" subtitle="Update your ideal partner criteria.">
-        <div className="py-10 text-center text-sm text-slate-600">Loading partner preferences...</div>
-      </FormPageLayout>
+      <section className="min-h-screen bg-gradient-to-b from-[#f8f2ff] via-white to-white py-10">
+        <div className="mx-auto w-full max-w-2xl rounded-[32px] bg-white/95 p-8 text-center shadow-[0_25px_70px_rgba(67,56,202,0.15)]">
+          <p className="text-sm text-slate-600">Loading partner preferences...</p>
+        </div>
+      </section>
     )
   }
 
   return (
-    <FormPageLayout title="Partner Preferences" subtitle="Update your ideal partner criteria.">
-      <form className="space-y-8" onSubmit={handleSubmit}>
+    <section className="min-h-screen bg-gradient-to-b from-[#f8f2ff] via-white to-white py-10">
+      <div className="mx-auto w-full max-w-2xl rounded-[32px] bg-white/95 p-8 shadow-[0_25px_70px_rgba(67,56,202,0.15)]">
+        <div className="space-y-4 text-center">
+          <div className="h-2 rounded-full bg-slate-100">
+            <div className="h-full w-[84%] rounded-full bg-gradient-to-r from-[#ff4f8b] to-[#ffa0d2]" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-pink-500">
+              Step 6 of 7
+            </p>
+            <h1 className="text-2xl font-semibold text-slate-900">Partner Preferences</h1>
+            <p className="text-sm text-slate-500">Update your ideal partner criteria.</p>
+          </div>
+        </div>
+
+        <form className="mt-8 space-y-8" onSubmit={handleSubmit}>
         <RangeGroup
           label="Age"
           minLabel="Min Age"
@@ -416,20 +431,21 @@ export const PartnerPreferencesPage = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => navigate('/dashboard/familydetails', { replace: true })}
-          >
-            ← Back
-          </Button>
-          <Button type="submit" size="lg" disabled={submitting}>
-            {submitting ? 'Saving...' : 'Next'}
-          </Button>
-        </div>
-      </form>
-    </FormPageLayout>
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate('/dashboard/familydetails', { replace: true })}
+            >
+              ← Back
+            </Button>
+            <Button type="submit" size="lg" disabled={submitting}>
+              {submitting ? 'Saving...' : 'Next'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </section>
   )
 
   function handleToggle(key: MultiValueKey, value: string) {
@@ -528,6 +544,7 @@ const MultiSelectField = ({
   selectedValues: string[]
   onChange: (values: string[]) => void
 }) => {
+  const [isOpen, setIsOpen] = useState(false)
   const availableOptions = options.filter((option) => !selectedValues.includes(option.value as string))
 
   const handleRemove = (value: string) => {
@@ -537,12 +554,13 @@ const MultiSelectField = ({
   const handleAdd = (value: string) => {
     if (!value) return
     onChange([...selectedValues, value])
+    setIsOpen(false)
   }
 
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-slate-600">{label}</p>
-      <div className="rounded-2xl border border-slate-200 bg-white p-3">
+      <div className="relative rounded-2xl border border-slate-200 bg-white p-3">
         <div className="flex flex-wrap gap-2">
           {selectedValues.map((value) => {
             const option = options.find((item) => item.value === value)
@@ -564,22 +582,28 @@ const MultiSelectField = ({
               </span>
             )
           })}
-          <select
-            defaultValue=""
-            className="min-w-[160px] flex-1 rounded-full border border-dashed border-slate-300 px-3 py-1 text-sm text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
-            onChange={(event) => {
-              handleAdd(event.target.value)
-              event.currentTarget.value = ''
-            }}
+          <button
+            type="button"
+            className="min-w-[160px] flex-1 rounded-full border border-dashed border-slate-300 px-3 py-1 text-left text-sm text-slate-500 hover:border-pink-400 hover:text-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
+            onClick={() => setIsOpen((prev) => !prev)}
           >
-            <option value="">{availableOptions.length ? placeholder : 'No options available'}</option>
-            {availableOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            {availableOptions.length ? placeholder : 'No options available'}
+          </button>
         </div>
+        {isOpen && availableOptions.length > 0 && (
+          <div className="absolute left-3 right-3 top-full z-20 mt-2 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 text-sm shadow-lg">
+            {availableOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className="flex w-full items-center justify-between px-3 py-2 text-left text-slate-700 hover:bg-pink-50"
+                onClick={() => handleAdd(option.value as string)}
+              >
+                <span>{option.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

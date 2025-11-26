@@ -482,6 +482,7 @@ const MultiSelectField = ({
   selectedValues: string[]
   onChange: (values: string[]) => void
 }) => {
+  const [isOpen, setIsOpen] = useState(false)
   const availableOptions = options.filter((option) => !selectedValues.includes(option.value))
 
   const handleRemove = (value: string) => {
@@ -491,12 +492,13 @@ const MultiSelectField = ({
   const handleAdd = (value: string) => {
     if (!value) return
     onChange([...selectedValues, value])
+    setIsOpen(false)
   }
 
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-slate-600">{label}</p>
-      <div className="rounded-2xl border border-slate-200 bg-white p-3">
+      <div className="relative rounded-2xl border border-slate-200 bg-white p-3">
         <div className="flex flex-wrap gap-2">
           {selectedValues.map((value) => {
             const option = options.find((item) => item.value === value)
@@ -518,22 +520,28 @@ const MultiSelectField = ({
               </span>
             )
           })}
-          <select
-            defaultValue=""
-            className="min-w-[160px] flex-1 rounded-full border border-dashed border-slate-300 px-3 py-1 text-sm text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
-            onChange={(event) => {
-              handleAdd(event.target.value)
-              event.currentTarget.value = ''
-            }}
+          <button
+            type="button"
+            className="min-w-[160px] flex-1 rounded-full border border-dashed border-slate-300 px-3 py-1 text-left text-sm text-slate-500 hover:border-pink-400 hover:text-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
+            onClick={() => setIsOpen((prev) => !prev)}
           >
-            <option value="">{availableOptions.length ? placeholder : 'No options available'}</option>
-            {availableOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            {availableOptions.length ? placeholder : 'No options available'}
+          </button>
         </div>
+        {isOpen && availableOptions.length > 0 && (
+          <div className="absolute left-3 right-3 top-full z-20 mt-2 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 text-sm shadow-lg">
+            {availableOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className="flex w-full items-center justify-between px-3 py-2 text-left text-slate-700 hover:bg-pink-50"
+                onClick={() => handleAdd(option.value)}
+              >
+                <span>{option.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

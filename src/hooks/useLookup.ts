@@ -56,6 +56,19 @@ const normalizeOption = (option: LookupOption | string | number | undefined | nu
 const normalizeOptions = (payload: GenericOptionResponse): LookupOption[] => {
   if (!payload) return []
   if (Array.isArray(payload)) {
+    // Special cases: state / city lookup come as [{ country_id, states: [...] }] or [{ state_id, cities: [...] }]
+    const first = payload[0] as { states?: unknown; cities?: unknown } | undefined
+    if (first?.states && Array.isArray(first.states)) {
+      return (first.states as LookupOption[])
+        .map((option) => normalizeOption(option))
+        .filter((option): option is LookupOption => Boolean(option))
+    }
+    if (first?.cities && Array.isArray(first.cities)) {
+      return (first.cities as LookupOption[])
+        .map((option) => normalizeOption(option))
+        .filter((option): option is LookupOption => Boolean(option))
+    }
+
     return payload
       .map((option) => normalizeOption(option))
       .filter((option): option is LookupOption => Boolean(option))
