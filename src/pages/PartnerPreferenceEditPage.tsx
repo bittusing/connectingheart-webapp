@@ -230,7 +230,7 @@ export const PartnerPreferenceEditPage = () => {
 
   if (pageLoading) {
     return (
-      <section className="section-shell">
+      <section className="section-shell pt-10 pb-12 sm:pt-12 lg:py-24">
         <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
           <p className="text-sm font-medium text-slate-500">Loading partner preferences...</p>
         </div>
@@ -239,7 +239,7 @@ export const PartnerPreferenceEditPage = () => {
   }
 
   return (
-    <section className="section-shell">
+    <section className="section-shell pt-10 pb-16 sm:pt-12 lg:py-24">
       <div className="space-y-6">
         <header className="rounded-3xl border border-pink-100 bg-white px-6 py-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

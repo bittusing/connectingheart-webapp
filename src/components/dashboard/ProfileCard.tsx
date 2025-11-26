@@ -56,15 +56,15 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
   return (
     <article
       onClick={handleCardClick}
-      className="group flex min-w-[280px] cursor-pointer flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 md:flex-row"
+      className="group flex h-[320px] w-[300px] cursor-pointer flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 md:flex-row md:h-[280px] md:w-[420px]"
     >
-      <div className="relative w-full bg-slate-100 dark:bg-slate-900 md:w-1/2">
-        <div className="flex h-64 items-center justify-center p-2 md:h-full">
+      <div className="relative h-[160px] w-full bg-slate-100 dark:bg-slate-900 md:h-full md:w-[200px]">
+        <div className="flex h-full w-full items-center justify-center p-2">
           {profile.avatar ? (
             <img
               src={profile.avatar}
               alt={profile.name}
-              className="max-h-[360px] w-full object-contain"
+              className="h-full w-full object-contain"
               loading="lazy"
             />
           ) : (
@@ -72,9 +72,9 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
           )}
         </div>
         {profile.verified && (
-          <div className="absolute right-3 top-3 rounded-full bg-emerald-500 p-1.5 shadow-md">
+          <div className="absolute right-2 top-2 rounded-full bg-emerald-500 p-1 shadow-md">
             <svg
-              className="h-4 w-4 text-white"
+              className="h-3.5 w-3.5 text-white"
               viewBox="0 0 20 20"
               fill="currentColor"
               xmlns="http://www.w3.org/2000/svg"
@@ -89,10 +89,9 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 text-slate-600 dark:text-slate-300">
-        <div className="space-y-1">
-          
-          <p className="text-lg font-semibold text-slate-900 dark:text-white">{profile.name}</p>
+      <div className="flex flex-1 flex-col justify-center gap-3 p-4 text-slate-600 dark:text-slate-300">
+        <div className="space-y-1 text-center md:text-left">
+          <p className="text-base font-semibold text-slate-900 dark:text-white">{profile.name}</p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {profile.age} yrs • {profile.height}
           </p>
@@ -103,7 +102,7 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
 
         <Button
           size="md"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-pink-500 py-3 font-semibold text-white shadow-lg shadow-pink-500/30 transition hover:bg-pink-600"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-pink-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-pink-500/30 transition hover:bg-pink-600"
           onClick={handleButtonClick}
         >
           <EyeIcon className="h-4 w-4" />

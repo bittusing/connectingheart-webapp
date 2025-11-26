@@ -37,7 +37,7 @@ export const DashboardPage = () => {
   }, [justJoinedCount, justJoinedLoading])
 
   return (
-  <div className="space-y-8">
+  <div className="space-y-6">
       <DashboardHero profile={heroProfile} />
       <StatsGrid tiles={tilesWithCounts} />
     <SectionRail />

@@ -4,6 +4,7 @@ import { ChevronDownIcon, CheckIcon } from '@heroicons/react/24/outline'
 import { Button } from '../components/common/Button'
 import { useLookupOptions } from '../hooks/useLookupOptions'
 import { useCountryLookup } from '../hooks/useCountryLookup'
+import { useApiClient } from '../hooks/useApiClient'
 import type { LookupOption, ProfileSearchPayload } from '../types/api'
 
 type SelectFieldProps = {
@@ -180,13 +181,24 @@ const initialRangeFilters: Record<'age' | 'height' | 'income', RangeState> = {
   income: { min: '', max: '' },
 }
 
+type SearchByProfileResponse = {
+  code: string
+  status: string
+  message?: string
+  filteredProfile?: {
+    clientID?: string
+  }
+}
+
 export const SearchPage = () => {
   const navigate = useNavigate()
+  const api = useApiClient()
   const [profileSuffix, setProfileSuffix] = useState('')
   const [multiFilters, setMultiFilters] = useState(initialMultiFilters)
   const [rangeFilters, setRangeFilters] = useState(initialRangeFilters)
   const [profileError, setProfileError] = useState<string | null>(null)
   const [advancedError, setAdvancedError] = useState<string | null>(null)
+  const [profileSearchLoading, setProfileSearchLoading] = useState(false)
   const { options, loading } = useLookupOptions()
   const { countries, loading: countryLoading } = useCountryLookup()
 
@@ -202,7 +214,7 @@ export const SearchPage = () => {
     [options],
   )
 
-  const handleProfileSearch = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleProfileSearch = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const cleanSuffix = profileSuffix.replace(/[^0-9]/g, '')
     if (!cleanSuffix) {
@@ -211,10 +223,23 @@ export const SearchPage = () => {
     }
     setProfileError(null)
     setAdvancedError(null)
-    const payload: ProfileSearchPayload = {
-      profileId: `HEARTS-${cleanSuffix}`,
+    setProfileSearchLoading(true)
+    try {
+      const response = await api.get<SearchByProfileResponse>(`auth/searchByProfileID/${cleanSuffix}`)
+      const clientId = response.filteredProfile?.clientID
+      if (response.status === 'success' && clientId) {
+        navigate(`/dashboard/profile/${clientId}`)
+        return
+      }
+      const message = response.message || 'Profile not found. Please verify the HEARTS ID.'
+      setProfileError(message)
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message.replace('API ', '') : 'Unable to search by profile ID right now.'
+      setProfileError(message)
+    } finally {
+      setProfileSearchLoading(false)
     }
-    navigate('/dashboard/search/results', { state: { filters: payload } })
   }
 
   const handleAdvancedSearch = (event: React.FormEvent<HTMLFormElement>) => {
@@ -316,8 +341,8 @@ export const SearchPage = () => {
             {profileError && <p className="text-xs text-red-500">{profileError}</p>}
           </div>
           <div className="flex items-end">
-            <Button type="submit" className="w-full">
-              Search
+            <Button type="submit" className="w-full" disabled={profileSearchLoading}>
+              {profileSearchLoading ? 'Searching...' : 'Search'}
             </Button>
           </div>
         </div>

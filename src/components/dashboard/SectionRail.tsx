@@ -147,9 +147,9 @@ export const SectionRail = () => {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
     {sections.map((section) => (
-        <div key={section.id} className="space-y-5">
+        <div key={section.id} className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-widest text-slate-400">

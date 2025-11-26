@@ -147,7 +147,7 @@ export const DashboardLayout = () => {
 
         {/* Page content */}
         <main
-          className={`flex-1 px-4 py-8 ${showBottomNav ? 'pb-28' : 'pb-12'} lg:px-6 lg:py-12 lg:pb-12`}
+          className={`flex-1 px-4 pt-4 pb-8 ${showBottomNav ? 'pb-28' : 'pb-12'} lg:px-6 lg:pt-6 lg:pb-12`}
         >
           <Outlet />
         </main>
