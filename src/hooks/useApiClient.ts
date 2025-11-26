@@ -49,9 +49,15 @@ export const useApiClient = () => {
             const errorPayload = await response.json()
             console.log("errorPayload",errorPayload);
             // Handle structured error responses
-            if (errorPayload.message) {
-              errorMessage = errorPayload.message
+            // Check if err is a string (e.g., "User data not found. Please signup to proceed.")
+            if (typeof errorPayload.err === 'string') {
+              errorMessage = errorPayload.err
             }
+            // Check if err is an object with msg property
+            else if (errorPayload.err?.msg) {
+              errorMessage = errorPayload.err.msg
+            }
+            // Check for redirectToMembership in err object
             else if((errorPayload.err as any)?.redirectToMembership) {
               const membershipMessage = errorPayload.err?.msg || 'Please renew your membership in order to unlock further profiles.'
               showToast(membershipMessage, 'error')
@@ -60,11 +66,16 @@ export const useApiClient = () => {
                 navigate('/dashboard/membership')
               }, 500)
             }
-            else if (errorPayload.err?.msg) {
-              errorMessage = errorPayload.err.msg
-            } else if (errorPayload.error) {
+            // Check for message property
+            else if (errorPayload.message) {
+              errorMessage = errorPayload.message
+            }
+            // Check for error property
+            else if (errorPayload.error) {
               errorMessage = errorPayload.error
-            } else if (typeof errorPayload === 'string') {
+            }
+            // If errorPayload itself is a string
+            else if (typeof errorPayload === 'string') {
               errorMessage = errorPayload
             }
           } else {
@@ -86,7 +97,7 @@ export const useApiClient = () => {
 
       return (await response.json()) as TResponse
     },
-    [baseUrl],
+    [baseUrl, navigate],
   )
 
   const withBody = useCallback(

@@ -75,7 +75,15 @@ export const LoginPage = () => {
     if (error instanceof Error) {
       const errorMessage = error.message
       
-      // Parse API error messages
+      // First, extract the actual API error message (remove "API 400: " prefix)
+      const extractedMessage = errorMessage.replace(/^API \d+:?\s*/, '').trim()
+      
+      // If we have a meaningful extracted message (not just status text), use it directly
+      if (extractedMessage && extractedMessage !== 'Bad Request' && extractedMessage !== 'Unauthorized' && extractedMessage !== 'Unknown error') {
+        return extractedMessage
+      }
+      
+      // Fallback to generic messages only if no specific message was extracted
       if (errorMessage.includes('password') || errorMessage.toLowerCase().includes('incorrect password')) {
         return 'Incorrect password. Please try again.'
       }
@@ -89,8 +97,8 @@ export const LoginPage = () => {
         return 'Invalid credentials. Please check your mobile number and password.'
       }
       
-      // Remove "API " prefix if present
-      return errorMessage.replace(/^API \d+:?\s*/, '').trim() || 'Login failed. Please try again.'
+      // Final fallback
+      return extractedMessage || 'Login failed. Please try again.'
     }
     return 'Login failed. Please try again.'
   }
