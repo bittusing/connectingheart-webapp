@@ -225,7 +225,7 @@ export const RegisterPage = () => {
     <section className="section-shell">
       <div className="grid gap-8 lg:grid-cols-2">
         <div
-          className="hidden rounded-3xl bg-cover bg-center lg:block"
+          className="hidden min-h-[70vh] rounded-3xl bg-cover bg-center lg:block"
           style={{ backgroundImage: "url('/homeScreenPic.png')" }}
         />
         <div className="glass-panel space-y-8">

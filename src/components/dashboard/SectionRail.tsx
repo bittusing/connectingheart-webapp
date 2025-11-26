@@ -256,9 +256,18 @@ export const SectionRail = () => {
     )
   }
 
+  // Filter out sections with 0 total (only after loading is complete)
+  const visibleSections = loading 
+    ? sections 
+    : sections.filter((section) => section.total > 0)
+
+  if (visibleSections.length === 0 && !loading) {
+    return null
+  }
+
   return (
     <div className="space-y-8">
-    {sections.map((section) => (
+    {visibleSections.map((section) => (
         <div key={section.id} className="space-y-4">
         <div className="flex items-center justify-between">
           <div>

@@ -18,51 +18,41 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
+// Permanent light mode - always return 'light'
 const getInitialTheme = (): Theme => {
-  if (typeof window === 'undefined') return 'light'
-  const stored = window.localStorage.getItem('connectingheart-theme') as Theme
-  if (stored) return stored
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light'
+  return 'light'
 }
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme)
+  // Force permanent light mode
+  const [theme] = useState<Theme>('light')
 
   const applyThemeClass = useCallback((value: Theme) => {
-    document.documentElement.classList.toggle('dark', value === 'dark')
+    // Always ensure dark class is removed for permanent light mode
+    document.documentElement.classList.remove('dark')
   }, [])
 
   useEffect(() => {
-    applyThemeClass(theme)
-    window.localStorage.setItem('connectingheart-theme', theme)
-  }, [applyThemeClass, theme])
+    // Always apply light theme on mount
+    applyThemeClass('light')
+    // Remove any stored theme preference
+    window.localStorage.removeItem('connectingheart-theme')
+  }, [applyThemeClass])
 
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const handler = (event: MediaQueryListEvent) =>
-      setThemeState(event.matches ? 'dark' : 'light')
-
-    media.addEventListener('change', handler)
-    return () => media.removeEventListener('change', handler)
+  // Disable theme switching - no-op functions
+  const setTheme = useCallback(() => {
+    // No-op: theme is permanently light
   }, [])
-
-  const setTheme = useCallback(
-    (value: Theme) => {
-      setThemeState(value)
-      applyThemeClass(value)
-    },
-    [applyThemeClass],
-  )
 
   const value = useMemo(
     () => ({
-      theme,
-      toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light'),
+      theme: 'light' as const,
+      toggleTheme: () => {
+        // No-op: theme is permanently light
+      },
       setTheme,
     }),
-    [setTheme, theme],
+    [setTheme],
   )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
