@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useApiClient } from './useApiClient'
 
 type UserProfilePicture = {
@@ -49,8 +49,11 @@ export const useUserProfile = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const hasFetchedRef = useRef(false)
 
   const fetchProfile = useCallback(async () => {
+    if (hasFetchedRef.current) return
+    
     try {
       setLoading(true)
       setError(null)
@@ -58,10 +61,13 @@ export const useUserProfile = () => {
       const response = await get<UserProfileResponse>('auth/getUser')
 
       if (response.status === 'success' && response.data) {
-        setProfile({
+        const userProfile = {
           ...response.data,
           avatarUrl: buildAvatarUrl(response.data.profilePic, response.data._id),
-        })
+        }
+        setProfile(userProfile)
+        hasFetchedRef.current = true
+        return userProfile
       } else {
         throw new Error(response.message || 'Failed to fetch user profile.')
       }
@@ -69,14 +75,20 @@ export const useUserProfile = () => {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load user profile.'
       setError(errorMessage)
       console.error('Error fetching user profile:', err)
+      throw err
     } finally {
       setLoading(false)
     }
   }, [get])
 
   useEffect(() => {
-    fetchProfile()
-  }, [fetchProfile])
+    if (!hasFetchedRef.current) {
+      fetchProfile().catch(() => {
+        // Error already handled in fetchProfile
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run once on mount
 
   return {
     profile,

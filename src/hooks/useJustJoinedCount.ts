@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useApiClient } from './useApiClient'
 import type { ApiProfileResponse } from '../types/api'
 
@@ -7,8 +7,11 @@ export const useJustJoinedCount = () => {
   const [count, setCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const hasFetchedRef = useRef(false)
 
   const fetchCount = useCallback(async () => {
+    if (hasFetchedRef.current) return
+    
     try {
       setLoading(true)
       setError(null)
@@ -20,6 +23,7 @@ export const useJustJoinedCount = () => {
       } else {
         setCount(0)
       }
+      hasFetchedRef.current = true
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch just joined count'
       setError(errorMessage)
@@ -31,8 +35,11 @@ export const useJustJoinedCount = () => {
   }, [get])
 
   useEffect(() => {
-    fetchCount()
-  }, [fetchCount])
+    if (!hasFetchedRef.current) {
+      fetchCount()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run once on mount
 
   return {
     count,

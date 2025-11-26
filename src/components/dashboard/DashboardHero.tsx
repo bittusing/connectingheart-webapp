@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import type { UserProfileSummary } from '../../types/dashboard'
 
 type DashboardHeroProps = {
@@ -59,7 +59,11 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
           <p className="text-xs uppercase tracking-[0.4em] text-white/80">Activate Your Plan</p>
           <div className="mt-3 rounded-2xl bg-white/20 px-6 py-3 backdrop-blur-sm">
             <p className="text-2xl font-semibold">{displayProfile.membershipTier}</p>
-            <p className="mt-1 text-xs text-white/80">Upgrade for premium features</p>
+            {/* how to navigate to membership page */}
+            <Link to="/dashboard/membership" className="text-xs text-white/80">
+              <p className="mt-1 text-xs text-white/80">Upgrade for premium features</p>
+            </Link>
+            
           </div>
         </div>
         <button

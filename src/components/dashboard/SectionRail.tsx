@@ -62,8 +62,12 @@ export const SectionRail = () => {
 
   useEffect(() => {
     let isMounted = true
+    let hasFetched = false
 
     const fetchSections = async () => {
+      if (hasFetched) return
+      hasFetched = true
+
       try {
         setLoading(true)
 
@@ -92,7 +96,9 @@ export const SectionRail = () => {
               const cardsLimit = config.limit ?? 6
               const limitedProfiles = profiles.slice(0, cardsLimit)
 
-              const casteOptions = lookupData.casts
+              // Get current lookup data (may be empty on first render, that's okay)
+              const currentLookupData = lookupData
+              const casteOptions = currentLookupData.casts
 
               // Build quick lookup maps
               const casteLabelMap: Record<string, string> = {}
@@ -228,7 +234,8 @@ export const SectionRail = () => {
     return () => {
       isMounted = false
     }
-  }, [get, fetchLookup, fetchStates, fetchCities, lookupData, countryOptions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run once on mount
 
   const scroll = (sectionId: string, direction: 'left' | 'right') => {
     const container = scrollRefs.current[sectionId]
