@@ -92,7 +92,7 @@ export const SectionRail = () => {
               const cardsLimit = config.limit ?? 6
               const limitedProfiles = profiles.slice(0, cardsLimit)
 
-              const { castes: casteOptions } = lookupData
+              const casteOptions = lookupData.casts
 
               // Build quick lookup maps
               const casteLabelMap: Record<string, string> = {}

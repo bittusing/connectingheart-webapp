@@ -1,9 +1,8 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { EyeIcon } from '@heroicons/react/24/outline'
 import type { ProfileCardData } from '../../types/dashboard'
 import { Button } from '../common/Button'
-import { useLookup } from '../../hooks/useLookup'
 
 type ProfileCardProps = {
   profile: ProfileCardData
@@ -35,30 +34,11 @@ const PlaceholderAvatar = ({ gender }: { gender?: string }) => (
 
 export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps) => {
   const navigate = useNavigate()
-  const { lookupData, fetchLookup } = useLookup()
-
-  useEffect(() => {
-    if (!lookupData.casts || lookupData.casts.length === 0) {
-      void fetchLookup()
-    }
-  }, [lookupData.casts, fetchLookup])
 
   const compactLocation = useMemo(() => {
     if (!profile.location) return 'Location not available'
     return profile.location.split(',').slice(0, 3).join(', ')
   }, [profile.location])
-
-  const displayCaste = useMemo(() => {
-    if (!profile.caste) return ''
-    const casteCode = String(profile.caste).trim()
-    const casts = lookupData.casts ?? []
-    const match = casts.find(
-      (option) =>
-        String(option.value).trim().toLowerCase() === casteCode.toLowerCase() ||
-        option.label.trim().toLowerCase() === casteCode.toLowerCase(),
-    )
-    return match?.label ?? profile.caste
-  }, [profile.caste, lookupData.casts])
 
   const handleCardClick = () => {
     navigate(`/dashboard/profile/${profile.id}`)
@@ -76,9 +56,9 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
   return (
     <article
       onClick={handleCardClick}
-      className="group flex h-[320px] w-[300px] cursor-pointer flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 md:flex-row md:h-[280px] md:w-[420px]"
+      className="group flex h-[280px] w-[420px] cursor-pointer flex-shrink-0 flex-row overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
     >
-      <div className="relative h-[160px] w-full bg-slate-100 dark:bg-slate-900 md:h-full md:w-[200px]">
+      <div className="relative h-full w-[180px] bg-slate-100 dark:bg-slate-900">
         <div className="flex h-full w-full items-center justify-center p-2">
           {profile.avatar ? (
             <img
@@ -110,13 +90,13 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
       </div>
 
       <div className="flex flex-1 flex-col justify-center gap-3 p-4 text-slate-600 dark:text-slate-300">
-        <div className="space-y-1 text-center md:text-left">
+        <div className="space-y-1 text-left">
           <p className="text-base font-semibold text-slate-900 dark:text-white">{profile.name}</p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {profile.age} yrs • {profile.height}
           </p>
           <p className="text-sm font-semibold text-slate-900 dark:text-white">{profile.income}</p>
-          {displayCaste && <p className="text-sm text-slate-600 dark:text-slate-300">{displayCaste}</p>}
+          {profile.caste && <p className="text-sm text-slate-600 dark:text-slate-300">{profile.caste}</p>}
           <p className="text-xs text-slate-500 dark:text-slate-400">{compactLocation}</p>
         </div>
 
