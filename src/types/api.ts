@@ -19,6 +19,7 @@ export type ApiProfile = {
   income?: number // income level code
   cast?: string
   heartsId?: number
+  gender?: string
   profilePic?: Array<{
     s3Link: string
     id: string
@@ -29,7 +30,7 @@ export type ApiProfile = {
   isShortlisted?: boolean
 }
 
-export type LookupOption<TValue = string | number> = {
+export type LookupOption<TValue = string> = {
   label: string
   value: TValue
 } & Record<string, unknown>

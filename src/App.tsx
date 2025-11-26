@@ -34,6 +34,14 @@ import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
 import { VerificationPendingPage } from './pages/VerificationPendingPage'
 import { NotificationPage } from './pages/NotificationPage'
 import { MyProfilePage } from './pages/MyProfilePage'
+import { PersonalDetailsPage } from './pages/PersonalDetailsPage'
+import { CareerDetailsPage } from './pages/CareerDetailsPage'
+import { SocialDetailsPage } from './pages/SocialDetailsPage'
+import { SRCMDetailsPage } from './pages/SRCMDetailsPage'
+import { FamilyDetailsPage } from './pages/FamilyDetailsPage'
+import { PartnerPreferencesPage } from './pages/PartnerPreferencesPage'
+import { PartnerPreferenceEditPage } from './pages/PartnerPreferenceEditPage'
+import { AboutYouPage } from './pages/AboutYouPage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 
 function App() {
@@ -49,6 +57,13 @@ function App() {
         <Route path="under-verification" element={<VerificationPendingPage />} />
       </Route>
       <Route element={<ProtectedRoute />}>
+        <Route path="dashboard/personaldetails" element={<PersonalDetailsPage />} />
+        <Route path="dashboard/careerdetails" element={<CareerDetailsPage />} />
+        <Route path="dashboard/socialdetails" element={<SocialDetailsPage />} />
+        <Route path="dashboard/srcmdetails" element={<SRCMDetailsPage />} />
+        <Route path="dashboard/familydetails" element={<FamilyDetailsPage />} />
+        <Route path="dashboard/partnerpreferences" element={<PartnerPreferencesPage />} />
+        <Route path="dashboard/aboutyou" element={<AboutYouPage />} />
         <Route element={<DashboardLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="dashboard/notification" element={<NotificationPage />} />
@@ -75,6 +90,7 @@ function App() {
           <Route path="dashboard/help" element={<HelpCenterPage />} />
           <Route path="dashboard/terms" element={<TermsConditionsPage />} />
           <Route path="dashboard/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="dashboard/partnerpreference" element={<PartnerPreferenceEditPage />} />
         </Route>
       </Route>
     </Routes>

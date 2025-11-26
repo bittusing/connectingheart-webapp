@@ -8,6 +8,42 @@ import { Toast } from '../components/common/Toast'
 import { useApiClient } from '../hooks/useApiClient'
 import type { AuthResponse } from '../types/auth'
 
+const screenNameRoutes: Record<string, string> = {
+  dashboard: '/dashboard',
+  personaldetails: '/dashboard/personaldetails',
+  careerdetails: '/dashboard/careerdetails',
+  socialdetails: '/dashboard/socialdetails',
+  srcmdetails: '/dashboard/srcmdetails',
+  familydetails: '/dashboard/familydetails',
+  partnerpreferences: '/dashboard/partnerpreferences',
+  partnerpreference: '/dashboard/partnerpreference',
+  partnerpreferenceedit: '/dashboard/partnerpreference',
+  aboutyou: '/dashboard/aboutyou',
+  notification: '/dashboard/notification',
+  search: '/dashboard/search',
+  searchresults: '/dashboard/search/results',
+  profiles: '/dashboard/profiles',
+  recommendations: '/dashboard/recommendations',
+  visitors: '/dashboard/visitors',
+  justjoined: '/dashboard/justjoined',
+  interestreceived: '/dashboard/interestreceived',
+  interestsent: '/dashboard/interestsent',
+  unlockedprofiles: '/dashboard/unlockedprofiles',
+  ideclined: '/dashboard/ideclined',
+  theydeclined: '/dashboard/theydeclined',
+  shortlist: '/dashboard/shortlist',
+  ignored: '/dashboard/ignored',
+  blocked: '/dashboard/blocked',
+  myprofile: '/dashboard/myprofile',
+  membership: '/dashboard/membership',
+  security: '/dashboard/security',
+  delete: '/dashboard/delete',
+  feedback: '/dashboard/feedback',
+  help: '/dashboard/help',
+  terms: '/dashboard/terms',
+  privacy: '/dashboard/privacy',
+}
+
 type ToastMessage = {
   id: string
   message: string
@@ -82,10 +118,13 @@ export const LoginPage = () => {
       showToast(successMessage, 'success')
 
       // Navigate based on screenName or default to dashboard
-      const redirectPath = response.screenName === 'dashboard' ? '/dashboard' : '/dashboard'
+      const normalizedScreen = response.screenName?.toLowerCase().replace(/\s+/g, '') ?? ''
+      const redirectPath =
+        screenNameRoutes[normalizedScreen] || (normalizedScreen ? `/dashboard/${normalizedScreen}` : '/dashboard')
+
       setTimeout(() => {
         navigate(redirectPath, { replace: true })
-      }, 1500)
+      }, 1000)
     } catch (error) {
       setStatus('error')
       const errorMessage = getErrorMessage(error)
@@ -122,14 +161,14 @@ export const LoginPage = () => {
               onChange={(event) => setMobile(event.target.value)}
             />
             <div className="relative">
-              <TextInput
-                label="Password"
+            <TextInput
+              label="Password"
                 type={showPassword ? 'text' : 'password'}
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
+              required
+              placeholder="••••••••"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}

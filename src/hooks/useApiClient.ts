@@ -19,20 +19,21 @@ export const useApiClient = () => {
     ): Promise<TResponse> => {
       // Get auth token from localStorage
       const token = window.localStorage.getItem('connectingheart-token')
-      
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         ...(init.headers as Record<string, string>),
       }
-      
+
       // Add Authorization header if token exists
       if (token) {
         headers['Authorization'] = `Bearer ${token}`
       }
 
       // Ensure path starts with / for proper URL construction
-      const normalizedPath = path.startsWith('/') ? path : `${path}`
-      const response = await fetch(`${baseUrl}${normalizedPath}`, {
+      const normalizedPath = path.startsWith('/') ? path : `/${path}`
+      const normalizedBase = baseUrl.replace(/\/+$/, '')
+      const response = await fetch(`${normalizedBase}${normalizedPath}`, {
         ...init,
         headers,
       })
@@ -140,6 +141,7 @@ export const useApiClient = () => {
     put,
     patch,
     delete: remove,
+    request,
   }
 }
 

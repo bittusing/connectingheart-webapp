@@ -34,7 +34,7 @@ export const ChangePasswordPage = () => {
 
   const dismissToast = (toastId: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== toastId))
-  }
+    }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -109,15 +109,15 @@ export const ChangePasswordPage = () => {
           className="space-y-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
         >
           <div className="relative">
-            <TextInput
-              label="Current Password"
+          <TextInput
+            label="Current Password"
               type={showCurrentPassword ? 'text' : 'password'}
-              name="currentPassword"
-              autoComplete="current-password"
-              required
-              value={form.currentPassword}
-              onChange={handleChange}
-            />
+            name="currentPassword"
+            autoComplete="current-password"
+            required
+            value={form.currentPassword}
+            onChange={handleChange}
+          />
             <button
               type="button"
               onClick={() => setShowCurrentPassword(!showCurrentPassword)}
@@ -132,16 +132,16 @@ export const ChangePasswordPage = () => {
             </button>
           </div>
           <div className="relative">
-            <TextInput
-              label="New Password"
+          <TextInput
+            label="New Password"
               type={showNewPassword ? 'text' : 'password'}
-              name="newPassword"
-              autoComplete="new-password"
-              required
-              value={form.newPassword}
-              onChange={handleChange}
-              hint={passwordStrengthHint}
-            />
+            name="newPassword"
+            autoComplete="new-password"
+            required
+            value={form.newPassword}
+            onChange={handleChange}
+            hint={passwordStrengthHint}
+          />
             <button
               type="button"
               onClick={() => setShowNewPassword(!showNewPassword)}
@@ -157,15 +157,15 @@ export const ChangePasswordPage = () => {
           </div>
           <div className="space-y-2">
             <div className="relative">
-              <TextInput
-                label="Confirm Password"
+            <TextInput
+              label="Confirm Password"
                 type={showConfirmPassword ? 'text' : 'password'}
-                name="confirmPassword"
-                autoComplete="new-password"
-                required
-                value={form.confirmPassword}
-                onChange={handleChange}
-              />
+              name="confirmPassword"
+              autoComplete="new-password"
+              required
+              value={form.confirmPassword}
+              onChange={handleChange}
+            />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -197,7 +197,7 @@ export const ChangePasswordPage = () => {
             className="pointer-events-auto"
           />
         ))}
-      </div>
+        </div>
     </>
   )
 }

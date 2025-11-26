@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import type { UserProfileSummary } from '../../types/dashboard'
 
 type DashboardHeroProps = {
@@ -12,7 +13,11 @@ const defaultProfile: UserProfileSummary = {
 }
 
 export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) => {
+  const navigate = useNavigate()
   const displayProfile = { ...defaultProfile, ...profile }
+  const openPartnerPreference = () => {
+    navigate('/dashboard/partnerpreference')
+  }
 
   return (
     <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-600 via-pink-500 to-rose-500 p-6 text-white shadow-2xl">
@@ -57,7 +62,12 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
             <p className="mt-1 text-xs text-white/80">Upgrade for premium features</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={openPartnerPreference}
+          className="flex items-center gap-4 rounded-3xl border border-white/0 bg-white/0 px-3 py-2 text-left transition hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          aria-label="Open partner preference editor"
+        >
           <div className="text-right">
             <p className="text-xs uppercase tracking-[0.3em] text-white/80">Looking For</p>
             <p className="mt-1 font-display text-2xl font-semibold">
@@ -89,7 +99,7 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
             )}
             <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-blue-500 ring-2 ring-white"></div>
           </div>
-        </div>
+        </button>
       </div>
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
     </section>

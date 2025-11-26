@@ -19,6 +19,7 @@ type UserProfileApiData = {
   isVerified?: boolean
   gender?: string
   profilePic?: UserProfilePicture[]
+  screenName?: string
 }
 
 type UserProfileResponse = {
@@ -81,7 +82,10 @@ export const useUserProfile = () => {
     profile,
     loading,
     error,
-    refetch: fetchProfile,
+    refetch: async () => {
+      await fetchProfile()
+      return profile
+    },
   }
 }
 

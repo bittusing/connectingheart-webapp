@@ -83,6 +83,7 @@ export const transformApiProfile = (apiProfile: ApiProfile): ProfileCardData => 
       location: formatLocation(apiProfile.city, apiProfile.state, apiProfile.country),
       avatar: getProfilePicture(apiProfile.profilePic, clientID),
       verified: apiProfile.isMembershipActive || false,
+      gender: apiProfile.gender,
     }
   } catch (error) {
     console.error('Error transforming profile:', error, apiProfile)

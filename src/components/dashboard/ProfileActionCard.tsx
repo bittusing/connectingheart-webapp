@@ -130,29 +130,29 @@ export const ProfileActionCard = ({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-3 divide-x divide-slate-200 text-center text-xs uppercase tracking-widest dark:divide-slate-800">
-          {actionButtons.map((action) => {
-            const isPending =
-              pendingActionType === action.key && pendingProfileId === profile.id
+      <div className="grid grid-cols-3 divide-x divide-slate-200 text-center text-xs uppercase tracking-widest dark:divide-slate-800">
+        {actionButtons.map((action) => {
+          const isPending =
+            pendingActionType === action.key && pendingProfileId === profile.id
 
-            return (
-              <button
-                key={action.label}
-                onClick={(e) => handleActionClick(e, action.key)}
-                disabled={
-                  (action.key === 'send-interest' && !onSendInterest) ||
-                  (action.key === 'shortlist' && !onShortlist) ||
-                  (action.key === 'ignore' && !onIgnore) ||
-                  isPending
-                }
-                className="flex flex-col items-center gap-1 py-3 text-slate-600 transition hover:bg-pink-50 hover:text-pink-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                <span className="text-base">{action.icon}</span>
-                {isPending ? 'Please wait...' : action.label}
-              </button>
-            )
-          })}
-        </div>
+          return (
+            <button
+              key={action.label}
+              onClick={(e) => handleActionClick(e, action.key)}
+              disabled={
+                (action.key === 'send-interest' && !onSendInterest) ||
+                (action.key === 'shortlist' && !onShortlist) ||
+                (action.key === 'ignore' && !onIgnore) ||
+                isPending
+              }
+              className="flex flex-col items-center gap-1 py-3 text-slate-600 transition hover:bg-pink-50 hover:text-pink-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-800"
+            >
+              <span className="text-base">{action.icon}</span>
+              {isPending ? 'Please wait...' : action.label}
+            </button>
+          )
+        })}
+      </div>
       )}
     </article>
   )

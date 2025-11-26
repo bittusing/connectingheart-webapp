@@ -47,6 +47,7 @@ export type ProfileCardData = {
   location: string
   avatar?: string | null
   verified?: boolean
+  gender?: string
 }
 
 // Dashboard section with profile cards
