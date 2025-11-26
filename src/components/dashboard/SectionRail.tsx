@@ -93,7 +93,7 @@ export const SectionRail = () => {
               }
 
               // Enrich profiles with human-readable caste / location labels
-              const cardsLimit = config.limit ?? 6
+              const cardsLimit = config.limit ?? 5
               const limitedProfiles = profiles.slice(0, cardsLimit)
 
               // Get current lookup data (may be empty on first render, that's okay)

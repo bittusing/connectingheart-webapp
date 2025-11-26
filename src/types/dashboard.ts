@@ -68,6 +68,7 @@ export type UserProfileSummary = {
   membershipTier?: string
   lookingFor?: string
   lookingForAvatar?: string | null
+  gender?: string
 }
 
 // Dashboard stats summary

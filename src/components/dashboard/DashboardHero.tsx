@@ -19,6 +19,15 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
     navigate('/dashboard/partnerpreference')
   }
 
+  // Determine default "Looking For" image based on user gender
+  const getDefaultLookingForImage = () => {
+    const gender = displayProfile.gender?.toLowerCase()
+    if (gender === 'male' || gender === 'm') {
+      return '/for-mans-girls.png'
+    }
+    return '/for-girls-man.png'
+  }
+
   return (
     <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-600 via-pink-500 to-rose-500 p-6 text-white shadow-2xl">
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -87,19 +96,26 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
                 className="h-20 w-20 rounded-full object-cover ring-4 ring-white/30"
               />
             ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/30">
-                <svg
-                  className="h-10 w-10 text-white/70"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
+              <img
+                src={getDefaultLookingForImage()}
+                alt="Looking for"
+                className="h-20 w-20 rounded-full object-cover ring-4 ring-white/30"
+                onError={(e) => {
+                  // Fallback to SVG if image fails to load
+                  e.currentTarget.style.display = 'none'
+                  const parent = e.currentTarget.parentElement
+                  if (parent && !parent.querySelector('.fallback-svg')) {
+                    const fallback = document.createElement('div')
+                    fallback.className = 'fallback-svg flex h-20 w-20 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/30'
+                    fallback.innerHTML = `
+                      <svg class="h-10 w-10 text-white/70" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                      </svg>
+                    `
+                    parent.appendChild(fallback)
+                  }
+                }}
+              />
             )}
             <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-blue-500 ring-2 ring-white"></div>
           </div>

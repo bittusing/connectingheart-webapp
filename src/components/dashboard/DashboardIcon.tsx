@@ -25,7 +25,7 @@ const iconMap: Record<IconName, React.ComponentType<{ className?: string }>> = {
   sparkles: SparklesIcon,
   eye: EyeIcon,
   badge: BookmarkSquareIcon,
-  'lock-closed': LockClosedIcon,
+  'lock-closed': LockClosedIcon, 
   trash: TrashIcon,
   chat: ChatBubbleBottomCenterTextIcon,
   lifebuoy: LifebuoyIcon,

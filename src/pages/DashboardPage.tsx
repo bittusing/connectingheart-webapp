@@ -20,6 +20,7 @@ export const DashboardPage = () => {
         membershipTier: profile.planName ?? 'Essential',
         completionPercentage,
         lookingFor: profile.description ? 'Life Partner' : undefined,
+        gender: profile.gender,
       }
     : undefined
 
