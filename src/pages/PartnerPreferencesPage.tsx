@@ -4,6 +4,7 @@ import { Button } from '../components/common/Button'
 import { useApiClient } from '../hooks/useApiClient'
 import { useUpdateLastActiveScreen } from '../hooks/useUpdateLastActiveScreen'
 import { useUserProfile } from '../hooks/useUserProfile'
+import { useCountryLookup } from '../hooks/useCountryLookup'
 import { showToast } from '../utils/toast'
 import type { LookupDictionary, LookupOption } from '../types/api'
 import {
@@ -150,6 +151,7 @@ export const PartnerPreferencesPage = () => {
   const { get, patch } = useApiClient()
   const { updateLastActiveScreen } = useUpdateLastActiveScreen()
   const { loading: profileLoading } = useUserProfile()
+  const { countries: countryOptions } = useCountryLookup()
 
   const [formState, setFormState] = useState<PreferenceFormState>(defaultFormState)
   const [pageLoading, setPageLoading] = useState(true)
@@ -357,7 +359,7 @@ export const PartnerPreferencesPage = () => {
           <MultiSelectField
             label="Country"
             placeholder="Select country"
-            options={optionSets.residential}
+            options={countryOptions}
             selectedValues={formState.countries}
             onChange={(values) => handleMultiChange('countries', values)}
           />
@@ -545,7 +547,12 @@ const MultiSelectField = ({
   onChange: (values: string[]) => void
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState('')
+
   const availableOptions = options.filter((option) => !selectedValues.includes(option.value as string))
+  const filteredOptions = availableOptions.filter((option) =>
+    option.label.toLowerCase().includes(search.toLowerCase()),
+  )
 
   const handleRemove = (value: string) => {
     onChange(selectedValues.filter((item) => item !== value))
@@ -591,17 +598,31 @@ const MultiSelectField = ({
           </button>
         </div>
         {isOpen && availableOptions.length > 0 && (
-          <div className="absolute left-3 right-3 top-full z-20 mt-2 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 text-sm shadow-lg">
-            {availableOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className="flex w-full items-center justify-between px-3 py-2 text-left text-slate-700 hover:bg-pink-50"
-                onClick={() => handleAdd(option.value as string)}
-              >
-                <span>{option.label}</span>
-              </button>
-            ))}
+          <div className="absolute left-3 right-3 top-full z-20 mt-2 max-h-60 overflow-hidden rounded-xl border border-slate-200 bg-white text-sm shadow-lg">
+            <div className="border-b border-slate-100 bg-slate-50/80 px-3 py-2">
+              <input
+                type="text"
+                className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-500"
+                placeholder="Search..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </div>
+            <div className="max-h-48 overflow-y-auto py-1">
+              {filteredOptions.length === 0 && (
+                <div className="px-3 py-2 text-xs text-slate-400">No matches found</div>
+              )}
+              {filteredOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-slate-700 hover:bg-pink-50"
+                  onClick={() => handleAdd(option.value as string)}
+                >
+                  <span>{option.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
