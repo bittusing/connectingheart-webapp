@@ -377,7 +377,7 @@ export const RegisterPage = () => {
     confirmPassword: '',
     agree: false,
   })
-
+   ////
   const [personal, setPersonal] = useState({
     gender: 'Female',
     dob: '',

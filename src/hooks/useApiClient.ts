@@ -1,4 +1,6 @@
 import { useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { showToast } from '../utils/toast'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -9,7 +11,7 @@ type RequestConfig = Omit<RequestInit, 'method'>
  */
 export const useApiClient = () => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3856'
-
+  const navigate = useNavigate()
   const request = useCallback(
     async <TResponse>(
       path: string,
@@ -41,14 +43,23 @@ export const useApiClient = () => {
         // Try to read error response as JSON first, then fallback to text
         const contentType = response.headers.get('content-type')
         const isJson = contentType?.includes('application/json')
-        
         try {
           if (isJson) {
             const errorPayload = await response.json()
+            console.log("errorPayload",errorPayload);
             // Handle structured error responses
             if (errorPayload.message) {
               errorMessage = errorPayload.message
-            } else if (errorPayload.err?.msg) {
+            }
+            else if((errorPayload.err as any)?.redirectToMembership) {
+              const membershipMessage = errorPayload.err?.msg || 'Please renew your membership in order to unlock further profiles.'
+              showToast(membershipMessage, 'error')
+              errorMessage = membershipMessage
+              setTimeout(() => {
+                navigate('/dashboard/membership')
+              }, 500)
+            }
+            else if (errorPayload.err?.msg) {
               errorMessage = errorPayload.err.msg
             } else if (errorPayload.error) {
               errorMessage = errorPayload.error

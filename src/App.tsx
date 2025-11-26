@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
 import { DashboardLayout } from './components/layout/DashboardLayout'
+import { GlobalToastContainer } from './components/common/GlobalToastContainer'
 import { DashboardPage } from './pages/DashboardPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
@@ -37,7 +38,9 @@ import { ProtectedRoute } from './routes/ProtectedRoute'
 
 function App() {
   return (
-    <Routes>
+    <>
+      <GlobalToastContainer />
+      <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
@@ -75,6 +78,7 @@ function App() {
         </Route>
       </Route>
     </Routes>
+    </>
   )
 }
 

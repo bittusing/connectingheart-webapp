@@ -24,6 +24,17 @@ export const useUnlockProfile = () => {
       setPendingProfileId(profileId)
       try {
         return await api.get<UnlockProfileResponse>(`dashboard/unlockProfile/${profileId}`)
+      } catch (error) {
+        console.log("error",error);
+        if (error instanceof Error && (error as any).redirectToMembership) {
+          return {
+            code: 'CH400',
+            status: 'failed',
+            message: 'Please renew your membership in order to unlock further profiles.',
+            err: { redirectToMembership: true }
+          }
+        }
+        throw error
       } finally {
         setPendingProfileId((current) => (current === profileId ? null : current))
       }
@@ -34,6 +45,7 @@ export const useUnlockProfile = () => {
   return {
     unlockProfile,
     isUnlocking: Boolean(pendingProfileId),
+    redirectToMembership: Boolean(pendingProfileId),
   }
 }
 

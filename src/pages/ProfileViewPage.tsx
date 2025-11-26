@@ -173,38 +173,23 @@ export const ProfileViewPage = () => {
       setIsUnlockModalOpen(false)
       return
     }
-
+    // console.log("isUnlocking",isUnlocking , );
     if (isUnlocking) return
 
     try {
       const response = await unlockProfile(profileClientId)
-
+     console.log("response",response.code,response.err);
       if (response.code === 'CH400') {
-        const unlockError = response.err
-        const isAlreadyUnlocked =
-          typeof unlockError === 'string' && unlockError.toLowerCase().includes('already unlocked')
-
-        const errorMessage =
-          typeof unlockError === 'string'
-            ? unlockError
-            : unlockError?.msg ||
-              response.message ||
-              'Please renew your membership in order to unlock further profiles.'
-
-        showToast(errorMessage, isAlreadyUnlocked ? 'success' : 'error')
-
-        setIsUnlockModalOpen(false)
-
-        if (typeof unlockError !== 'string' && unlockError?.redirectToMembership) {
-          // Small delay to ensure toast is visible before redirect
+         if((response.err as any)?.redirectToMembership) {
           setTimeout(() => {
             navigate('/dashboard/membership')
           }, 500)
           return
-        }
-        return
+         }
+        setIsUnlockModalOpen(false)
+       showToast(response?.message ?? 'Profile unlocked successfully.', 'success')
       }
-
+       
       showToast(response.message ?? 'Profile unlocked successfully.', 'success')
     } catch (err) {
       const message =
