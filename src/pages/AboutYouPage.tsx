@@ -52,6 +52,7 @@ export const AboutYouPage = () => {
             familydetails: '/dashboard/familydetails',
             partnerpreferences: '/dashboard/partnerpreferences',
             aboutyou: '/dashboard/aboutyou',
+            underverification: '/under-verification',
             dashboard: '/dashboard',
           }
 
@@ -169,8 +170,8 @@ export const AboutYouPage = () => {
 
       if (response.status === 'success' || response.code === 'CH200') {
         showToast('About you updated successfully', 'success')
-        await updateLastActiveScreen('dashboard')
-        navigate('/dashboard', { replace: true })
+        await updateLastActiveScreen('underVerification')
+        navigate('/under-verification', { replace: true })
       } else {
         showToast(response.message || 'Failed to update about you', 'error')
       }

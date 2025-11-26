@@ -19,6 +19,7 @@ const screenNameRoutes: Record<string, string> = {
   partnerpreference: '/dashboard/partnerpreference',
   partnerpreferenceedit: '/dashboard/partnerpreference',
   aboutyou: '/dashboard/aboutyou',
+  underverification: '/under-verification',
   notification: '/dashboard/notification',
   search: '/dashboard/search',
   searchresults: '/dashboard/search/results',

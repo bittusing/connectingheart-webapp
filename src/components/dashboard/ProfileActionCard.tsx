@@ -108,10 +108,8 @@ export const ProfileActionCard = ({
           </p> */}
           <p className="mt-1 text-lg font-semibold text-white">{profile.name}</p>
           <p className="text-sm text-white/80">
-            {profile.age} yrs · {profile.height} · {profile.income}
+            {profile.age} yrs | {profile.height} | {profile.income}
           </p>
-          {profile.caste && <p className="text-xs text-white/70">{profile.caste}</p>}
-          <p className="text-xs text-white/70">{profile.location}</p>
         </div>
       </div>
       {singleButton ? (

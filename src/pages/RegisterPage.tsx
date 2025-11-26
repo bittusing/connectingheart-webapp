@@ -189,6 +189,7 @@ export const RegisterPage = () => {
                   familydetails: '/dashboard/familydetails',
                   partnerpreferences: '/dashboard/partnerpreferences',
                   aboutyou: '/dashboard/aboutyou',
+                  underverification: '/under-verification',
                   dashboard: '/dashboard',
                 }
 

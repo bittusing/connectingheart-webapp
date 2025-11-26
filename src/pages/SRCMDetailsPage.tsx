@@ -71,6 +71,7 @@ export const SRCMDetailsPage = () => {
             familydetails: '/dashboard/familydetails',
             partnerpreferences: '/dashboard/partnerpreferences',
             aboutyou: '/dashboard/aboutyou',
+            underverification: '/under-verification',
             dashboard: '/dashboard',
           }
           if (screenName !== 'srcmdetails' && routeMap[screenName]) {
