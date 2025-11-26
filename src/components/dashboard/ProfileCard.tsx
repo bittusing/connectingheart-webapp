@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { EyeIcon } from '@heroicons/react/24/outline'
 import type { ProfileCardData } from '../../types/dashboard'
 import { Button } from '../common/Button'
+import { useLookup } from '../../hooks/useLookup'
 
 type ProfileCardProps = {
   profile: ProfileCardData
@@ -34,11 +35,30 @@ const PlaceholderAvatar = ({ gender }: { gender?: string }) => (
 
 export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps) => {
   const navigate = useNavigate()
+  const { lookupData, fetchLookup } = useLookup()
+
+  useEffect(() => {
+    if (!lookupData.casts || lookupData.casts.length === 0) {
+      void fetchLookup()
+    }
+  }, [lookupData.casts, fetchLookup])
 
   const compactLocation = useMemo(() => {
     if (!profile.location) return 'Location not available'
     return profile.location.split(',').slice(0, 3).join(', ')
   }, [profile.location])
+
+  const displayCaste = useMemo(() => {
+    if (!profile.caste) return ''
+    const casteCode = String(profile.caste).trim()
+    const casts = lookupData.casts ?? []
+    const match = casts.find(
+      (option) =>
+        String(option.value).trim().toLowerCase() === casteCode.toLowerCase() ||
+        option.label.trim().toLowerCase() === casteCode.toLowerCase(),
+    )
+    return match?.label ?? profile.caste
+  }, [profile.caste, lookupData.casts])
 
   const handleCardClick = () => {
     navigate(`/dashboard/profile/${profile.id}`)
@@ -96,7 +116,7 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
             {profile.age} yrs • {profile.height}
           </p>
           <p className="text-sm font-semibold text-slate-900 dark:text-white">{profile.income}</p>
-          {profile.caste && <p className="text-sm text-slate-600 dark:text-slate-300">{profile.caste}</p>}
+          {displayCaste && <p className="text-sm text-slate-600 dark:text-slate-300">{displayCaste}</p>}
           <p className="text-xs text-slate-500 dark:text-slate-400">{compactLocation}</p>
         </div>
 

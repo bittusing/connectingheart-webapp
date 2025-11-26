@@ -6,6 +6,8 @@ import { useApiClient } from '../../hooks/useApiClient'
 import type { DashboardSection } from '../../types/dashboard'
 import type { ApiProfile, ApiProfileResponse } from '../../types/api'
 import { transformApiProfiles } from '../../utils/profileTransform'
+import { useLookup } from '../../hooks/useLookup'
+import { useCountryLookup } from '../../hooks/useCountryLookup'
 
 type SectionConfig = {
   id: string
@@ -43,6 +45,8 @@ const sectionConfigs: SectionConfig[] = [
 export const SectionRail = () => {
   const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const { get } = useApiClient()
+  const { lookupData, fetchLookup, fetchStates, fetchCities } = useLookup()
+  const { countries: countryOptions } = useCountryLookup()
   const [sections, setSections] = useState<DashboardSection[]>(
     sectionConfigs.map((config) => ({
       id: config.id,
@@ -62,6 +66,15 @@ export const SectionRail = () => {
     const fetchSections = async () => {
       try {
         setLoading(true)
+
+        // Ensure base lookup data (for casts etc.) is loaded
+        try {
+          await fetchLookup()
+        } catch (error) {
+          // Lookup is optional for cards – log and continue with codes if it fails
+          console.error('Failed to preload lookup data for dashboard cards', error)
+        }
+
         const results = await Promise.all(
           sectionConfigs.map(async (config) => {
             try {
@@ -75,7 +88,97 @@ export const SectionRail = () => {
                 throw new Error(response.message || 'Failed to fetch profiles')
               }
 
-              const transformedProfiles = transformApiProfiles(profiles).slice(0, config.limit ?? 6)
+              // Enrich profiles with human-readable caste / location labels
+              const cardsLimit = config.limit ?? 6
+              const limitedProfiles = profiles.slice(0, cardsLimit)
+
+              const { castes: casteOptions } = lookupData
+
+              // Build quick lookup maps
+              const casteLabelMap: Record<string, string> = {}
+              if (casteOptions && casteOptions.length) {
+                casteOptions.forEach((option) => {
+                  if (option.value) {
+                    casteLabelMap[String(option.value)] = option.label
+                  }
+                })
+              }
+
+              const countryLabelMap: Record<string, string> = {}
+              countryOptions.forEach((option) => {
+                if (option.value) {
+                  countryLabelMap[String(option.value)] = option.label
+                }
+              })
+
+              // State and city labels require dedicated lookups
+              const stateLabelMap: Record<string, string> = {}
+              const cityLabelMap: Record<string, string> = {}
+
+              try {
+                // Group required states by country so we don't over-fetch
+                const statesByCountry = new Map<string, Set<string>>()
+                const citiesByState = new Map<string, Set<string>>()
+
+                limitedProfiles.forEach((profile) => {
+                  if (profile.country && profile.state) {
+                    if (!statesByCountry.has(profile.country)) {
+                      statesByCountry.set(profile.country, new Set())
+                    }
+                    statesByCountry.get(profile.country)!.add(profile.state)
+                  }
+                  if (profile.state && profile.city) {
+                    if (!citiesByState.has(profile.state)) {
+                      citiesByState.set(profile.state, new Set())
+                    }
+                    citiesByState.get(profile.state)!.add(profile.city)
+                  }
+                })
+
+                // Resolve state labels
+                for (const [countryId, stateCodes] of statesByCountry.entries()) {
+                  const stateOptions = await fetchStates(countryId)
+                  stateCodes.forEach((code) => {
+                    const match = stateOptions.find((opt) => String(opt.value) === String(code))
+                    if (match && match.value) {
+                      stateLabelMap[String(code)] = match.label
+                    }
+                  })
+                }
+
+                // Resolve city labels
+                for (const [stateId, cityCodes] of citiesByState.entries()) {
+                  const cityOptions = await fetchCities(stateId)
+                  cityCodes.forEach((code) => {
+                    const match = cityOptions.find((opt) => String(opt.value) === String(code))
+                    if (match && match.value) {
+                      cityLabelMap[String(code)] = match.label
+                    }
+                  })
+                }
+              } catch (error) {
+                console.error('Failed to resolve state/city labels for dashboard cards', error)
+              }
+
+              const transformedProfiles = transformApiProfiles(limitedProfiles).map((card) => {
+                const source = limitedProfiles.find((profile) => profile.clientID === card.id)
+                if (!source) return card
+
+                const casteCode = source.cast ? String(source.cast) : undefined
+                const casteLabel = casteCode ? casteLabelMap[casteCode] : undefined
+
+                const cityLabel = source.city ? cityLabelMap[String(source.city)] : undefined
+                const stateLabel = source.state ? stateLabelMap[String(source.state)] : undefined
+                const countryLabel = source.country ? countryLabelMap[String(source.country)] : undefined
+
+                const locationParts = [cityLabel, stateLabel, countryLabel].filter(Boolean)
+
+                return {
+                  ...card,
+                  caste: casteLabel ?? card.caste,
+                  location: locationParts.length > 0 ? locationParts.join(', ') : card.location,
+                }
+              })
 
               return {
                 section: {
@@ -125,7 +228,7 @@ export const SectionRail = () => {
     return () => {
       isMounted = false
     }
-  }, [get])
+  }, [get, fetchLookup, fetchStates, fetchCities, lookupData, countryOptions])
 
   const scroll = (sectionId: string, direction: 'left' | 'right') => {
     const container = scrollRefs.current[sectionId]
