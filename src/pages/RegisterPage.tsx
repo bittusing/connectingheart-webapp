@@ -144,8 +144,16 @@ export const RegisterPage = () => {
         showToast(response.message || 'Failed to send OTP', 'error')
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to send OTP'
-      showToast(message.replace('API ', ''), 'error')
+      // Extract the actual API error message (remove "API 400: " prefix)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send OTP'
+      const extractedMessage = errorMessage.replace(/^API \d+:?\s*/, '').trim()
+      
+      // Use the extracted message if it's meaningful, otherwise use fallback
+      const finalMessage = extractedMessage && extractedMessage !== 'Bad Request' && extractedMessage !== 'Unknown error'
+        ? extractedMessage
+        : 'Failed to send OTP'
+      
+      showToast(finalMessage, 'error')
     } finally {
       setOtpLoading(false)
     }
@@ -203,18 +211,40 @@ export const RegisterPage = () => {
               navigate('/dashboard/personaldetails', { replace: true })
             }
           } else {
-            showToast(signupResponse.message || 'Registration failed', 'error')
+            // Check for err field (string or object with msg) in response
+            const errorMessage = 
+              (typeof (signupResponse as any).err === 'string' ? (signupResponse as any).err : null) ||
+              ((signupResponse as any).err?.msg) ||
+              signupResponse.message ||
+              'Registration failed'
+            showToast(errorMessage, 'error')
           }
         } catch (error) {
-          const message = error instanceof Error ? error.message : 'Registration failed'
-          showToast(message.replace('API ', ''), 'error')
+          // Extract the actual API error message (remove "API 400: " prefix)
+          const errorMessage = error instanceof Error ? error.message : 'Registration failed'
+          const extractedMessage = errorMessage.replace(/^API \d+:?\s*/, '').trim()
+          
+          // Use the extracted message if it's meaningful, otherwise use fallback
+          const finalMessage = extractedMessage && extractedMessage !== 'Bad Request' && extractedMessage !== 'Unknown error'
+            ? extractedMessage
+            : 'Registration failed'
+          
+          showToast(finalMessage, 'error')
         }
       } else {
         showToast(verifyResponse.message || 'OTP verification failed', 'error')
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'OTP verification failed'
-      showToast(message.replace('API ', ''), 'error')
+      // Extract the actual API error message (remove "API 400: " prefix)
+      const errorMessage = error instanceof Error ? error.message : 'OTP verification failed'
+      const extractedMessage = errorMessage.replace(/^API \d+:?\s*/, '').trim()
+      
+      // Use the extracted message if it's meaningful, otherwise use fallback
+      const finalMessage = extractedMessage && extractedMessage !== 'Bad Request' && extractedMessage !== 'Unknown error'
+        ? extractedMessage
+        : 'OTP verification failed'
+      
+      showToast(finalMessage, 'error')
     } finally {
       setOtpLoading(false)
       setOtpModalOpen(false)
