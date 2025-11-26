@@ -268,6 +268,14 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
     },
 
     allProfilePics,
+    isUnlocked: data.miscellaneous.isUnlocked,
+    contactDetails: data.miscellaneous.isUnlocked && data.contact
+      ? {
+          phoneNumber: data.contact.phoneNumber,
+          email: data.contact.email,
+          name: data.contact.name,
+        }
+      : undefined,
   }
 }
 

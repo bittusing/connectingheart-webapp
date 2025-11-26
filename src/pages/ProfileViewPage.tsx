@@ -82,7 +82,7 @@ export const ProfileViewPage = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<TabType>('basic')
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const { profile, loading, error } = useProfileDetail(id)
+  const { profile, loading, error, refetch } = useProfileDetail(id)
   const {
     sendInterest,
     unsendInterest,
@@ -188,9 +188,14 @@ export const ProfileViewPage = () => {
          }
         setIsUnlockModalOpen(false)
        showToast(response?.message ?? 'Profile unlocked successfully.', 'success')
+      } else {
+        // Unlock successful - refetch profile details in background to get contact info
+        showToast(response.message ?? 'Profile unlocked successfully.', 'success')
+        // Refetch profile details to get contact information
+        setTimeout(() => {
+          refetch()
+        }, 500)
       }
-       
-      showToast(response.message ?? 'Profile unlocked successfully.', 'success')
     } catch (err) {
       const message =
         err instanceof Error ? err.message.replace('API ', '') || 'Unable to unlock profile.' : 'Unable to unlock profile.'
@@ -319,6 +324,23 @@ export const ProfileViewPage = () => {
         <InfoRow label="Thalassemia" value={profile.thalassemia} />
         <InfoRow label="HIV Positive" value={profile.hivPositive} />
       </div>
+
+      {profile.isUnlocked && profile.contactDetails && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Contact Information
+          </h3>
+          {profile.contactDetails.name && (
+            <InfoRow label="Name" value={profile.contactDetails.name} />
+          )}
+          {profile.contactDetails.phoneNumber && (
+            <InfoRow label="Phone Number" value={profile.contactDetails.phoneNumber} />
+          )}
+          {profile.contactDetails.email && (
+            <InfoRow label="Email" value={profile.contactDetails.email} />
+          )}
+        </div>
+      )}
 
       <div className="space-y-3">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">

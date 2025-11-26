@@ -86,4 +86,10 @@ export type ProfileViewData = {
   }>
   isShortlisted?: boolean
   isIgnored?: boolean
+  isUnlocked?: boolean
+  contactDetails?: {
+    phoneNumber?: string
+    email?: string
+    name?: string
+  }
 }
