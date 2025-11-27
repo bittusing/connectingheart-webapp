@@ -22,11 +22,11 @@ const getPlaceholderImage = (gender?: string) => {
 }
 
 const PlaceholderAvatar = ({ gender }: { gender?: string }) => (
-  <div className="flex h-full w-full items-center justify-center bg-slate-200">
+  <div className="flex h-full w-full items-center justify-center bg-slate-200 dark:bg-slate-800">
     <img
       src={getPlaceholderImage(gender)}
       alt="Profile placeholder"
-      className="h-full w-full object-contain"
+      className="h-full w-full object-cover"
       loading="lazy"
     />
   </div>
@@ -53,24 +53,27 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
     }
   }
 
+  const heartsIdDisplay = profile.heartsId ? `HEARTS-${profile.heartsId}` : profile.id
+
   return (
     <article
       onClick={handleCardClick}
-      className="group flex h-[280px] w-[420px] cursor-pointer flex-shrink-0 flex-row overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
+      className="group flex h-[280px] w-full max-w-[500px] cursor-pointer flex-shrink-0 flex-row overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
     >
-      <div className="relative h-full w-[180px] bg-slate-100 dark:bg-slate-900">
-        <div className="flex h-full w-full items-center justify-center p-2">
-          {profile.avatar ? (
-            <img
-              src={profile.avatar}
-              alt={profile.name}
-              className="h-full w-full object-contain"
-              loading="lazy"
-            />
-          ) : (
-            <PlaceholderAvatar gender={profile.gender} />
-          )}
-        </div>
+      <div className="relative h-full w-[200px] flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-900">
+        {profile.avatar ? (
+          <img
+            src={profile.avatar}
+            alt={profile.name}
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none'
+            }}
+          />
+        ) : (
+          <PlaceholderAvatar gender={profile.gender} />
+        )}
         {profile.verified && (
           <div className="absolute right-2 top-2 rounded-full bg-emerald-500 p-1 shadow-md">
             <svg
@@ -89,25 +92,29 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
         )}
       </div>
 
-      <div className="flex flex-1 flex-col justify-center gap-3 p-4 text-slate-600 dark:text-slate-300">
-        <div className="space-y-1 text-left">
-          <p className="text-base font-semibold text-slate-900 dark:text-white">{profile.name}</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+      <div className="flex flex-1 flex-col justify-between p-5 text-slate-600 dark:text-slate-300">
+        <div className="space-y-2 text-left">
+          <p className="text-lg font-bold text-slate-900 dark:text-white">{heartsIdDisplay}</p>
+          <p className="text-sm text-slate-700 dark:text-slate-300">
             {profile.age} yrs • {profile.height}
           </p>
           <p className="text-sm font-semibold text-slate-900 dark:text-white">{profile.income}</p>
-          {profile.caste && <p className="text-sm text-slate-600 dark:text-slate-300">{profile.caste}</p>}
+          {profile.caste && (
+            <p className="text-sm text-slate-600 dark:text-slate-400">{profile.caste}</p>
+          )}
           <p className="text-xs text-slate-500 dark:text-slate-400">{compactLocation}</p>
         </div>
 
-        <Button
-          size="md"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-pink-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-pink-500/30 transition hover:bg-pink-600"
-          onClick={handleButtonClick}
-        >
-          <EyeIcon className="h-4 w-4" />
-          {actionLabel}
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            size="md"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-pink-600 active:scale-95"
+            onClick={handleButtonClick}
+          >
+            <EyeIcon className="h-4 w-4" />
+            {actionLabel}
+          </Button>
+        </div>
       </div>
     </article>
   )
