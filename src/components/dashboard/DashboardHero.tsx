@@ -34,11 +34,12 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
         <div className="flex items-center gap-4">
           <div className="relative">
             {displayProfile.avatar ? (
-              <img
-                src={displayProfile.avatar}
-                alt="Your profile"
-                className="h-20 w-20 rounded-full object-cover ring-4 ring-white/30"
-              />
+              <Link to="/dashboard/myprofile"> <img
+              src={displayProfile.avatar}
+              alt="Your profile"
+              className="h-20 w-20 rounded-full object-cover ring-4 ring-white/30"
+            /></Link>
+             
             ) : (
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/30">
                 <svg
@@ -54,13 +55,13 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
                 </svg>
               </div>
             )}
-            <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-emerald-500 ring-2 ring-white"></div>
+            {/* <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-emerald-500 ring-2 ring-white"></div> */}
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-white/80">Your Profile</p>
+            {/* <p className="text-xs uppercase tracking-[0.3em] text-white/80">Your Profile</p> */}
             <p className="mt-1 font-display text-2xl font-semibold">{displayProfile.name}</p>
             <p className="text-sm text-white/70">
-              Profile completion {displayProfile.completionPercentage}%
+              {/* Profile completion {displayProfile.completionPercentage}% */}
             </p>
           </div>
         </div>
@@ -117,7 +118,7 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
                 }}
               />
             )}
-            <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-blue-500 ring-2 ring-white"></div>
+            {/* <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-blue-500 ring-2 ring-white"></div> */}
           </div>
         </button>
       </div>
