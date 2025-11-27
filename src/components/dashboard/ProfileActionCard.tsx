@@ -81,7 +81,7 @@ export const ProfileActionCard = ({
   return (
     <article
       onClick={handleCardClick}
-      className="group cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
+      className="group w-full cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-200 dark:bg-slate-700">
         {profile.avatar ? (

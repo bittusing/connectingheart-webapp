@@ -1,10 +1,11 @@
+import { useMemo } from 'react'
 import { DashboardHero } from '../components/dashboard/DashboardHero'
 import { SectionRail } from '../components/dashboard/SectionRail'
 import { StatsGrid } from '../components/dashboard/StatsGrid'
 import { useUserProfile } from '../hooks/useUserProfile'
 import { useJustJoinedCount } from '../hooks/useJustJoinedCount'
 import { statTiles } from '../data/dashboardContent'
-import { useMemo } from 'react'
+import { DashboardBannerSlider } from '../components/dashboard/DashboardBannerSlider'
 
 export const DashboardPage = () => {
   const { profile } = useUserProfile()
@@ -37,12 +38,34 @@ export const DashboardPage = () => {
     })
   }, [justJoinedCount, justJoinedLoading])
 
+  const celebrationSlides = useMemo(
+    () => [
+      {
+        image: '/banner1.jpg',
+        title: 'Heartfulness Weddings',
+        description: 'Blessed unions guided by love, grace, and shared purpose.',
+      },
+      {
+        image: '/banner2.jpg',
+        title: 'Celebrating Togetherness',
+        description: 'Families and seekers coming together for meaningful connections.',
+      },
+      {
+        image: '/banner3.jpg',
+        title: 'Sacred Moments',
+        description: 'Memories from our community ceremonies around the world.',
+      },
+    ],
+    [],
+  )
+
   return (
-  <div className="space-y-6">
+    <div className="space-y-6">
       <DashboardHero profile={heroProfile} />
+      <DashboardBannerSlider slides={celebrationSlides} />
       <StatsGrid tiles={tilesWithCounts} />
-    <SectionRail />
-  </div>
-)
+      <SectionRail />
+    </div>
+  )
 }
 

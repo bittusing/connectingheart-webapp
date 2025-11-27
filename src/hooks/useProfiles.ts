@@ -15,6 +15,7 @@ type RefetchOptions = {
 
 type UseProfilesResult = {
   profiles: ProfileCardData[]
+  allProfiles: ProfileCardData[] // All profiles without pagination
   loading: boolean
   error: string | null
   totalProfiles: number
@@ -102,6 +103,7 @@ export const useProfiles = (
 
   return {
     profiles,
+    allProfiles, // Return all profiles for infinite scroll
     loading,
     error,
     totalProfiles,

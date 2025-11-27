@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useProfiles } from '../hooks/useProfiles'
 import { ProfileActionCard } from '../components/dashboard/ProfileActionCard'
 import { Pagination } from '../components/dashboard/Pagination'
@@ -35,7 +35,11 @@ const ProfileListTemplate = ({
   singleButton,
 }: ProfileListTemplateProps) => {
   const [currentPage, setCurrentPage] = useState(1)
-  const { profiles, loading, error, totalProfiles, totalPages, refetch } = useProfiles(endpoint, {
+  const [displayedProfiles, setDisplayedProfiles] = useState<number>(5) // Start with 5 profiles
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  // Get all profiles - use allProfiles for infinite scroll, profiles for desktop pagination
+  const { profiles, allProfiles, loading, error, totalProfiles, totalPages, refetch } = useProfiles(endpoint, {
     page: currentPage,
   })
   const {
@@ -48,11 +52,92 @@ const ProfileListTemplate = ({
     pendingAction,
   } = useProfileActions()
   const [toasts, setToasts] = useState<ToastMessage[]>([])
+  
+  // Detect mobile viewport
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
+  // Reset displayed profiles when allProfiles change - start with 5
+  useEffect(() => {
+    setDisplayedProfiles(5)
+  }, [allProfiles.length])
+
+  // Infinite scroll for mobile view - load 5 profiles at a time
+  useEffect(() => {
+    if (!isMobile || allProfiles.length === 0 || displayedProfiles >= allProfiles.length) {
+      // Clean up observer if conditions not met
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+        observerRef.current = null
+      }
+      return
+    }
+
+    // Clean up previous observer
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Trigger when the element enters the viewport
+          if (entry.isIntersecting) {
+            setDisplayedProfiles((prev) => {
+              if (prev >= allProfiles.length) return prev
+              const next = Math.min(prev + 5, allProfiles.length)
+              return next
+            })
+          }
+        })
+      },
+      {
+        root: null,
+        rootMargin: '50px 0px', // Trigger 50px before element enters viewport (pre-load)
+        threshold: [0, 0.1, 0.5], // Trigger at multiple thresholds for better detection
+      },
+    )
+
+    observerRef.current = observer
+
+    // Observe the trigger element - use requestAnimationFrame for better timing
+    const rafId = requestAnimationFrame(() => {
+      const currentRef = loadMoreRef.current
+      if (currentRef && observerRef.current) {
+        observerRef.current.observe(currentRef)
+      }
+    })
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+        observerRef.current = null
+      }
+    }
+  }, [displayedProfiles, allProfiles.length, isMobile])
+
+  // Desktop pagination handler
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+
+  // Get profiles to display - mobile: one at a time from allProfiles, desktop: paginated profiles
+  const profilesToDisplay = allProfiles.slice(0, displayedProfiles)
+  
+  // For desktop, use paginated profiles; for mobile, use displayedProfiles from allProfiles
+  const finalProfilesToShow = useMemo(() => {
+    return isMobile ? profilesToDisplay : profiles
+  }, [isMobile, profilesToDisplay, profiles])
 
   const showToast = (message: string, variant: ToastVariant) => {
     const id = globalThis.crypto?.randomUUID() ?? `${Date.now()}`
@@ -196,7 +281,7 @@ const ProfileListTemplate = ({
         {note && <p className="mt-2 text-xs text-pink-600">{note}</p>}
         {totalProfiles > 0 && (
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-            Showing {profiles.length} of {totalProfiles} profiles
+            Showing {isMobile ? profilesToDisplay.length : profiles.length} of {totalProfiles} profiles
           </p>
         )}
       </header>
@@ -206,35 +291,48 @@ const ProfileListTemplate = ({
         </div>
       ) : (
         <>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {profiles.map((profile) => (
-              <ProfileActionCard
-                key={profile.id}
-                profile={profile}
-                onSendInterest={singleButton ? undefined : handleSendInterest}
-                onShortlist={singleButton ? undefined : handleShortlist}
-                onIgnore={singleButton ? undefined : handleIgnore}
-                singleButton={
-                  singleButton
-                    ? {
-                        label: singleButton.label,
-                        icon: singleButton.icon,
-                        onClick: handleSingleButtonAction,
-                        actionType: singleButton.actionType,
+          {/* Mobile: Single card at a time, Desktop: Grid layout */}
+          <div className="flex flex-col gap-4 md:grid md:grid-cols-2 md:gap-6 xl:grid-cols-3">
+            {finalProfilesToShow.map((profile, index) => {
+              // Set ref on the last displayed profile to trigger loading next batch
+              // When user scrolls past the last displayed profile, load next 5
+              const isLastCard = index === finalProfilesToShow.length - 1
+              const isTriggerCard = isMobile && 
+                displayedProfiles < allProfiles.length && 
+                isLastCard
+              
+              return (
+                <div
+                  key={`${profile.id}-${index}`}
+                  ref={isTriggerCard ? loadMoreRef : null}
+                  className="flex min-h-[85vh] flex-shrink-0 items-center justify-center md:min-h-0"
+                >
+                  <div className="w-full max-w-md">
+                    <ProfileActionCard
+                      profile={profile}
+                      onSendInterest={singleButton ? undefined : handleSendInterest}
+                      onShortlist={singleButton ? undefined : handleShortlist}
+                      onIgnore={singleButton ? undefined : handleIgnore}
+                      singleButton={
+                        singleButton
+                          ? {
+                              label: singleButton.label,
+                              icon: singleButton.icon,
+                              onClick: handleSingleButtonAction,
+                              actionType: singleButton.actionType,
+                            }
+                          : undefined
                       }
-                    : undefined
-                }
-                pendingActionType={pendingAction?.type}
-                pendingProfileId={pendingAction?.profileId}
-              />
-            ))}
+                      pendingActionType={pendingAction?.type}
+                      pendingProfileId={pendingAction?.profileId}
+                    />
+                  </div>
+                </div>
+              )
+            })}
           </div>
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+          {!isMobile && totalPages > 1 && (
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
           )}
         </>
       )}
@@ -359,4 +457,5 @@ export const JustJoinedPage = () => (
     endpoint="dashboard/getjustJoined"
   />
 )
+
 
