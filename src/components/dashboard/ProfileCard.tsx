@@ -35,9 +35,10 @@ const PlaceholderAvatar = ({ gender }: { gender?: string }) => (
 export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps) => {
   const navigate = useNavigate()
 
-  const compactLocation = useMemo(() => {
-    if (!profile.location) return 'Location not available'
-    return profile.location.split(',').slice(0, 3).join(', ')
+  const locationParts = useMemo(() => {
+    if (!profile.location) return []
+    // Split location and filter out empty strings
+    return profile.location.split(',').map((part) => part.trim()).filter(Boolean)
   }, [profile.location])
 
   const handleCardClick = () => {
@@ -58,9 +59,9 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
   return (
     <article
       onClick={handleCardClick}
-      className="group flex h-[280px] w-full max-w-[500px] cursor-pointer flex-shrink-0 flex-row overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
+      className="group flex h-auto min-h-[200px] w-full max-w-[500px] cursor-pointer flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all hover:shadow-xl sm:flex-row sm:h-[280px] dark:border-slate-700 dark:bg-slate-800"
     >
-      <div className="relative h-full w-[200px] flex-shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-900">
+      <div className="relative h-[250px] w-full flex-shrink-0 overflow-hidden bg-slate-100 sm:h-full sm:w-[200px] dark:bg-slate-900">
         {profile.avatar ? (
           <img
             src={profile.avatar}
@@ -92,9 +93,9 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
         )}
       </div>
 
-      <div className="flex flex-1 flex-col justify-between p-5 text-slate-600 dark:text-slate-300">
+      <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 text-slate-600 dark:text-slate-300">
         <div className="space-y-2 text-left">
-          <p className="text-lg font-bold text-slate-900 dark:text-white">{heartsIdDisplay}</p>
+          <p className="text-base font-bold sm:text-lg text-slate-900 dark:text-white">{heartsIdDisplay}</p>
           <p className="text-sm text-slate-700 dark:text-slate-300">
             {profile.age} yrs • {profile.height}
           </p>
@@ -102,13 +103,19 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
           {profile.caste && (
             <p className="text-sm text-slate-600 dark:text-slate-400">{profile.caste}</p>
           )}
-          <p className="text-xs text-slate-500 dark:text-slate-400">{compactLocation}</p>
+          {locationParts.length > 0 ? (
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {locationParts.join(', ')}
+            </p>
+          ) : (
+            <p className="text-xs text-slate-500 dark:text-slate-400">Location not available</p>
+          )}
         </div>
 
-        <div className="flex justify-end">
+        <div className="mt-4 flex justify-end sm:mt-0">
           <Button
             size="md"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-pink-600 active:scale-95"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-pink-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-pink-600 active:scale-95 sm:w-auto sm:px-5"
             onClick={handleButtonClick}
           >
             <EyeIcon className="h-4 w-4" />
