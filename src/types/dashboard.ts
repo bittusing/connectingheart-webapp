@@ -39,6 +39,7 @@ export type StatTile = {
 // Profile card data structure
 export type ProfileCardData = {
   id: string
+  heartsId?: number
   name: string
   age: number
   height: string

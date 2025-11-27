@@ -75,6 +75,7 @@ export const transformApiProfile = (apiProfile: ApiProfile): ProfileCardData => 
     const clientID = apiProfile.clientID || 'unknown'
     return {
       id: clientID,
+      heartsId: apiProfile.heartsId,
       name: `HEARTS-${apiProfile.heartsId || 'N/A'}`, // Display name using heartsId (name not in API response)
       age: apiProfile.dob ? calculateAge(apiProfile.dob) : 0,
       height: apiProfile.height ? formatHeight(apiProfile.height) : 'N/A',
@@ -90,6 +91,7 @@ export const transformApiProfile = (apiProfile: ApiProfile): ProfileCardData => 
     // Return a safe fallback profile
     return {
       id: apiProfile.clientID || 'unknown',
+      heartsId: apiProfile.heartsId,
       name: `HEARTS-${apiProfile.heartsId || 'N/A'}`,
       age: 0,
       height: 'N/A',

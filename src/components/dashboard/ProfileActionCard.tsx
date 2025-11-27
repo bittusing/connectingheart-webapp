@@ -1,5 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import {
+  XMarkIcon,
+  PaperAirplaneIcon,
+  StarIcon,
+} from '@heroicons/react/24/outline'
 import type { ProfileCardData } from '../../types/dashboard'
 import type { ProfileActionType } from '../../hooks/useProfileActions'
 
@@ -21,9 +25,13 @@ type ProfileActionCardProps = {
 }
 
 const actionButtons = [
-  { label: 'Send interest', icon: '➤', key: 'send-interest' as ProfileActionType },
-  { label: 'Shortlist', icon: '★', key: 'shortlist' as ProfileActionType },
-  { label: 'Ignore', icon: '✕', key: 'ignore' as ProfileActionType },
+  {
+    label: 'Send interest',
+    icon: PaperAirplaneIcon,
+    key: 'send-interest' as ProfileActionType,
+  },
+  { label: 'Shortlist', icon: StarIcon, key: 'shortlist' as ProfileActionType },
+  { label: 'Ignore', icon: XMarkIcon, key: 'ignore' as ProfileActionType },
 ]
 
 export const ProfileActionCard = ({
@@ -73,14 +81,14 @@ export const ProfileActionCard = ({
   return (
     <article
       onClick={handleCardClick}
-      className="cursor-pointer rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
+      className="group cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
     >
-      <div className="relative h-64 w-full overflow-hidden rounded-t-3xl bg-slate-200 dark:bg-slate-700">
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-200 dark:bg-slate-700">
         {profile.avatar ? (
           <img
             src={profile.avatar}
             alt={profile.name}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
             loading="lazy"
             onError={(e) => {
               // Hide image on error, show placeholder
@@ -102,12 +110,11 @@ export const ProfileActionCard = ({
             </svg>
           </div>
         )}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/90 to-transparent p-4">
-          {/* <p className="text-xs font-semibold uppercase tracking-widest text-white/80">
-            {profile.id}
-          </p> */}
-          <p className="mt-1 text-lg font-semibold text-white">{profile.name}</p>
-          <p className="text-sm text-white/80">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 pb-6">
+          <p className="text-xs font-semibold text-white/90">
+            {profile.heartsId ? `HEARTS-${profile.heartsId}` : profile.id}
+          </p>
+          <p className="mt-0.5 text-sm font-medium text-white">
             {profile.age} yrs | {profile.height} | {profile.income}
           </p>
         </div>
@@ -128,29 +135,32 @@ export const ProfileActionCard = ({
           </button>
         </div>
       ) : (
-      <div className="grid grid-cols-3 divide-x divide-slate-200 text-center text-xs uppercase tracking-widest dark:divide-slate-800">
-        {actionButtons.map((action) => {
-          const isPending =
-            pendingActionType === action.key && pendingProfileId === profile.id
+        <div className="grid grid-cols-3 divide-x divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
+          {actionButtons.map((action) => {
+            const isPending =
+              pendingActionType === action.key && pendingProfileId === profile.id
+            const IconComponent = action.icon
 
-          return (
-            <button
-              key={action.label}
-              onClick={(e) => handleActionClick(e, action.key)}
-              disabled={
-                (action.key === 'send-interest' && !onSendInterest) ||
-                (action.key === 'shortlist' && !onShortlist) ||
-                (action.key === 'ignore' && !onIgnore) ||
-                isPending
-              }
-              className="flex flex-col items-center gap-1 py-3 text-slate-600 transition hover:bg-pink-50 hover:text-pink-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-800"
-            >
-              <span className="text-base">{action.icon}</span>
-              {isPending ? 'Please wait...' : action.label}
-            </button>
-          )
-        })}
-      </div>
+            return (
+              <button
+                key={action.label}
+                onClick={(e) => handleActionClick(e, action.key)}
+                disabled={
+                  (action.key === 'send-interest' && !onSendInterest) ||
+                  (action.key === 'shortlist' && !onShortlist) ||
+                  (action.key === 'ignore' && !onIgnore) ||
+                  isPending
+                }
+                className="flex flex-col items-center justify-center gap-1.5 py-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 active:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-300 dark:hover:bg-slate-800 dark:active:bg-slate-700"
+              >
+                <IconComponent className="h-5 w-5" />
+                <span className="leading-tight">
+                  {isPending ? 'Please wait...' : action.label}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       )}
     </article>
   )
