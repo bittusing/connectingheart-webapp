@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { EyeIcon } from '@heroicons/react/24/outline'
 import type { ProfileCardData } from '../../types/dashboard'
 import { Button } from '../common/Button'
+import { getGenderPlaceholder } from '../../utils/imagePlaceholders'
 
 type ProfileCardProps = {
   profile: ProfileCardData
@@ -10,30 +11,11 @@ type ProfileCardProps = {
   onClick?: () => void
 }
 
-const getPlaceholderImage = (gender?: string) => {
-  const normalized = gender?.toLowerCase()
-  if (normalized === 'male' || normalized === 'm') {
-    return '/man-placeholder.png'
-  }
-  if (normalized === 'female' || normalized === 'f') {
-    return '/female-placeholder.png'
-  }
-  return '/female-placeholder.png'
-}
-
-const PlaceholderAvatar = ({ gender }: { gender?: string }) => (
-  <div className="flex h-full w-full items-center justify-center bg-slate-200 dark:bg-slate-800">
-    <img
-      src={getPlaceholderImage(gender)}
-      alt="Profile placeholder"
-      className="h-full w-full object-cover"
-      loading="lazy"
-    />
-  </div>
-)
-
 export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps) => {
   const navigate = useNavigate()
+  const [imageFailed, setImageFailed] = useState(false)
+  const profileImageSrc =
+    !profile.avatar || imageFailed ? getGenderPlaceholder(profile.gender) : profile.avatar ?? getGenderPlaceholder(profile.gender)
 
   const locationParts = useMemo(() => {
     if (!profile.location) return []
@@ -62,19 +44,13 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
       className="group flex h-auto min-h-[200px] w-full max-w-[500px] cursor-pointer flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm transition-all hover:shadow-xl sm:flex-row sm:h-[280px] dark:border-slate-700 dark:bg-slate-800"
     >
       <div className="relative h-[250px] w-full flex-shrink-0 overflow-hidden bg-slate-100 sm:h-full sm:w-[200px] dark:bg-slate-900">
-        {profile.avatar ? (
-          <img
-            src={profile.avatar}
-            alt={profile.name}
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none'
-            }}
-          />
-        ) : (
-          <PlaceholderAvatar gender={profile.gender} />
-        )}
+        <img
+          src={profileImageSrc}
+          alt={profile.name}
+          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+          loading="lazy"
+          onError={() => setImageFailed(true)}
+        />
         {profile.verified && (
           <div className="absolute right-2 top-2 rounded-full bg-emerald-500 p-1 shadow-md">
             <svg

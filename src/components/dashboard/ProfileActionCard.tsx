@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   XMarkIcon,
@@ -6,6 +7,7 @@ import {
 } from '@heroicons/react/24/outline'
 import type { ProfileCardData } from '../../types/dashboard'
 import type { ProfileActionType } from '../../hooks/useProfileActions'
+import { getGenderPlaceholder } from '../../utils/imagePlaceholders'
 
 type SingleButtonConfig = {
   label: string
@@ -44,6 +46,9 @@ export const ProfileActionCard = ({
   pendingProfileId,
 }: ProfileActionCardProps) => {
   const navigate = useNavigate()
+  const [imageFailed, setImageFailed] = useState(false)
+  const cardImageSrc =
+    !profile.avatar || imageFailed ? getGenderPlaceholder(profile.gender) : profile.avatar ?? getGenderPlaceholder(profile.gender)
 
   const handleCardClick = () => {
     // Navigate to profile view page using profile id
@@ -84,32 +89,13 @@ export const ProfileActionCard = ({
       className="group w-full cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-200 dark:bg-slate-700">
-        {profile.avatar ? (
-          <img
-            src={profile.avatar}
-            alt={profile.name}
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-            loading="lazy"
-            onError={(e) => {
-              // Hide image on error, show placeholder
-              e.currentTarget.style.display = 'none'
-            }}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <svg
-              className="h-16 w-16 text-slate-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        )}
+        <img
+          src={cardImageSrc}
+          alt={profile.name}
+          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+          loading="lazy"
+          onError={() => setImageFailed(true)}
+        />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 pb-6">
           <p className="text-xs font-semibold text-white/90">
             {profile.heartsId ? `HEARTS-${profile.heartsId}` : profile.id}

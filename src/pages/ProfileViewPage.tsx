@@ -18,6 +18,7 @@ import { useUnlockProfile } from '../hooks/useUnlockProfile'
 import { useUserProfile } from '../hooks/useUserProfile'
 import { Toast } from '../components/common/Toast'
 import { ConfirmModal } from '../components/forms/ConfirmModal'
+import { getGenderPlaceholder } from '../utils/imagePlaceholders'
 
 
 type TabType = 'basic' | 'family' | 'kundali' | 'match'
