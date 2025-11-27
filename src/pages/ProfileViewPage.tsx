@@ -829,20 +829,6 @@ export const ProfileViewPage = () => {
     )
   }
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'basic':
-        return renderBasicDetails()
-      case 'family':
-        return renderFamilyDetails()
-      case 'kundali':
-        return renderKundaliDetails()
-      case 'match':
-        return renderMatchDetails()
-      default:
-        return renderBasicDetails()
-    }
-  }
 
   const currentImage = profile.allProfilePics?.[currentImageIndex] || { url: profile.avatar, id: 'primary' }
   const hasMultipleImages = (profile.allProfilePics?.length || 0) > 1

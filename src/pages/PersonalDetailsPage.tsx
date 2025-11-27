@@ -526,7 +526,6 @@ export const PersonalDetailsPage = () => {
     }
   }
 
-  const [showAdvanced, setShowAdvanced] = useState(false)
 
   if (profileLoading || lookupLoading) {
     return (

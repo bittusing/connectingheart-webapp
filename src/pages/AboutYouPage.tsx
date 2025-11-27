@@ -36,7 +36,7 @@ export const AboutYouPage = () => {
   const [uploadPreview, setUploadPreview] = useState<string>('')
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
-  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3856').replace(/\/$/, '')
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'https://backendapp.connectingheart.co.in/').replace(/\/$/, '')
 
   useEffect(() => {
     const checkScreenName = async () => {
@@ -166,7 +166,7 @@ export const AboutYouPage = () => {
         if (payload[key] === undefined) delete payload[key]
       })
 
-      const response = await api.patch('personalDetails', payload)
+      const response = await api.patch<typeof payload, { status?: string; code?: string; message?: string }>('personalDetails', payload)
 
       if (response.status === 'success' || response.code === 'CH200') {
         showToast('About you updated successfully', 'success')

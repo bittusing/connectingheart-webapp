@@ -3,7 +3,7 @@ import { formatHeight, formatLocation } from './profileTransform'
 
 // Get profile picture URL
 export const getProfilePictureUrl = (clientID: string, fileId: string): string => {
-  const imageBaseUrl = 'https://backend.prod.connectingheart.co'
+  const imageBaseUrl = 'https://backendapp.connectingheart.co.in'
   return `${imageBaseUrl}/api/profile/file/${clientID}/${fileId}`
 }
 

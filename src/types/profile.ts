@@ -8,6 +8,7 @@ export type ProfileViewData = {
   location: string
   avatar?: string | null
   verified?: boolean
+  gender?: string
 
   // Basic Details
   dateOfBirth?: string
@@ -66,6 +67,7 @@ export type ProfileViewData = {
       isMatched: boolean
       value: string
     }>
+    partnerQualities?: string[]
   }
   // Lifestyle Data
   lifestyleData?: {

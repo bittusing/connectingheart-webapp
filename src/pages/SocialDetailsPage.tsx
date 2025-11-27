@@ -26,7 +26,7 @@ export const SocialDetailsPage = () => {
   const navigate = useNavigate()
   const api = useApiClient()
   const { updateLastActiveScreen } = useUpdateLastActiveScreen()
-  const { profile, loading: profileLoading } = useUserProfile()
+  const { loading: profileLoading } = useUserProfile()
   const { fetchLookup, lookupData } = useLookup()
 
   const [formData, setFormData] = useState({

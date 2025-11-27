@@ -61,7 +61,7 @@ const getProfilePicture = (
   
   // Use production backend URL for images: https://backend.prod.connectingheart.co
   // URL format: https://backend.prod.connectingheart.co/api/profile/file/{clientID}/{fileId}
-  const imageBaseUrl = 'https://backend.prod.connectingheart.co'
+  const imageBaseUrl = 'https://backendapp.connectingheart.co.in'
   // Ensure no double slashes in the path
   const cleanPath = `/api/profile/file/${clientID}/${primaryPic.id}`.replace(/\/+/g, '/')
   return `${imageBaseUrl}${cleanPath}`

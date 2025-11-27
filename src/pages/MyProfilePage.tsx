@@ -1,11 +1,9 @@
-import { useState } from 'react'
 import { useUserProfile } from '../hooks/useUserProfile'
 import { PencilIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { getGenderPlaceholder } from '../utils/imagePlaceholders'
 
 export const MyProfilePage = () => {
   const { profile, loading } = useUserProfile()
-  const [isEditing, setIsEditing] = useState(false)
 
   if (loading) {
     return (

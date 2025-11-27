@@ -4,7 +4,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
   type ReactNode,
 } from 'react'
 
@@ -18,23 +17,16 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-// Permanent light mode - always return 'light'
-const getInitialTheme = (): Theme => {
-  return 'light'
-}
-
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   // Force permanent light mode
-  const [theme] = useState<Theme>('light')
-
-  const applyThemeClass = useCallback((value: Theme) => {
+  const applyThemeClass = useCallback(() => {
     // Always ensure dark class is removed for permanent light mode
     document.documentElement.classList.remove('dark')
   }, [])
 
   useEffect(() => {
     // Always apply light theme on mount
-    applyThemeClass('light')
+    applyThemeClass()
     // Remove any stored theme preference
     window.localStorage.removeItem('connectingheart-theme')
   }, [applyThemeClass])

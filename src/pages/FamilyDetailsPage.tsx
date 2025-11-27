@@ -256,7 +256,7 @@ export const FamilyDetailsPage = () => {
         if (payload[key] === undefined) delete payload[key]
       })
 
-      const response = await api.patch('personalDetails', payload)
+      const response = await api.patch<typeof payload, { status?: string; code?: string; message?: string }>('personalDetails', payload)
 
       if (response.status === 'success' || response.code === 'CH200') {
         showToast('Family details updated successfully', 'success')

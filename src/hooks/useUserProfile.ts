@@ -20,6 +20,10 @@ type UserProfileApiData = {
   gender?: string
   profilePic?: UserProfilePicture[]
   screenName?: string
+  education?: { qualification?: string; otherUGDegree?: string }
+  employed_in?: string
+  occupation?: string
+  income?: number
 }
 
 type UserProfileResponse = {
@@ -39,7 +43,7 @@ const buildAvatarUrl = (profilePics: UserProfilePicture[] | undefined, userId: s
   const primaryPic = profilePics.find((pic) => pic.primary) ?? profilePics[0]
   if (!primaryPic?.id) return null
 
-  const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL || 'https://backend.prod.connectingheart.co'
+  const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL || 'https://backendapp.connectingheart.co.in'
   const cleanPath = `/api/profile/file/${userId}/${primaryPic.id}`.replace(/\/+/g, '/')
   return `${baseUrl}${cleanPath}`
 }

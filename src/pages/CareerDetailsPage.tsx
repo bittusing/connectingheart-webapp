@@ -114,7 +114,10 @@ export const CareerDetailsPage = () => {
     if (profile) {
       setFormData((prev) => ({
         ...prev,
-        education: profile.education || { qualification: '', otherUGDegree: '' },
+        education: {
+          qualification: profile.education?.qualification || '',
+          otherUGDegree: profile.education?.otherUGDegree || '',
+        },
         employed_in: profile.employed_in || 'Private Sector',
         occupation: profile.occupation || '',
         income: profile.income?.toString() || '',
