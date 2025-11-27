@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import type { UserProfileSummary } from '../../types/dashboard'
+import { getGenderPlaceholder } from '../../utils/imagePlaceholders'
 
 type DashboardHeroProps = {
   profile?: UserProfileSummary
@@ -28,33 +29,24 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
     return '/for-girls-man.png'
   }
 
+  const profileImageSrc = displayProfile.avatar || getGenderPlaceholder(displayProfile.gender)
+
   return (
     <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-600 via-pink-500 to-rose-500 p-6 text-white shadow-2xl">
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
           <div className="relative">
-            {displayProfile.avatar ? (
-              <Link to="/dashboard/myprofile"> <img
-              src={displayProfile.avatar}
-              alt="Your profile"
-              className="h-20 w-20 rounded-full object-cover ring-4 ring-white/30"
-            /></Link>
-             
-            ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/30">
-                <svg
-                  className="h-10 w-10 text-white/70"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            )}
+            <Link to="/dashboard/myprofile">
+              <img
+                src={profileImageSrc}
+                alt="Your profile"
+                className="h-20 w-20 rounded-full object-cover ring-4 ring-white/30"
+                onError={(e) => {
+                  e.currentTarget.onerror = null
+                  e.currentTarget.src = getGenderPlaceholder(displayProfile.gender)
+                }}
+              />
+            </Link>
             {/* <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-emerald-500 ring-2 ring-white"></div> */}
           </div>
           <div>

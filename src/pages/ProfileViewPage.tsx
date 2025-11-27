@@ -346,6 +346,9 @@ export const ProfileViewPage = () => {
     )
   }
 
+  const profilePlaceholder = getGenderPlaceholder(profile.gender)
+  const viewerPlaceholder = getGenderPlaceholder(currentUserProfile?.gender)
+
   const renderBasicDetails = () => (
     <div ref={basicSectionRef} className="space-y-6">
       {/* Profile Attributes */}
@@ -706,8 +709,8 @@ export const ProfileViewPage = () => {
     const totalCount = matchData.length || 15
 
     // Get profile images
-    const profileImage = profile.avatar || profile.allProfilePics?.[0]?.url
-    const currentUserImage = currentUserProfile?.avatarUrl
+    const profileImage = profile.avatar || profile.allProfilePics?.[0]?.url || profilePlaceholder
+    const currentUserImage = currentUserProfile?.avatarUrl || viewerPlaceholder
 
     // Partner preferences/qualities (if available in matchDetails or can be extracted)
     const partnerQualities = profile.matchDetails?.partnerQualities || [
@@ -739,30 +742,15 @@ export const ProfileViewPage = () => {
           <div className="flex flex-col items-center gap-2">
             <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Her Preference</p>
             <div className="relative h-20 w-20 overflow-hidden rounded-full ring-2 ring-pink-500">
-              {profileImage ? (
-                <img
-                  src={profileImage}
-                  alt={profile.name}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none'
-                  }}
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-slate-200 dark:bg-slate-700">
-                  <svg
-                    className="h-10 w-10 text-slate-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              )}
+              <img
+                src={profileImage}
+                alt={profile.name}
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null
+                  e.currentTarget.src = profilePlaceholder
+                }}
+              />
             </div>
           </div>
 
@@ -798,30 +786,15 @@ export const ProfileViewPage = () => {
           <div className="flex flex-col items-center gap-2">
             <p className="text-xs font-medium text-slate-600 dark:text-slate-400">You Match</p>
             <div className="relative h-20 w-20 overflow-hidden rounded-full ring-2 ring-pink-500">
-              {currentUserImage ? (
-                <img
-                  src={currentUserImage}
-                  alt="Your profile"
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none'
-                  }}
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-slate-200 dark:bg-slate-700">
-                  <svg
-                    className="h-10 w-10 text-slate-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              )}
+              <img
+                src={currentUserImage}
+                alt="Your profile"
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null
+                  e.currentTarget.src = viewerPlaceholder
+                }}
+              />
             </div>
           </div>
         </div>
@@ -873,6 +846,7 @@ export const ProfileViewPage = () => {
 
   const currentImage = profile.allProfilePics?.[currentImageIndex] || { url: profile.avatar, id: 'primary' }
   const hasMultipleImages = (profile.allProfilePics?.length || 0) > 1
+  const heroImageSrc = currentImage?.url || profilePlaceholder
 
   return (
     <div className="space-y-0 pb-20 md:pb-24">
@@ -887,30 +861,15 @@ export const ProfileViewPage = () => {
 
       {/* Profile Picture with Gradient Overlay */}
       <div className="relative mx-auto flex h-[60vh] min-h-[400px] w-full items-center justify-center overflow-hidden rounded-3xl bg-slate-200 dark:bg-slate-800 md:h-[70vh] lg:h-[80vh]">
-        {currentImage?.url ? (
-          <img
-            src={currentImage.url}
-            alt={profile.name}
-            className="h-full w-full object-contain"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none'
-            }}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <svg
-              className="h-24 w-24 text-slate-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        )}
+        <img
+          src={heroImageSrc}
+          alt={profile.name}
+          className="h-full w-full object-contain"
+          onError={(e) => {
+            e.currentTarget.onerror = null
+            e.currentTarget.src = profilePlaceholder
+          }}
+        />
         
         {/* Gradient Overlay with Profile Info */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-6 pb-12">

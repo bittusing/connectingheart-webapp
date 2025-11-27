@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useUserProfile } from '../hooks/useUserProfile'
 import { PencilIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { getGenderPlaceholder } from '../utils/imagePlaceholders'
 
 export const MyProfilePage = () => {
   const { profile, loading } = useUserProfile()
@@ -35,23 +36,15 @@ export const MyProfilePage = () => {
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
           <div className="relative">
-            {profile.avatarUrl ? (
-              <img
-                src={profile.avatarUrl}
-                alt={profile.name || 'Profile'}
-                className="h-32 w-32 rounded-full object-cover ring-4 ring-pink-100 dark:ring-pink-900/30"
-              />
-            ) : (
-              <div className="flex h-32 w-32 items-center justify-center rounded-full bg-slate-200 ring-4 ring-pink-100 dark:bg-slate-700 dark:ring-pink-900/30">
-                <svg className="h-16 w-16 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            )}
+            <img
+              src={profile.avatarUrl || getGenderPlaceholder(profile.gender)}
+              alt={profile.name || 'Profile'}
+              className="h-32 w-32 rounded-full object-cover ring-4 ring-pink-100 dark:ring-pink-900/30"
+              onError={(e) => {
+                e.currentTarget.onerror = null
+                e.currentTarget.src = getGenderPlaceholder(profile.gender)
+              }}
+            />
             <button className="absolute bottom-0 right-0 rounded-full bg-pink-500 p-2 text-white shadow-lg transition hover:bg-pink-600">
               <PencilIcon className="h-4 w-4" />
             </button>
