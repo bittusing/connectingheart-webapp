@@ -3,7 +3,6 @@ import { AppLayout } from './components/layout/AppLayout'
 import { DashboardLayout } from './components/layout/DashboardLayout'
 import { GlobalToastContainer } from './components/common/GlobalToastContainer'
 import { DashboardPage } from './pages/DashboardPage'
-import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import {
   AllProfilesPage,
@@ -43,6 +42,7 @@ import { PartnerPreferencesPage } from './pages/PartnerPreferencesPage'
 import { PartnerPreferenceEditPage } from './pages/PartnerPreferenceEditPage'
 import { AboutYouPage } from './pages/AboutYouPage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
+import { RootRedirect } from './routes/RootRedirect'
 
 function App() {
   return (
@@ -50,7 +50,7 @@ function App() {
       <GlobalToastContainer />
       <Routes>
       <Route element={<AppLayout />}>
-        <Route index element={<HomePage />} />
+        <Route index element={<RootRedirect />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="policy" element={<PolicyPage />} />
