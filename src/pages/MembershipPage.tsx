@@ -1,5 +1,6 @@
 import { MembershipPlanCard } from '../components/dashboard/MembershipPlanCard'
 import { useMemberships } from '../hooks/useMemberships'
+import { usePayment } from '../hooks/usePayment'
 
 const formatExpiry = (isoDate: string) =>
   new Intl.DateTimeFormat('en-IN', {
@@ -24,11 +25,19 @@ const SkeletonCard = () => (
 )
 
 export const MembershipPage = () => {
-  const { plans, myMembership, heartCoins, isLoading, error } = useMemberships()
+  const { plans, myMembership, heartCoins, isLoading, error, refetch } = useMemberships()
+  const { processPayment, isProcessing } = usePayment()
   const hasMembership = Boolean(myMembership)
   const expiryCopy = myMembership?.memberShipExpiryDate
     ? `Expires on ${formatExpiry(myMembership.memberShipExpiryDate)}`
     : 'Renew or upgrade anytime.'
+
+  const handleBuyClick = async (membershipId: string) => {
+    await processPayment(membershipId, () => {
+      // Refetch membership data after successful payment
+      void refetch()
+    })
+  }
 
   return (
     <section className="space-y-10">
@@ -39,7 +48,7 @@ export const MembershipPage = () => {
             Activate your plan
           </h1>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-            Choose a plan that matches your family’s expectations. Upgrade anytime — your preferences stay intact.
+            Choose a plan that matches your family's expectations. Upgrade anytime — your preferences stay intact.
           </p>
         </div>
         <div
@@ -73,7 +82,14 @@ export const MembershipPage = () => {
       <div className="grid gap-6 lg:grid-cols-3">
         {isLoading
           ? Array.from({ length: 3 }).map((_, index) => <SkeletonCard key={`membership-skeleton-${index}`} />)
-          : plans.map((plan) => <MembershipPlanCard key={plan.id} plan={plan} />)}
+          : plans.map((plan) => (
+              <MembershipPlanCard
+                key={plan.id}
+                plan={plan}
+                onBuyClick={handleBuyClick}
+                isProcessing={isProcessing}
+              />
+            ))}
       </div>
     </section>
   )

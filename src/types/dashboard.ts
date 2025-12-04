@@ -120,4 +120,30 @@ export type MembershipSnapshot = {
   memberShipExpiryDate: string | null
 }
 
+// Payment order response from backend
+export type PaymentOrderResponse = {
+  orderId: string
+  keyId: string
+  amount: number
+  currency: string
+}
+
+// Razorpay payment response
+export type RazorpayPaymentResponse = {
+  razorpay_payment_id: string
+  razorpay_order_id: string
+  razorpay_signature: string
+}
+
+// Payment verification response from backend
+export type PaymentVerificationResponse = {
+  status: 'success' | 'failed'
+  message: string
+  data?: {
+    membershipId?: string
+    planName?: string
+    expiryDate?: string
+  }
+}
+
 
