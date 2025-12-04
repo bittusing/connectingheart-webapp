@@ -292,7 +292,7 @@ const ProfileListTemplate = ({
       ) : (
         <>
           {/* Mobile: Single card at a time, Desktop: Grid layout */}
-          <div className="flex flex-col gap-4 md:grid md:grid-cols-2 md:gap-6 xl:grid-cols-3">
+          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-4 xl:grid-cols-3">
             {finalProfilesToShow.map((profile, index) => {
               // Set ref on the last displayed profile to trigger loading next batch
               // When user scrolls past the last displayed profile, load next 5

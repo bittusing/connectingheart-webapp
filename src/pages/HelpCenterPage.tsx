@@ -19,10 +19,10 @@ export const HelpCenterPage = () => {
               <div>
                 <p className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400">Phone</p>
                 <a
-                  href="tel:+919452613159"
+                  href="tel:+9450312512"
                   className="text-lg font-semibold text-slate-900 transition hover:text-pink-600 dark:text-white"
                 >
-                  +91-9452613159
+                  +91-9450312512
                 </a>
               </div>
               <div>

@@ -142,7 +142,7 @@ export const SearchResultsPage = () => {
         </div>
       ) : (
         <>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {paginatedProfiles.map((profile) => (
               <ProfileActionCard key={profile.id} profile={profile} />
             ))}
