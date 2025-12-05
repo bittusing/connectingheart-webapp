@@ -64,31 +64,24 @@ export const useNotificationCounts = () => {
         get<NotificationCountResponse>('dashboard/getMyBlockedProfiles'),
       ])
 
-      const getCount = (res: NotificationCountResponse | unknown[]): number => {
+      // Get notification count (unseen count) from response
+      const getNotificationCount = (res: NotificationCountResponse | unknown[]): number => {
         if (Array.isArray(res)) {
-          return res.length
+          return 0 // Array response doesn't have notification count
         }
-        if (res.shortlistedProfilesData) {
-          return res.shortlistedProfilesData.length
-        }
-        if (res.ignoreListData) {
-          return res.ignoreListData.length
-        }
-        if (res.filteredProfiles) {
-          return res.filteredProfiles.length
-        }
-        return res.notificationCount || 0
+        // Use notificationCount field which represents unseen/new notifications
+        return res.notificationCount ?? 0
       }
 
       const newCounts: NotificationCounts = {
-        interestReceived: getCount(interestReceivedRes),
-        interestSent: getCount(interestSentRes),
-        unlockedProfiles: getCount(unlockedRes),
-        iDeclined: getCount(iDeclinedRes),
-        theyDeclined: getCount(theyDeclinedRes),
-        shortlisted: getCount(shortlistedRes),
-        ignored: getCount(ignoredRes),
-        blocked: getCount(blockedRes),
+        interestReceived: getNotificationCount(interestReceivedRes),
+        interestSent: getNotificationCount(interestSentRes),
+        unlockedProfiles: getNotificationCount(unlockedRes),
+        iDeclined: getNotificationCount(iDeclinedRes),
+        theyDeclined: getNotificationCount(theyDeclinedRes),
+        shortlisted: getNotificationCount(shortlistedRes),
+        ignored: getNotificationCount(ignoredRes),
+        blocked: getNotificationCount(blockedRes),
         total: 0,
       }
 
