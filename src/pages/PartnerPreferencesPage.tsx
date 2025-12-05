@@ -297,156 +297,173 @@ export const PartnerPreferencesPage = () => {
 
   if (profileLoading || pageLoading) {
     return (
-      <section className="min-h-screen bg-gradient-to-b from-[#f8f2ff] via-white to-white py-10">
-        <div className="mx-auto w-full max-w-2xl rounded-[32px] bg-white/95 p-8 text-center shadow-[0_25px_70px_rgba(67,56,202,0.15)]">
-          <p className="text-sm text-slate-600">Loading partner preferences...</p>
-        </div>
+      <section className="space-y-8">
+        <header className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <p className="text-sm text-slate-600 dark:text-slate-300">Loading partner preferences...</p>
+        </header>
       </section>
     )
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from-[#f8f2ff] via-white to-white py-10">
-      <div className="mx-auto w-full max-w-2xl rounded-[32px] bg-white/95 p-8 shadow-[0_25px_70px_rgba(67,56,202,0.15)]">
-        <div className="space-y-4 text-center">
-          <div className="h-2 rounded-full bg-slate-100">
-            <div className="h-full w-[84%] rounded-full bg-gradient-to-r from-[#ff4f8b] to-[#ffa0d2]" />
+    <section className="space-y-8">
+      <header className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h1 className="font-display text-3xl font-semibold text-slate-900 dark:text-white">
+          Partner Preferences
+        </h1>
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          Update your ideal partner criteria to find the perfect match.
+        </p>
+      </header>
+
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        {/* Basic Preferences Card */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Basic Preferences</h2>
+          <div className="space-y-6">
+            <RangeGroup
+              label="Age"
+              minLabel="Min Age"
+              maxLabel="Max Age"
+              minValue={formState.minAge}
+              maxValue={formState.maxAge}
+              options={optionSets.age}
+              onMinChange={(value) => setFormState((prev) => ({ ...prev, minAge: value }))}
+              onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxAge: value }))}
+            />
+
+            <RangeGroup
+              label="Height"
+              minLabel="Min Height"
+              maxLabel="Max Height"
+              minValue={formState.minHeight}
+              maxValue={formState.maxHeight}
+              options={optionSets.height}
+              onMinChange={(value) => setFormState((prev) => ({ ...prev, minHeight: value }))}
+              onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxHeight: value }))}
+            />
+
+            <RangeGroup
+              label="Income"
+              minLabel="Min Income"
+              maxLabel="Max Income"
+              minValue={formState.minIncome}
+              maxValue={formState.maxIncome}
+              options={optionSets.income}
+              onMinChange={(value) => setFormState((prev) => ({ ...prev, minIncome: value }))}
+              onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxIncome: value }))}
+            />
           </div>
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-pink-500">
-              Step 6 of 7
-            </p>
-            <h1 className="text-2xl font-semibold text-slate-900">Partner Preferences</h1>
-            <p className="text-sm text-slate-500">Update your ideal partner criteria.</p>
+        </div>
+
+        {/* Location & Background Card */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Location & Background</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <MultiSelectField
+              label="Country"
+              placeholder="Select country"
+              options={countryOptions}
+              selectedValues={formState.countries}
+              onChange={(values) => handleMultiChange('countries', values)}
+            />
+            <MultiSelectField
+              label="Residential Status"
+              placeholder="Select residential status"
+              options={optionSets.residential}
+              selectedValues={formState.residentialStatuses}
+              onChange={(values) => handleMultiChange('residentialStatuses', values)}
+            />
+            <MultiSelectField
+              label="Occupation"
+              placeholder="Select occupation"
+              options={optionSets.occupation}
+              selectedValues={formState.occupations}
+              onChange={(values) => handleMultiChange('occupations', values)}
+            />
+            <MultiSelectField
+              label="Mother Tongue"
+              placeholder="Select mother tongue"
+              options={optionSets.motherTongue}
+              selectedValues={formState.motherTongues}
+              onChange={(values) => handleMultiChange('motherTongues', values)}
+            />
           </div>
         </div>
 
-        <form className="mt-8 space-y-8" onSubmit={handleSubmit}>
-        <RangeGroup
-          label="Age"
-          minLabel="Min Age"
-          maxLabel="Max Age"
-          minValue={formState.minAge}
-          maxValue={formState.maxAge}
-          options={optionSets.age}
-          onMinChange={(value) => setFormState((prev) => ({ ...prev, minAge: value }))}
-          onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxAge: value }))}
-        />
+        {/* Religion & Family Card */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Religion & Family</h2>
+          <div className="space-y-6">
+            <CheckboxGroup
+              label="Religion"
+              options={optionSets.religion}
+              selectedValues={formState.religions}
+              onToggle={(value) => handleToggle('religions', value)}
+            />
 
-        <RangeGroup
-          label="Height"
-          minLabel="Min Height"
-          maxLabel="Max Height"
-          minValue={formState.minHeight}
-          maxValue={formState.maxHeight}
-          options={optionSets.height}
-          onMinChange={(value) => setFormState((prev) => ({ ...prev, minHeight: value }))}
-          onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxHeight: value }))}
-        />
+            <CheckboxGroup
+              label="Marital Status"
+              options={optionSets.maritalStatus}
+              selectedValues={formState.maritalStatuses}
+              onToggle={(value) => handleToggle('maritalStatuses', value)}
+            />
 
-        <RangeGroup
-          label="Income"
-          minLabel="Min Income"
-          maxLabel="Max Income"
-          minValue={formState.minIncome}
-          maxValue={formState.maxIncome}
-          options={optionSets.income}
-          onMinChange={(value) => setFormState((prev) => ({ ...prev, minIncome: value }))}
-          onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxIncome: value }))}
-        />
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <MultiSelectField
-            label="Country"
-            placeholder="Select country"
-            options={countryOptions}
-            selectedValues={formState.countries}
-            onChange={(values) => handleMultiChange('countries', values)}
-          />
-          <MultiSelectField
-            label="Residential Status"
-            placeholder="Select residential status"
-            options={optionSets.residential}
-            selectedValues={formState.residentialStatuses}
-            onChange={(values) => handleMultiChange('residentialStatuses', values)}
-          />
-          <MultiSelectField
-            label="Occupation"
-            placeholder="Select occupation"
-            options={optionSets.occupation}
-            selectedValues={formState.occupations}
-            onChange={(values) => handleMultiChange('occupations', values)}
-          />
-          <MultiSelectField
-            label="Mother Tongue"
-            placeholder="Select mother tongue"
-            options={optionSets.motherTongue}
-            selectedValues={formState.motherTongues}
-            onChange={(values) => handleMultiChange('motherTongues', values)}
-          />
+            <div className="grid gap-4 md:grid-cols-2">
+              <MultiSelectField
+                label="Caste"
+                placeholder="Select caste"
+                options={optionSets.caste}
+                selectedValues={formState.castes}
+                onChange={(values) => handleMultiChange('castes', values)}
+              />
+              <MultiSelectField
+                label="Education"
+                placeholder="Select education"
+                options={optionSets.education}
+                selectedValues={formState.educations}
+                onChange={(values) => handleMultiChange('educations', values)}
+              />
+            </div>
+          </div>
         </div>
 
-        <CheckboxGroup
-          label="Religion"
-          options={optionSets.religion}
-          selectedValues={formState.religions}
-          onToggle={(value) => handleToggle('religions', value)}
-        />
-
-        <CheckboxGroup
-          label="Marital Status"
-          options={optionSets.maritalStatus}
-          selectedValues={formState.maritalStatuses}
-          onToggle={(value) => handleToggle('maritalStatuses', value)}
-        />
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <MultiSelectField
-            label="Caste"
-            placeholder="Select caste"
-            options={optionSets.caste}
-            selectedValues={formState.castes}
-            onChange={(values) => handleMultiChange('castes', values)}
-          />
-          <MultiSelectField
-            label="Education"
-            placeholder="Select education"
-            options={optionSets.education}
-            selectedValues={formState.educations}
-            onChange={(values) => handleMultiChange('educations', values)}
-          />
+        {/* Horoscope Card */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Horoscope</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <MultiSelectField
+              label="Horoscope"
+              placeholder="Select horoscope"
+              options={optionSets.horoscope}
+              selectedValues={formState.horoscopes}
+              onChange={(values) => handleMultiChange('horoscopes', values)}
+            />
+            <CheckboxGroup
+              label="Manglik"
+              options={optionSets.manglik}
+              selectedValues={formState.manglik}
+              onToggle={(value) => handleToggle('manglik', value)}
+            />
+          </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <MultiSelectField
-            label="Horoscope"
-            placeholder="Select horoscope"
-            options={optionSets.horoscope}
-            selectedValues={formState.horoscopes}
-            onChange={(values) => handleMultiChange('horoscopes', values)}
-          />
-          <CheckboxGroup
-            label="Manglik"
-            options={optionSets.manglik}
-            selectedValues={formState.manglik}
-            onToggle={(value) => handleToggle('manglik', value)}
-          />
-        </div>
-
-          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+        {/* Submit Button Card */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Button
               type="button"
               variant="ghost"
-              onClick={() => navigate('/dashboard/familydetails', { replace: true })}
+              onClick={() => navigate('/dashboard', { replace: true })}
             >
-              ← Back
+              Cancel
             </Button>
-            <Button type="submit" size="lg" disabled={submitting}>
-              {submitting ? 'Saving...' : 'Next'}
+            <Button type="submit" disabled={submitting}>
+              {submitting ? 'Saving...' : 'Save Preferences'}
             </Button>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </section>
   )
 
@@ -482,8 +499,8 @@ const RangeGroup = ({
   onMinChange: (value: string) => void
   onMaxChange: (value: string) => void
 }) => (
-  <div className="space-y-3 rounded-3xl border border-slate-100 bg-slate-50/50 p-4 shadow-inner shadow-white">
-    <p className="text-sm font-semibold text-slate-900">{label}</p>
+  <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+    <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
     <div className="grid gap-4 md:grid-cols-2">
       <SelectInput
         label={minLabel}
@@ -517,11 +534,11 @@ const SelectInput = ({
   onChange: (value: string) => void
 }) => (
   <label className="space-y-1">
-    <span className="text-sm font-medium text-slate-600">{label}</span>
+    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
     <select
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
+      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
     >
       <option value="">{placeholder}</option>
       {options.map((option) => (
@@ -566,8 +583,8 @@ const MultiSelectField = ({
 
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium text-slate-600">{label}</p>
-      <div className="relative rounded-2xl border border-slate-200 bg-white p-3">
+      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</p>
+      <div className="relative rounded-2xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
         <div className="flex flex-wrap gap-2">
           {selectedValues.map((value) => {
             const option = options.find((item) => item.value === value)
@@ -575,13 +592,13 @@ const MultiSelectField = ({
             return (
               <span
                 key={`${label}-${value}`}
-                className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-3 py-1 text-sm font-medium text-pink-600"
+                className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-3 py-1 text-sm font-medium text-pink-600 dark:bg-pink-900/30 dark:text-pink-400"
               >
                 {displayLabel}
                 <button
                   type="button"
                   onClick={() => handleRemove(value)}
-                  className="text-base leading-none text-pink-500"
+                  className="text-base leading-none text-pink-500 dark:text-pink-400"
                   aria-label={`Remove ${displayLabel}`}
                 >
                   ×
@@ -591,18 +608,18 @@ const MultiSelectField = ({
           })}
           <button
             type="button"
-            className="min-w-[160px] flex-1 rounded-full border border-dashed border-slate-300 px-3 py-1 text-left text-sm text-slate-500 hover:border-pink-400 hover:text-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
+            className="min-w-[160px] flex-1 rounded-full border border-dashed border-slate-300 px-3 py-1 text-left text-sm text-slate-500 hover:border-pink-400 hover:text-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500 dark:border-slate-600 dark:text-slate-400 dark:hover:border-pink-500 dark:hover:text-slate-300"
             onClick={() => setIsOpen((prev) => !prev)}
           >
             {availableOptions.length ? placeholder : 'No options available'}
           </button>
         </div>
         {isOpen && availableOptions.length > 0 && (
-          <div className="absolute left-3 right-3 top-full z-20 mt-2 max-h-60 overflow-hidden rounded-xl border border-slate-200 bg-white text-sm shadow-lg">
-            <div className="border-b border-slate-100 bg-slate-50/80 px-3 py-2">
+          <div className="absolute left-3 right-3 top-full z-20 mt-2 max-h-60 overflow-hidden rounded-xl border border-slate-200 bg-white text-sm shadow-lg dark:border-slate-700 dark:bg-slate-800">
+            <div className="border-b border-slate-100 bg-slate-50/80 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/80">
               <input
                 type="text"
-                className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-500"
+                className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-pink-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
                 placeholder="Search..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
@@ -610,13 +627,13 @@ const MultiSelectField = ({
             </div>
             <div className="max-h-48 overflow-y-auto py-1">
               {filteredOptions.length === 0 && (
-                <div className="px-3 py-2 text-xs text-slate-400">No matches found</div>
+                <div className="px-3 py-2 text-xs text-slate-400 dark:text-slate-500">No matches found</div>
               )}
               {filteredOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
-                  className="flex w-full items-center justify-between px-3 py-2 text-left text-slate-700 hover:bg-pink-50"
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-slate-700 hover:bg-pink-50 dark:text-slate-100 dark:hover:bg-slate-700/50"
                   onClick={() => handleAdd(option.value as string)}
                 >
                   <span>{option.label}</span>
@@ -642,13 +659,13 @@ const CheckboxGroup = ({
   onToggle: (value: string) => void
 }) => (
   <div className="space-y-2">
-    <p className="text-sm font-medium text-slate-600">{label}</p>
+    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</p>
     <div className="flex flex-wrap gap-4">
       {options.map((option) => (
-        <label key={`${label}-${option.value}`} className="inline-flex items-center gap-2 text-sm text-slate-600">
+        <label key={`${label}-${option.value}`} className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
           <input
             type="checkbox"
-            className="h-4 w-4 rounded border-slate-300 text-pink-600 focus:ring-pink-500"
+            className="h-4 w-4 rounded border-slate-300 text-pink-600 focus:ring-pink-500 dark:border-slate-600 dark:bg-slate-800"
             checked={selectedValues.includes(option.value as string)}
             onChange={() => onToggle(option.value as string)}
           />
