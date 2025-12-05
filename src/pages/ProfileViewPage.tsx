@@ -650,10 +650,9 @@ export const ProfileViewPage = () => {
               <div className="grid gap-3 sm:grid-cols-3">
                 {lifestyle.drinkingHabits && (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-700 dark:bg-slate-800/50">
-                    {/* Wine Glass Icon - Wide shallow bowl with short stem */}
-                    <svg className="mx-auto h-10 w-10 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 4h14M5 4c-2 0-2.5 1.5-2.5 3.5v8c0 2 .5 3.5 2.5 3.5h9c2 0 2.5-1.5 2.5-3.5v-8c0-2-.5-3.5-2.5-3.5" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v6M10 24h4" />
+                    {/* Wine Glass Icon */}
+                    <svg className="mx-auto h-10 w-10 text-slate-600 dark:text-slate-400" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18,20H13V14.94A9,9,0,0,0,21,6a8.72,8.72,0,0,0-.67-3.39,1,1,0,0,0-.22-.32L20,2.21a.92.92,0,0,0-.21-.13A.94.94,0,0,0,19.51,2l-.1,0H4.59L4.5,2a.94.94,0,0,0-.29.06A2.12,2.12,0,0,0,4,2.2l-.12.09a1,1,0,0,0-.22.32A8.72,8.72,0,0,0,3,6a9,9,0,0,0,8,8.94V20H6a1,1,0,0,0,0,2H18a1,1,0,0,0,0-2ZM5,6a6.91,6.91,0,0,1,.29-2H18.71A6.91,6.91,0,0,1,19,6,7,7,0,0,1,5,6Z" />
                     </svg>
                     <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">
                       {lifestyle.drinkingHabits === 'No' ? 'She does not drink' : lifestyle.drinkingHabits === 'Yes' ? 'She drinks' : `She ${lifestyle.drinkingHabits.toLowerCase()}`}
@@ -662,12 +661,9 @@ export const ProfileViewPage = () => {
                 )}
                 {lifestyle.dietaryHabits && (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-700 dark:bg-slate-800/50">
-                    {/* Fork and Knife Icon - Fork left, knife right, upright */}
-                    <svg className="mx-auto h-10 w-10 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      {/* Fork on left with 4 tines */}
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 2v20M2 2l1 1M2 22l1-1M3 4l0.5-0.5M3 6l0.5-0.5M3 8l0.5-0.5M3 10l0.5-0.5" />
-                      {/* Knife on right with curved blade */}
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 2v20M20 2l1 1M20 22l1-1M20.5 4l0.5-0.3M20.5 6l0.5-0.3M20.5 8l0.5-0.3M20.5 10l0.5-0.3" />
+                    {/* Fork and Knife Icon */}
+                    <svg className="mx-auto h-10 w-10 text-slate-600 dark:text-slate-400" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19,2a1,1,0,0,0-1,1V8.46l-1,.67V3a1,1,0,0,0-2,0V9.13l-1-.67V3a1,1,0,0,0-2,0V9a1,1,0,0,0,.45.83L15,11.54V21a1,1,0,0,0,2,0V11.54l2.55-1.71A1,1,0,0,0,20,9V3A1,1,0,0,0,19,2ZM9,2H9A5,5,0,0,0,4,7v6a1,1,0,0,0,1,1H8v7a1,1,0,0,0,2,0V3A1,1,0,0,0,9,2ZM8,12H6V7A3,3,0,0,1,8,4.17Z" />
                     </svg>
                     <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">
                       {lifestyle.dietaryHabits === 'Vegetarian' ? 'She is a vegetarian' : lifestyle.dietaryHabits === 'Non Vegetarian' ? 'She is non-vegetarian' : `She is ${lifestyle.dietaryHabits.toLowerCase()}`}
@@ -676,12 +672,9 @@ export const ProfileViewPage = () => {
                 )}
                 {lifestyle.smokingHabits && (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-700 dark:bg-slate-800/50">
-                    {/* Cigarette Icon - Horizontal line with 2-3 wavy smoke lines from right */}
-                    <svg className="mx-auto h-10 w-10 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 12h16" />
-                      {/* Wavy smoke lines */}
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 12c0.3 0.3 0.6-0.3 0.9-0.6M18 12c0.3-0.3 0.6 0.3 0.9 0.6" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.5 11.2c0.25 0.25 0.5-0.25 0.75-0.5M18.5 12.8c0.25-0.25 0.5 0.25 0.75 0.5" />
+                    {/* Cigarette Icon */}
+                    <svg className="mx-auto h-10 w-10 text-slate-600 dark:text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M15.708 7.692a2.77 2.77 0 0 0 .834-1.984 2.792 2.792 0 0 0-2.792-2.791v1.25c.85 0 1.542.691 1.542 1.541S14.6 7.25 13.75 7.25V8.5c1.867 0 3.333 1.525 3.333 3.392v1.858h1.25v-1.867c0-1.85-1.066-3.45-2.625-4.191ZM1.667 14.583h12.5v2.5h-12.5v-2.5Zm15.417 0h1.25v2.5h-1.25v-2.5Zm-.834 0H15v2.5h1.25v-2.5ZM12.083 9.75h1.275c1.559 0 2.892 1.125 2.892 2.633v1.367H15v-1.083c0-1.092-.767-1.709-1.642-1.709h-1.275a2.792 2.792 0 0 1 0-5.583v1.25c-.85 0-1.541.608-1.541 1.458s.691 1.667 1.541 1.667Z" />
                     </svg>
                     <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">
                       {lifestyle.smokingHabits === 'No' ? 'She does not smoke' : lifestyle.smokingHabits === 'Yes' ? 'She smokes' : `She ${lifestyle.smokingHabits.toLowerCase()}`}
