@@ -9,7 +9,11 @@ import { useUpdateNotificationCount, type NotificationType } from '../hooks/useU
 type SingleButtonConfig = {
   label: string
   icon?: React.ReactNode
-  actionType: 'unsend-interest' | 'unshortlist' | 'unignore'
+  actionType: 'unsend-interest' | 'unshortlist' | 'unignore' | 'accept-again' | 'unblock'
+}
+
+type DualButtonConfig = {
+  type: 'accept-decline'
 }
 
 type ProfileListTemplateProps = {
@@ -18,6 +22,8 @@ type ProfileListTemplateProps = {
   endpoint: string
   note?: string
   singleButton?: SingleButtonConfig
+  dualButton?: DualButtonConfig
+  hideButtons?: boolean
   notificationType?: NotificationType
 }
 
@@ -35,6 +41,8 @@ const ProfileListTemplate = ({
   endpoint,
   note,
   singleButton,
+  dualButton,
+  hideButtons,
   notificationType,
 }: ProfileListTemplateProps) => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -53,6 +61,9 @@ const ProfileListTemplate = ({
     unsendInterest,
     unshortlistProfile,
     unignoreProfile,
+    unblockProfile,
+    acceptInterest,
+    declineInterest,
     pendingAction,
   } = useProfileActions()
   const { updateNotificationCount } = useUpdateNotificationCount()
@@ -213,31 +224,84 @@ const ProfileListTemplate = ({
     try {
       let response
       let successMessage = ''
+      let notificationTypeForUpdate: NotificationType | null = null
 
       switch (singleButton.actionType) {
         case 'unsend-interest':
           response = await unsendInterest(profileId)
           successMessage = response?.message ?? 'Interest cancelled successfully.'
+          notificationTypeForUpdate = 'interestSent'
           break
         case 'unshortlist':
           response = await unshortlistProfile(profileId)
           successMessage = response?.message ?? 'Profile removed from shortlist successfully.'
+          notificationTypeForUpdate = 'shortlistedProfile'
           break
         case 'unignore':
           response = await unignoreProfile(profileId)
           successMessage = response?.message ?? 'Profile removed from ignored list successfully.'
+          notificationTypeForUpdate = 'ignoredProfile'
+          break
+        case 'accept-again':
+          response = await acceptInterest(profileId)
+          successMessage = response?.message ?? 'Interest accepted successfully.'
+          notificationTypeForUpdate = 'iDeclined'
+          break
+        case 'unblock':
+          response = await unblockProfile(profileId)
+          successMessage = response?.message ?? 'Profile unblocked successfully.'
+          notificationTypeForUpdate = 'blockedProfile'
           break
         default:
           throw new Error('Unknown action type')
       }
 
       showToast(successMessage, 'success')
+      
+      // Update notification count after action
+      if (notificationTypeForUpdate) {
+        const remainingIds = allProfiles
+          .filter((p) => p.id !== profileId)
+          .map((p) => p.id)
+        if (remainingIds.length > 0) {
+          void updateNotificationCount(remainingIds, notificationTypeForUpdate)
+        }
+      }
+      
       await refetch({ silent: true })
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message.replace('API ', '') || `Unable to ${singleButton.label.toLowerCase()}.`
           : `Unable to ${singleButton.label.toLowerCase()}.`
+      showToast(message, 'error')
+    }
+  }
+
+  const handleAcceptInterest = async (profileId: string) => {
+    try {
+      const response = await acceptInterest(profileId)
+      showToast(response?.message ?? 'Interest accepted successfully.', 'success')
+      await refetch({ silent: true })
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message.replace('API ', '') || 'Unable to accept interest.'
+          : 'Unable to accept interest.'
+      showToast(message, 'error')
+    }
+  }
+
+  const handleDeclineInterest = async (profileId: string) => {
+    try {
+      const response = await declineInterest(profileId)
+      showToast(response?.message ?? 'Interest declined successfully.', 'success')
+      await refetch({ silent: true })
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message.replace('API ', '') || 'Unable to decline interest.'
+          : 'Unable to decline interest.'
       showToast(message, 'error')
     }
   }
@@ -324,9 +388,9 @@ const ProfileListTemplate = ({
                   <div className="w-full max-w-md">
                     <ProfileActionCard
                       profile={profile}
-                      onSendInterest={singleButton ? undefined : handleSendInterest}
-                      onShortlist={singleButton ? undefined : handleShortlist}
-                      onIgnore={singleButton ? undefined : handleIgnore}
+                      onSendInterest={singleButton || dualButton || hideButtons ? undefined : handleSendInterest}
+                      onShortlist={singleButton || dualButton || hideButtons ? undefined : handleShortlist}
+                      onIgnore={singleButton || dualButton || hideButtons ? undefined : handleIgnore}
                       singleButton={
                         singleButton
                           ? {
@@ -337,6 +401,15 @@ const ProfileListTemplate = ({
                             }
                           : undefined
                       }
+                      dualButton={
+                        dualButton
+                          ? {
+                              onAccept: handleAcceptInterest,
+                              onDecline: handleDeclineInterest,
+                            }
+                          : undefined
+                      }
+                      hideButtons={hideButtons}
                       pendingActionType={pendingAction?.type}
                       pendingProfileId={pendingAction?.profileId}
                     />
@@ -401,6 +474,7 @@ export const InterestReceivedPage = () => (
     title="Interests Received"
     subtitle="Profiles that have sent you interest."
     endpoint="interest/getInterests"
+    dualButton={{ type: 'accept-decline' }}
     notificationType="interestReceived"
   />
 )
@@ -429,6 +503,10 @@ export const IDeclinedPage = () => (
     title="I Declined"
     subtitle="Profiles whose interest you have declined."
     endpoint="dashboard/getMyDeclinedProfiles"
+    singleButton={{
+      label: 'Accept Again',
+      actionType: 'accept-again',
+    }}
     notificationType="iDeclined"
   />
 )
@@ -437,6 +515,7 @@ export const TheyDeclinedPage = () => (
     title="They Declined"
     subtitle="Profiles that declined your interest."
     endpoint="dashboard/getUsersWhoHaveDeclinedMe"
+    hideButtons
     notificationType="theyDeclined"
   />
 )
@@ -469,6 +548,10 @@ export const BlockedProfilesPage = () => (
     title="Blocked Profiles"
     subtitle="Profiles you have blocked from contacting you."
     endpoint="dashboard/getMyBlockedProfiles"
+    singleButton={{
+      label: 'Unblock',
+      actionType: 'unblock',
+    }}
     notificationType="blockedProfile"
   />
 )

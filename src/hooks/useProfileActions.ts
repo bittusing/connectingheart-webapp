@@ -10,10 +10,14 @@ type ApiResponse = {
 export type ProfileActionType =
   | 'send-interest'
   | 'unsend-interest'
+  | 'accept-interest'
+  | 'accept-again'
+  | 'decline-interest'
   | 'shortlist'
   | 'unshortlist'
   | 'ignore'
   | 'unignore'
+  | 'unblock'
 
 export const useProfileActions = () => {
   const api = useApiClient()
@@ -52,6 +56,28 @@ export const useProfileActions = () => {
     [api, runAction],
   )
 
+  const acceptInterest = useCallback(
+    (profileId: string) =>
+      runAction('accept-interest', profileId, () =>
+        api.post<{ _id: string; status: string }, ApiResponse>('interest/updateInterest', {
+          _id: profileId,
+          status: 'accept',
+        }),
+      ),
+    [api, runAction],
+  )
+
+  const declineInterest = useCallback(
+    (profileId: string) =>
+      runAction('decline-interest', profileId, () =>
+        api.post<{ _id: string; status: string }, ApiResponse>('interest/updateInterest', {
+          _id: profileId,
+          status: 'reject',
+        }),
+      ),
+    [api, runAction],
+  )
+
   const shortlistProfile = useCallback(
     (profileId: string) =>
       runAction('shortlist', profileId, () => api.get<ApiResponse>(`dashboard/shortlist/${profileId}`)),
@@ -76,13 +102,22 @@ export const useProfileActions = () => {
     [api, runAction],
   )
 
+  const unblockProfile = useCallback(
+    (profileId: string) =>
+      runAction('unblock', profileId, () => api.get<ApiResponse>(`dashboard/unblockprofile/${profileId}`)),
+    [api, runAction],
+  )
+
   return {
     sendInterest,
     unsendInterest,
+    acceptInterest,
+    declineInterest,
     shortlistProfile,
     unshortlistProfile,
     ignoreProfile,
     unignoreProfile,
+    unblockProfile,
     pendingAction,
   }
 }

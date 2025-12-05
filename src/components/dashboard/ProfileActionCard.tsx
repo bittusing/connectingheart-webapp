@@ -4,6 +4,8 @@ import {
   XMarkIcon,
   PaperAirplaneIcon,
   StarIcon,
+  CheckIcon,
+  NoSymbolIcon,
 } from '@heroicons/react/24/outline'
 import type { ProfileCardData } from '../../types/dashboard'
 import type { ProfileActionType } from '../../hooks/useProfileActions'
@@ -16,12 +18,19 @@ type SingleButtonConfig = {
   actionType: ProfileActionType
 }
 
+type DualButtonConfig = {
+  onAccept: (profileId: string) => void
+  onDecline: (profileId: string) => void
+}
+
 type ProfileActionCardProps = {
   profile: ProfileCardData
   onSendInterest?: (profileId: string) => void
   onShortlist?: (profileId: string) => void
   onIgnore?: (profileId: string) => void
   singleButton?: SingleButtonConfig
+  dualButton?: DualButtonConfig
+  hideButtons?: boolean
   pendingActionType?: ProfileActionType | null
   pendingProfileId?: string | null
 }
@@ -42,6 +51,8 @@ export const ProfileActionCard = ({
   onShortlist,
   onIgnore,
   singleButton,
+  dualButton,
+  hideButtons,
   pendingActionType,
   pendingProfileId,
 }: ProfileActionCardProps) => {
@@ -83,6 +94,20 @@ export const ProfileActionCard = ({
     }
   }
 
+  const handleAcceptClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (dualButton) {
+      dualButton.onAccept(profile.id)
+    }
+  }
+
+  const handleDeclineClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (dualButton) {
+      dualButton.onDecline(profile.id)
+    }
+  }
+
   return (
     <article
       onClick={handleCardClick}
@@ -105,19 +130,64 @@ export const ProfileActionCard = ({
           </p>
         </div>
       </div>
-      {singleButton ? (
-        <div className="border-t border-slate-200 dark:border-slate-800">
+      {hideButtons ? null : dualButton ? (
+        <div className="flex divide-x divide-slate-700 rounded-b-3xl bg-slate-800 dark:bg-slate-800">
+          <button
+            onClick={handleDeclineClick}
+            disabled={pendingActionType === 'decline-interest' && pendingProfileId === profile.id}
+            className="flex flex-1 flex-col items-center justify-center gap-2 py-4 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-600">
+              <XMarkIcon className="h-6 w-6 text-white" />
+            </div>
+            <span>
+              {pendingActionType === 'decline-interest' && pendingProfileId === profile.id
+                ? 'Please wait...'
+                : 'Decline'}
+            </span>
+          </button>
+          <button
+            onClick={handleAcceptClick}
+            disabled={pendingActionType === 'accept-interest' && pendingProfileId === profile.id}
+            className="flex flex-1 flex-col items-center justify-center gap-2 py-4 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
+              <CheckIcon className="h-6 w-6 text-white" />
+            </div>
+            <span>
+              {pendingActionType === 'accept-interest' && pendingProfileId === profile.id
+                ? 'Please wait...'
+                : 'Accept Interest'}
+            </span>
+          </button>
+        </div>
+      ) : singleButton ? (
+        <div className="rounded-b-3xl bg-slate-800">
           <button
             onClick={handleSingleButtonClick}
             disabled={
               pendingActionType === singleButton.actionType && pendingProfileId === profile.id
             }
-            className="flex w-full items-center justify-center gap-2 py-3 text-sm font-medium text-slate-600 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-300 dark:hover:bg-red-900/20"
+            className="flex w-full flex-col items-center justify-center gap-2 py-4 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {singleButton.icon || <XMarkIcon className="h-5 w-5" />}
-            {pendingActionType === singleButton.actionType && pendingProfileId === profile.id
-              ? 'Please wait...'
-              : singleButton.label}
+            {singleButton.actionType === 'accept-again' ? (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
+                <CheckIcon className="h-6 w-6 text-white" />
+              </div>
+            ) : singleButton.actionType === 'unblock' ? (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-600">
+                <NoSymbolIcon className="h-6 w-6 text-white" />
+              </div>
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-yellow-400">
+                <NoSymbolIcon className="h-5 w-5 text-yellow-400" />
+              </div>
+            )}
+            <span className={singleButton.actionType === 'accept-again' || singleButton.actionType === 'unblock' ? 'text-white' : 'text-yellow-400'}>
+              {pendingActionType === singleButton.actionType && pendingProfileId === profile.id
+                ? 'Please wait...'
+                : singleButton.label}
+            </span>
           </button>
         </div>
       ) : (

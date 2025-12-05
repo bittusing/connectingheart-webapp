@@ -20,6 +20,13 @@ type SectionConfig = {
 
 const sectionConfigs: SectionConfig[] = [
   {
+    id: 'interest-received',
+    title: 'Interest Received',
+    endpoint: 'interest/getInterests',
+    actionLabel: 'View Interest',
+    viewAllHref: '/dashboard/interestreceived',
+  },
+  {
     id: 'daily-recommendations',
     title: 'Daily Recommendation',
     endpoint: 'interest/getDailyRecommendations',
