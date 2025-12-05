@@ -41,6 +41,7 @@ import { FamilyDetailsPage } from './pages/FamilyDetailsPage'
 import { PartnerPreferencesPage } from './pages/PartnerPreferencesPage'
 import { PartnerPreferenceEditPage } from './pages/PartnerPreferenceEditPage'
 import { AboutYouPage } from './pages/AboutYouPage'
+import { AcceptancePage } from './pages/AcceptancePage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { RootRedirect } from './routes/RootRedirect'
 
@@ -91,6 +92,7 @@ function App() {
           <Route path="dashboard/terms" element={<TermsConditionsPage />} />
           <Route path="dashboard/privacy" element={<PrivacyPolicyPage />} />
           <Route path="dashboard/partnerpreference" element={<PartnerPreferenceEditPage />} />
+          <Route path="acceptance" element={<AcceptancePage />} />
         </Route>
       </Route>
     </Routes>

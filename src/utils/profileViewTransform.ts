@@ -114,7 +114,7 @@ const formatManglik = (manglik?: string): string => {
   const manglikMap: Record<string, string> = {
     man: 'Manglik',
     non: 'Non-Manglik',
-    ansh: 'Anshik (Partial Manglik)',
+    ang: 'Angshik(Partial manglik)',
   }
   return manglikMap[manglik.toLowerCase()] || manglik
 }

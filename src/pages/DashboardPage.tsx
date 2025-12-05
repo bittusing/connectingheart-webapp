@@ -34,6 +34,12 @@ export const DashboardPage = () => {
           href: '/dashboard/justjoined',
         }
       }
+      if (tile.label === 'Acceptance') {
+        return {
+          ...tile,
+          href: '/acceptance',
+        }
+      }
       return tile
     })
   }, [justJoinedCount, justJoinedLoading])

@@ -111,13 +111,13 @@ export const DashboardLayout = () => {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-40 bg-gradient-to-r from-pink-600 to-rose-500 px-4 py-4 text-white shadow-lg lg:px-6 lg:py-5">
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="menu-button rounded-lg bg-white/15 p-2 text-white transition hover:bg-white/25 lg:hidden"
-              aria-label="Open menu"
-            >
-              <Bars3Icon className="h-6 w-6" />
-            </button>
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="menu-button rounded-lg bg-white/15 p-2 text-white transition hover:bg-white/25 lg:hidden"
+                aria-label="Open menu"
+              >
+                <Bars3Icon className="h-6 w-6" />
+              </button>
             <p className="flex-1 text-center text-xl font-semibold tracking-wide lg:text-2xl">Connecting Hearts</p>
             <div className="flex items-center gap-3">
               <button

@@ -129,6 +129,7 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     const sports = effectiveLookup.sports
     const rashiOptions = effectiveLookup.rashi || effectiveLookup.horoscopes
     const nakshatraOptions = effectiveLookup.nakshatra
+    const manglikOptions = effectiveLookup.manglik
     const qualificationOptions = effectiveLookup.highestEducation || effectiveLookup.qualification
 
     // Location enrichment
@@ -174,6 +175,7 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     // Map kundali fields
     const rashiLabel = mapCode(rashiOptions, apiData.kundali.rashi)
     const nakshatraLabel = mapCode(nakshatraOptions, apiData.kundali.nakshatra)
+    const manglikLabel = mapCode(manglikOptions, apiData.kundali.manglik)
 
     const enrichedProfile: ProfileViewData = {
       ...baseProfile,
@@ -191,6 +193,7 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
         ...baseProfile.kundaliDetails,
         rashi: rashiLabel || baseProfile.kundaliDetails.rashi,
         nakshatra: nakshatraLabel || baseProfile.kundaliDetails.nakshatra,
+        manglik: manglikLabel || baseProfile.kundaliDetails.manglik,
       },
       lifestyleData: baseProfile.lifestyleData && {
         ...baseProfile.lifestyleData,

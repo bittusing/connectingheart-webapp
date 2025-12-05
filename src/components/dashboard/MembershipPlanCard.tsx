@@ -85,27 +85,27 @@ export const MembershipPlanCard = ({ plan, onBuyClick, isProcessing }: Membershi
   const styles = getPlanStyles(plan.name, plan.highlight)
 
   return (
-    <article
+  <article
       className={`rounded-3xl border p-6 shadow-lg transition ${styles.cardBg} ${styles.border}`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
+  >
+    <div className="flex items-center justify-between">
+      <div>
           <p className={`text-sm uppercase tracking-widest ${styles.textColor} opacity-70`}>Plan</p>
           <h3 className={`font-display text-2xl font-bold ${styles.titleColor}`}>
-            {plan.name}
-          </h3>
-        </div>
-        <span className={`text-lg font-bold ${styles.priceColor}`}>{plan.price}</span>
+          {plan.name}
+        </h3>
       </div>
+        <span className={`text-lg font-bold ${styles.priceColor}`}>{plan.price}</span>
+    </div>
       <p className={`mt-2 text-sm ${styles.textColor}`}>{plan.description}</p>
       <ul className={`mt-4 space-y-2 text-sm ${styles.textColor}`}>
-        {plan.perks.map((perk) => (
-          <li key={perk} className="flex items-start gap-2">
+      {plan.perks.map((perk) => (
+        <li key={perk} className="flex items-start gap-2">
             <span className={`mt-1.5 h-2 w-2 flex-shrink-0 rounded-full ${styles.bulletColor}`} />
-            {perk}
-          </li>
-        ))}
-      </ul>
+          {perk}
+        </li>
+      ))}
+    </ul>
       <button
         className={`mt-6 w-full rounded-full px-6 py-3 text-sm font-semibold shadow-md transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${styles.buttonBg} ${styles.buttonText}`}
         onClick={handleBuyClick}
@@ -113,7 +113,7 @@ export const MembershipPlanCard = ({ plan, onBuyClick, isProcessing }: Membershi
       >
         {isProcessing ? 'Processing...' : plan.cta ?? 'Choose plan'}
       </button>
-    </article>
-  )
+  </article>
+)
 }
 
