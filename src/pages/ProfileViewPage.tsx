@@ -16,6 +16,7 @@ import { useProfileDetail } from '../hooks/useProfileDetail'
 import { useProfileActions } from '../hooks/useProfileActions'
 import { useUnlockProfile } from '../hooks/useUnlockProfile'
 import { useUserProfile } from '../hooks/useUserProfile'
+import { useLookup } from '../hooks/useLookup'
 import { Toast } from '../components/common/Toast'
 import { ConfirmModal } from '../components/forms/ConfirmModal'
 import { getGenderPlaceholder } from '../utils/imagePlaceholders'
@@ -97,11 +98,26 @@ export const ProfileViewPage = () => {
     pendingAction,
   } = useProfileActions()
   const { unlockProfile, isUnlocking } = useUnlockProfile()
+  const { lookupData, fetchLookup } = useLookup()
   const [toasts, setToasts] = useState<ToastMessage[]>([])
   const [hasSentInterest, setHasSentInterest] = useState(false)
   const [isShortlisted, setIsShortlisted] = useState(false)
   const [isIgnored, setIsIgnored] = useState(false)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
+  
+  // Fetch lookup data on mount
+  useEffect(() => {
+    fetchLookup()
+  }, [fetchLookup])
+
+  // Helper function to get label from lookup value
+  const getLookupLabel = (lookupKey: string, value: string | undefined): string => {
+    if (!value) return ''
+    const lookupArray = lookupData[lookupKey] as Array<{ label: string; value: string }> | undefined
+    if (!lookupArray || !Array.isArray(lookupArray)) return value
+    const found = lookupArray.find((item) => item.value === value)
+    return found?.label || value
+  }
   
   // Refs for scroll-based tab switching
   const basicSectionRef = useRef<HTMLDivElement>(null)
@@ -563,9 +579,9 @@ export const ProfileViewPage = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
-                {family.fatherOccupation && `Father is ${family.fatherOccupation}`}
+                {family.fatherOccupation && `Father is ${getLookupLabel('fathersOccupation', family.fatherOccupation)}`}
                 {family.fatherOccupation && family.motherOccupation && ' & '}
-                {family.motherOccupation && `Mother is ${family.motherOccupation}`}
+                {family.motherOccupation && `Mother is ${getLookupLabel('mothersOccupation', family.motherOccupation)}`}
               </p>
               {siblingsInfo.length > 0 && (
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
@@ -639,8 +655,8 @@ export const ProfileViewPage = () => {
           </div>
         )}
 
-        {/* Lifestyle Section */}
-        {lifestyle && (
+        {/* Lifestyle Section - Only show if at least one habit exists */}
+        {lifestyle && (lifestyle.drinkingHabits || lifestyle.dietaryHabits || lifestyle.smokingHabits) && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Lifestyle and Interests</h3>
             
@@ -880,7 +896,7 @@ export const ProfileViewPage = () => {
               {profile.name}, {profile.age}
             </p>
             {profile.profileManagedBy && (
-              <p className="text-xs text-white/80">Profile managed by {profile.profileManagedBy}</p>
+              <p className="text-xs text-white/80">Profile managed by {getLookupLabel('managedBy', profile.profileManagedBy)}</p>
             )}
           </div>
         </div>
