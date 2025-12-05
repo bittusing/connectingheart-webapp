@@ -88,11 +88,11 @@ export const ProfileActionCard = ({
       onClick={handleCardClick}
       className="group w-full cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
     >
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-200 dark:bg-slate-700">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-slate-200 dark:bg-slate-700 sm:aspect-[3/4]">
         <img
           src={cardImageSrc}
           alt={profile.name}
-          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+          className="h-full w-full object-cover object-top transition-transform group-hover:scale-105"
           loading="lazy"
           onError={() => setImageFailed(true)}
         />

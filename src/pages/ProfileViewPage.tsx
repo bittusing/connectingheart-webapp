@@ -737,11 +737,11 @@ export const ProfileViewPage = () => {
         </div>
 
         {/* Match Summary with Images */}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-between gap-2 sm:gap-4">
           {/* Her Preference */}
           <div className="flex flex-col items-center gap-2">
-            <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Her Preference</p>
-            <div className="relative h-20 w-20 overflow-hidden rounded-full ring-2 ring-pink-500">
+            <p className="text-[10px] font-medium text-slate-600 dark:text-slate-400 sm:text-xs">Her Preference</p>
+            <div className="relative h-14 w-14 overflow-hidden rounded-full ring-2 ring-pink-500 sm:h-20 sm:w-20">
               <img
                 src={profileImage}
                 alt={profile.name}
@@ -755,28 +755,28 @@ export const ProfileViewPage = () => {
           </div>
 
           {/* Connecting Line */}
-          <div className="flex-1">
+          <div className="hidden flex-1 sm:block">
             <div className="relative">
               <div className="h-0.5 bg-slate-300 dark:bg-slate-600"></div>
             </div>
           </div>
 
-          {/* Match Box */}
-          <div className="flex flex-col items-center gap-2">
-            <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
-              <p className="text-center text-sm font-medium text-slate-700 dark:text-slate-300">
+          {/* Match Box - Center */}
+          <div className="flex flex-1 flex-col items-center gap-2 sm:flex-initial">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 dark:border-slate-700 dark:bg-slate-800 sm:px-4 sm:py-3">
+              <p className="text-center text-[10px] font-medium text-slate-700 dark:text-slate-300 sm:text-sm">
                 You match {matchedCount}/{totalCount} of her preference
               </p>
             </div>
             {matchPercentage && (
-              <div className="rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 px-4 py-2 text-center">
-                <p className="text-2xl font-bold text-white">{matchPercentage}%</p>
+              <div className="rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 px-3 py-1.5 text-center sm:px-4 sm:py-2">
+                <p className="text-lg font-bold text-white sm:text-2xl">{matchPercentage}%</p>
               </div>
             )}
           </div>
 
           {/* Connecting Line */}
-          <div className="flex-1">
+          <div className="hidden flex-1 sm:block">
             <div className="relative">
               <div className="h-0.5 bg-slate-300 dark:bg-slate-600"></div>
             </div>
@@ -784,8 +784,8 @@ export const ProfileViewPage = () => {
 
           {/* You Match */}
           <div className="flex flex-col items-center gap-2">
-            <p className="text-xs font-medium text-slate-600 dark:text-slate-400">You Match</p>
-            <div className="relative h-20 w-20 overflow-hidden rounded-full ring-2 ring-pink-500">
+            <p className="text-[10px] font-medium text-slate-600 dark:text-slate-400 sm:text-xs">You Match</p>
+            <div className="relative h-14 w-14 overflow-hidden rounded-full ring-2 ring-pink-500 sm:h-20 sm:w-20">
               <img
                 src={currentUserImage}
                 alt="Your profile"

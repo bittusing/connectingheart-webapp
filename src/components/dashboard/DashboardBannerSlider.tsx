@@ -46,7 +46,7 @@ export const DashboardBannerSlider = ({ slides, autoPlayInterval = 6000 }: Dashb
   return (
     <section
       aria-label="Celebration stories"
-      className="relative h-[220px] overflow-hidden rounded-[32px] bg-gradient-to-r from-pink-500 via-rose-500 to-orange-400 shadow-[0_25px_70px_rgba(67,56,202,0.15)] sm:h-[320px]"
+      className="relative h-[220px] max-w-full overflow-hidden rounded-[32px] bg-gradient-to-r from-pink-500 via-rose-500 to-orange-400 shadow-[0_25px_70px_rgba(67,56,202,0.15)] sm:h-[320px] lg:h-[380px]"
     >
       {sanitizedSlides.map((slide, index) => (
         <div
@@ -59,7 +59,7 @@ export const DashboardBannerSlider = ({ slides, autoPlayInterval = 6000 }: Dashb
           <img
             src={slide.image}
             alt={slide.title ?? 'Heartfulness celebration'}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-center"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/40 to-transparent" />

@@ -8,6 +8,7 @@ import type {
 export const navItems: NavItem[] = [
   { label: 'Home', icon: 'home', href: '/dashboard' },
   { label: 'Edit Profile', icon: 'user', href: '/dashboard/myprofile' },
+  { label: 'Preference Setup', icon: 'heart', href: '/dashboard/partnerpreference' },
   { label: 'Search', icon: 'search', href: '/dashboard/search' },
   { label: 'All Profiles', icon: 'users', href: '/dashboard/profiles' },
   { label: 'Daily Recommendations', icon: 'sparkles', href: '/dashboard/recommendations' },

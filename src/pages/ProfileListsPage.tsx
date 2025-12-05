@@ -305,7 +305,7 @@ const ProfileListTemplate = ({
                 <div
                   key={`${profile.id}-${index}`}
                   ref={isTriggerCard ? loadMoreRef : null}
-                  className="flex min-h-[85vh] flex-shrink-0 items-center justify-center md:min-h-0"
+                  className="flex flex-shrink-0 items-start justify-center md:items-center"
                 >
                   <div className="w-full max-w-md">
                     <ProfileActionCard

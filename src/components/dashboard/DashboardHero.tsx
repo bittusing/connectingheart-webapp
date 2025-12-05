@@ -68,10 +68,11 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
             
           </div>
         </div>
+        {/* Looking For - Hidden on mobile, shown on desktop */}
         <button
           type="button"
           onClick={openPartnerPreference}
-          className="flex items-center gap-4 rounded-3xl border border-white/0 bg-white/0 px-3 py-2 text-left transition hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="hidden items-center gap-4 rounded-3xl border border-white/0 bg-white/0 px-3 py-2 text-left transition hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:flex"
           aria-label="Open partner preference editor"
         >
           <div className="text-right">
@@ -110,7 +111,6 @@ export const DashboardHero = ({ profile = defaultProfile }: DashboardHeroProps) 
                 }}
               />
             )}
-            {/* <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-blue-500 ring-2 ring-white"></div> */}
           </div>
         </button>
       </div>
