@@ -4,6 +4,7 @@ import { ProfileActionCard } from '../components/dashboard/ProfileActionCard'
 import { Pagination } from '../components/dashboard/Pagination'
 import { useProfileActions } from '../hooks/useProfileActions'
 import { Toast } from '../components/common/Toast'
+import { useUpdateNotificationCount, type NotificationType } from '../hooks/useUpdateNotificationCount'
 
 type SingleButtonConfig = {
   label: string
@@ -17,6 +18,7 @@ type ProfileListTemplateProps = {
   endpoint: string
   note?: string
   singleButton?: SingleButtonConfig
+  notificationType?: NotificationType
 }
 
 type ToastVariant = 'success' | 'error'
@@ -33,11 +35,13 @@ const ProfileListTemplate = ({
   endpoint,
   note,
   singleButton,
+  notificationType,
 }: ProfileListTemplateProps) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [displayedProfiles, setDisplayedProfiles] = useState<number>(5) // Start with 5 profiles
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const hasUpdatedNotification = useRef(false)
   // Get all profiles - use allProfiles for infinite scroll, profiles for desktop pagination
   const { profiles, allProfiles, loading, error, totalProfiles, totalPages, refetch } = useProfiles(endpoint, {
     page: currentPage,
@@ -51,7 +55,17 @@ const ProfileListTemplate = ({
     unignoreProfile,
     pendingAction,
   } = useProfileActions()
+  const { updateNotificationCount } = useUpdateNotificationCount()
   const [toasts, setToasts] = useState<ToastMessage[]>([])
+
+  // Update notification count when profiles are loaded (mark as seen)
+  useEffect(() => {
+    if (notificationType && allProfiles.length > 0 && !hasUpdatedNotification.current) {
+      hasUpdatedNotification.current = true
+      const profileIds = allProfiles.map((profile) => profile.id)
+      void updateNotificationCount(profileIds, notificationType)
+    }
+  }, [notificationType, allProfiles, updateNotificationCount])
   
   // Detect mobile viewport
   const [isMobile, setIsMobile] = useState(false)
@@ -387,6 +401,7 @@ export const InterestReceivedPage = () => (
     title="Interests Received"
     subtitle="Profiles that have sent you interest."
     endpoint="interest/getInterests"
+    notificationType="interestReceived"
   />
 )
 export const InterestSentPage = () => (
@@ -398,6 +413,7 @@ export const InterestSentPage = () => (
       label: 'Cancel Interest',
       actionType: 'unsend-interest',
     }}
+    notificationType="interestSent"
   />
 )
 export const UnlockedProfilesPage = () => (
@@ -405,6 +421,7 @@ export const UnlockedProfilesPage = () => (
     title="Unlocked Profiles"
     subtitle="Profiles you have unlocked to view contact details."
     endpoint="dashboard/getMyUnlockedProfiles"
+    notificationType="unlockedProfiles"
   />
 )
 export const IDeclinedPage = () => (
@@ -412,6 +429,7 @@ export const IDeclinedPage = () => (
     title="I Declined"
     subtitle="Profiles whose interest you have declined."
     endpoint="dashboard/getMyDeclinedProfiles"
+    notificationType="iDeclined"
   />
 )
 export const TheyDeclinedPage = () => (
@@ -419,6 +437,7 @@ export const TheyDeclinedPage = () => (
     title="They Declined"
     subtitle="Profiles that declined your interest."
     endpoint="dashboard/getUsersWhoHaveDeclinedMe"
+    notificationType="theyDeclined"
   />
 )
 export const ShortlistedProfilesPage = () => (
@@ -430,6 +449,7 @@ export const ShortlistedProfilesPage = () => (
       label: 'Remove from Shortlist',
       actionType: 'unshortlist',
     }}
+    notificationType="shortlistedProfile"
   />
 )
 export const IgnoredProfilesPage = () => (
@@ -441,6 +461,7 @@ export const IgnoredProfilesPage = () => (
       label: 'Remove',
       actionType: 'unignore',
     }}
+    notificationType="ignoredProfile"
   />
 )
 export const BlockedProfilesPage = () => (
@@ -448,6 +469,7 @@ export const BlockedProfilesPage = () => (
     title="Blocked Profiles"
     subtitle="Profiles you have blocked from contacting you."
     endpoint="dashboard/getMyBlockedProfiles"
+    notificationType="blockedProfile"
   />
 )
 export const JustJoinedPage = () => (
