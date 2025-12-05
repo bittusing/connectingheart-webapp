@@ -79,8 +79,9 @@ export const SectionRail = () => {
         setLoading(true)
 
         // Ensure base lookup data (for casts etc.) is loaded
+        let fetchedLookupData = lookupData
         try {
-          await fetchLookup()
+          fetchedLookupData = await fetchLookup()
         } catch (error) {
           // Lookup is optional for cards – log and continue with codes if it fails
           console.error('Failed to preload lookup data for dashboard cards', error)
@@ -103,9 +104,8 @@ export const SectionRail = () => {
               const cardsLimit = config.limit ?? 5
               const limitedProfiles = profiles.slice(0, cardsLimit)
 
-              // Get current lookup data (may be empty on first render, that's okay)
-              const currentLookupData = lookupData
-              const casteOptions = currentLookupData.casts
+              // Use fetched lookup data (not stale state reference)
+              const casteOptions = fetchedLookupData.casts
 
               // Build quick lookup maps
               const casteLabelMap: Record<string, string> = {}

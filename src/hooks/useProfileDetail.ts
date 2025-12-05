@@ -16,8 +16,8 @@ type UseProfileDetailResult = {
 
 export const useProfileDetail = (profileId: string | undefined): UseProfileDetailResult => {
   const { get } = useApiClient()
-  const { lookupData, fetchLookup, fetchStates, fetchCities } = useLookup()
-  const { countries } = useCountryLookup()
+  const { lookupData, fetchLookup, fetchStates, fetchCities, fetchCountries } = useLookup()
+  const { countries: countryLookup } = useCountryLookup()
   const [profile, setProfile] = useState<ProfileViewData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -48,7 +48,8 @@ export const useProfileDetail = (profileId: string | undefined): UseProfileDetai
           fetchLookup,
           fetchStates,
           fetchCities,
-          countries,
+          fetchCountries,
+          countryLookup,
           onProfileUpdate: setProfile,
         })
       } else {
@@ -83,7 +84,8 @@ type EnrichContext = {
   fetchLookup: () => Promise<LookupDictionary>
   fetchStates: (countryId: string) => Promise<LookupOption[]>
   fetchCities: (stateId: string) => Promise<LookupOption[]>
-  countries: LookupOption[]
+  fetchCountries: () => Promise<LookupOption[]>
+  countryLookup: LookupOption[]
   onProfileUpdate: (profile: ProfileViewData) => void
 }
 
@@ -107,13 +109,17 @@ const mapCodesArray = (options: LookupOption[] | undefined, codes?: string[]): s
 }
 
 const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> => {
-  const { apiData, baseProfile, lookupData, fetchLookup, fetchStates, fetchCities, countries, onProfileUpdate } =
+  const { apiData, baseProfile, lookupData, fetchLookup, fetchStates, fetchCities, fetchCountries, countryLookup, onProfileUpdate } =
     context
 
   try {
     const effectiveLookup =
       Object.keys(lookupData || {}).length > 0 ? lookupData : await fetchLookup().catch(() => ({} as LookupDictionary))
 
+    // Fetch countries if not already available
+    const countries = countryLookup.length > 0 ? countryLookup : await fetchCountries().catch(() => [] as LookupOption[])
+
+    // Extract all lookup options
     const casts = effectiveLookup.casts
     const occupations = effectiveLookup.occupation
     const motherTongue = effectiveLookup.motherTongue || effectiveLookup.languages
@@ -121,6 +127,9 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     const hobbies = effectiveLookup.hobbies
     const interests = effectiveLookup.interests
     const sports = effectiveLookup.sports
+    const rashiOptions = effectiveLookup.rashi || effectiveLookup.horoscopes
+    const nakshatraOptions = effectiveLookup.nakshatra
+    const qualificationOptions = effectiveLookup.highestEducation || effectiveLookup.qualification
 
     // Location enrichment
     const countryCode = apiData.miscellaneous.country
@@ -137,24 +146,51 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
         const stateOptions = await fetchStates(countryCode)
         stateLabel = mapCode(stateOptions, stateCode)
         if (stateCode) {
-          const cityOptions = await fetchCities(stateCode)
-          cityLabel = mapCode(cityOptions, cityCode)
+          try {
+            const cityOptions = await fetchCities(stateCode)
+            if (cityOptions && cityOptions.length > 0) {
+              cityLabel = mapCode(cityOptions, cityCode)
+            }
+          } catch (cityError) {
+            console.warn('City lookup failed for state:', stateCode, cityError)
+          }
         }
-      } catch {
-        // If state/city lookups fail, keep existing labels
+      } catch (stateError) {
+        console.warn('State lookup failed for country:', countryCode, stateError)
       }
     }
 
     const locationParts = [cityLabel, stateLabel, countryLabel].filter(Boolean)
 
+    // Map familyBasedOutOf country code to label
+    const familyBasedOutOfLabel = mapCode(countries, apiData.family.familyBasedOutOf)
+
+    // Map occupation/career code to label
+    const occupationLabel = mapCode(occupations, apiData.career.occupation)
+
+    // Map qualification/education code to label
+    const qualificationLabel = mapCode(qualificationOptions, apiData.education.qualification)
+
+    // Map kundali fields
+    const rashiLabel = mapCode(rashiOptions, apiData.kundali.rashi)
+    const nakshatraLabel = mapCode(nakshatraOptions, apiData.kundali.nakshatra)
+
     const enrichedProfile: ProfileViewData = {
       ...baseProfile,
       location: locationParts.length ? locationParts.join(', ') : baseProfile.location,
       caste: mapCode(casts, apiData.basic.cast) || baseProfile.caste,
+      occupation: occupationLabel || baseProfile.occupation,
+      qualification: qualificationLabel || baseProfile.qualification,
       familyDetails: baseProfile.familyDetails && {
         ...baseProfile.familyDetails,
         fatherOccupation: mapCode(occupations, apiData.family.fatherOccupation) || baseProfile.familyDetails.fatherOccupation,
         motherOccupation: mapCode(occupations, apiData.family.motherOccupation) || baseProfile.familyDetails.motherOccupation,
+        familyBasedOutOf: familyBasedOutOfLabel || baseProfile.familyDetails.familyBasedOutOf,
+      },
+      kundaliDetails: baseProfile.kundaliDetails && {
+        ...baseProfile.kundaliDetails,
+        rashi: rashiLabel || baseProfile.kundaliDetails.rashi,
+        nakshatra: nakshatraLabel || baseProfile.kundaliDetails.nakshatra,
       },
       lifestyleData: baseProfile.lifestyleData && {
         ...baseProfile.lifestyleData,

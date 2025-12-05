@@ -79,7 +79,7 @@ export const DashboardBannerSlider = ({ slides, autoPlayInterval = 6000 }: Dashb
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/20" />
 
-      <button
+      {/* <button
         type="button"
         aria-label="Previous slide"
         onClick={handlePrev}
@@ -95,7 +95,7 @@ export const DashboardBannerSlider = ({ slides, autoPlayInterval = 6000 }: Dashb
         className="group absolute right-4 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-2 text-slate-900 shadow-lg backdrop-blur transition hover:bg-white"
       >
         <ChevronRightIcon className="h-5 w-5" />
-      </button>
+      </button> */}
 
     </section>
   )

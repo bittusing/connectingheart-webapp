@@ -129,6 +129,15 @@ const formatManagedBy = (managed?: string): string => {
   return managedMap[managed.toLowerCase()] || managed
 }
 
+// Format Y/N to Yes/No
+const formatYesNo = (value?: string): string => {
+  if (!value) return ''
+  const normalized = value.trim().toUpperCase()
+  if (normalized === 'Y' || normalized === 'YES') return 'Yes'
+  if (normalized === 'N' || normalized === 'NO') return 'No'
+  return value
+}
+
 // Calculate age from date of birth
 const calculateAge = (dob: string): number => {
   const birthDate = new Date(dob)
@@ -190,7 +199,7 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
   const age = data.critical.dob ? calculateAge(data.critical.dob) : 0
   const profileId = `HEARTS-${data.miscellaneous.heartsId}`
   const location = formatLocation(data.miscellaneous.city, data.miscellaneous.state, data.miscellaneous.country)
-
+ console.log("location",location);
   return {
     id: clientID,
     profileId,
@@ -240,7 +249,7 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
       aboutMyFamily: data.family.aboutMyFamily,
       familyBasedOutOf: data.family.familyBasedOutOf,
       gothra: data.family.gothra,
-      livingWithParents: data.family.livingWithParents,
+      livingWithParents: formatYesNo(data.family.livingWithParents),
     },
 
     kundaliDetails: {

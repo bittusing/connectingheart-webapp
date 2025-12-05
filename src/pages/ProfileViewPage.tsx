@@ -265,6 +265,7 @@ export const ProfileViewPage = () => {
     setHasSentInterest(false)
     setIsShortlisted(Boolean(profile?.isShortlisted))
     setIsIgnored(Boolean(profile?.isIgnored))
+    console.log("profile",profile);
   }, [profile?.id, profile?.isShortlisted, profile?.isIgnored])
 
   // Scroll-based auto tab switching
@@ -586,13 +587,16 @@ export const ProfileViewPage = () => {
         )}
 
         {family.livingWithParents && (
-          <div className="inline-flex items-center gap-2 rounded-lg bg-orange-100 px-3 py-2 dark:bg-orange-900/20">
-            <svg className="h-4 w-4 text-orange-600 dark:text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-            </svg>
-            <span className="text-sm font-medium text-orange-700 dark:text-orange-300">
-              {family.livingWithParents}
-            </span>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">Living with Parents</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{family.livingWithParents}</p>
+            </div>
           </div>
         )}
       </div>

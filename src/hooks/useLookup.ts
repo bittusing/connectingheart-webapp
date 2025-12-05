@@ -36,7 +36,9 @@ const normalizeOption = (option: LookupOption | string | number | undefined | nu
 
   const { label, value, name, id, _id } = option
   const resolvedLabel = label ?? name ?? value?.toString() ?? id?.toString() ?? _id?.toString()
-  const rawResolvedValue = id ?? _id ?? value ?? label ?? name
+  // Prioritize 'value' field over 'id'/'_id' for lookup matching
+  // This is important because city/state lookups have both 'value' (code) and '_id' (MongoDB ID)
+  const rawResolvedValue = value ?? id ?? _id ?? label ?? name
   const resolvedValue =
     typeof rawResolvedValue === 'string'
       ? rawResolvedValue
