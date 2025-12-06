@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeftIcon } from '@heroicons/react/24/outline'
+import { ChevronLeftIcon, ChatBubbleLeftRightIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ProfileActionCard } from '../components/dashboard/ProfileActionCard'
 import { useApiClient } from '../hooks/useApiClient'
 import type { ApiProfile, ApiProfileResponse } from '../types/api'
@@ -8,6 +8,8 @@ import { transformApiProfiles } from '../utils/profileTransform'
 import type { ProfileCardData } from '../types/dashboard'
 import { useLookup } from '../hooks/useLookup'
 import { useCountryLookup } from '../hooks/useCountryLookup'
+import { useProfileActions } from '../hooks/useProfileActions'
+import { showToast } from '../utils/toast'
 
 type TabType = 'acceptedMe' | 'acceptedByMe'
 
@@ -16,6 +18,7 @@ export const AcceptancePage = () => {
   const { get } = useApiClient()
   const { fetchLookup, fetchStates, fetchCities } = useLookup()
   const { countries: countryOptions } = useCountryLookup()
+  const { declineInterest, pendingAction } = useProfileActions()
   const [activeTab, setActiveTab] = useState<TabType>('acceptedMe')
   const [profiles, setProfiles] = useState<ProfileCardData[]>([])
   const [loading, setLoading] = useState(true)
@@ -150,6 +153,22 @@ export const AcceptancePage = () => {
     fetchProfiles()
   }, [activeTab, get, fetchLookup, fetchStates, fetchCities, countryOptions])
 
+  const handleDeclined = async (profileId: string) => {
+    try {
+      const response = await declineInterest(profileId)
+      showToast(response?.message || 'Interest declined successfully', 'success')
+      // Remove declined profile from the list
+      setProfiles((prev) => prev.filter((profile) => profile.id !== profileId))
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to decline interest'
+      showToast(message, 'error')
+    }
+  }
+
+  const handleChat = () => {
+    showToast('Chat Coming Soon', 'success')
+  }
+
   return (
     <section className="space-y-6">
       {/* Header */}
@@ -213,7 +232,25 @@ export const AcceptancePage = () => {
                 onSendInterest={undefined}
                 onShortlist={undefined}
                 onIgnore={undefined}
-                hideButtons={true}
+                hideButtons={false}
+                dualButton={{
+                  onAccept: handleChat,
+                  onDecline: handleDeclined,
+                  acceptLabel: 'Chat',
+                  declineLabel: 'Declined',
+                  acceptIcon: (
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500">
+                      <ChatBubbleLeftRightIcon className="h-6 w-6 text-white" />
+                    </div>
+                  ),
+                  declineIcon: (
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500">
+                      <XMarkIcon className="h-6 w-6 text-white" />
+                    </div>
+                  ),
+                }}
+                pendingActionType={pendingAction?.type || null}
+                pendingProfileId={pendingAction?.profileId || null}
               />
             ))}
           </div>

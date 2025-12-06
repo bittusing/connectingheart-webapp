@@ -21,6 +21,10 @@ type SingleButtonConfig = {
 type DualButtonConfig = {
   onAccept: (profileId: string) => void
   onDecline: (profileId: string) => void
+  acceptLabel?: string
+  declineLabel?: string
+  acceptIcon?: React.ReactNode
+  declineIcon?: React.ReactNode
 }
 
 type ProfileActionCardProps = {
@@ -137,13 +141,15 @@ export const ProfileActionCard = ({
             disabled={pendingActionType === 'decline-interest' && pendingProfileId === profile.id}
             className="flex flex-1 flex-col items-center justify-center gap-2 py-4 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-600">
-              <XMarkIcon className="h-6 w-6 text-white" />
-            </div>
+            {dualButton.declineIcon || (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-600">
+                <XMarkIcon className="h-6 w-6 text-white" />
+              </div>
+            )}
             <span>
               {pendingActionType === 'decline-interest' && pendingProfileId === profile.id
                 ? 'Please wait...'
-                : 'Decline'}
+                : dualButton.declineLabel || 'Decline'}
             </span>
           </button>
           <button
@@ -151,13 +157,15 @@ export const ProfileActionCard = ({
             disabled={pendingActionType === 'accept-interest' && pendingProfileId === profile.id}
             className="flex flex-1 flex-col items-center justify-center gap-2 py-4 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
-              <CheckIcon className="h-6 w-6 text-white" />
-            </div>
+            {dualButton.acceptIcon || (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
+                <CheckIcon className="h-6 w-6 text-white" />
+              </div>
+            )}
             <span>
               {pendingActionType === 'accept-interest' && pendingProfileId === profile.id
                 ? 'Please wait...'
-                : 'Accept Interest'}
+                : dualButton.acceptLabel || 'Accept Interest'}
             </span>
           </button>
         </div>
