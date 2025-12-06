@@ -130,10 +130,15 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     const hobbies = effectiveLookup.hobbies
     const interests = effectiveLookup.interests
     const sports = effectiveLookup.sports
+    const books = effectiveLookup.books
+    const dress = effectiveLookup.dressStyle || effectiveLookup.dress
+    const music = effectiveLookup.music
     const rashiOptions = effectiveLookup.rashi || effectiveLookup.horoscopes
     const nakshatraOptions = effectiveLookup.nakshatra
     const manglikOptions = effectiveLookup.manglik
     const qualificationOptions = effectiveLookup.highestEducation || effectiveLookup.qualification
+    const disabilityOptions = effectiveLookup.disability
+    const employedInOptions = effectiveLookup.employed_in
 
     // Location enrichment
     const countryCode = apiData.miscellaneous.country
@@ -151,10 +156,10 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
         stateLabel = mapCode(stateOptions, stateCode)
         if (stateCode) {
           try {
-            const cityOptions = await fetchCities(stateCode)
+          const cityOptions = await fetchCities(stateCode)
             if (cityOptions && cityOptions.length > 0) {
-              cityLabel = mapCode(cityOptions, cityCode)
-            }
+          cityLabel = mapCode(cityOptions, cityCode)
+        }
           } catch (cityError) {
             console.warn('City lookup failed for state:', stateCode, cityError)
           }
@@ -183,6 +188,12 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     // Map managedBy from lookup
     const managedByLabel = mapCode(managedByOptions, apiData.about.managedBy)
 
+    // Map disability from lookup
+    const disabilityLabel = mapCode(disabilityOptions, apiData.about.disability)
+
+    // Map employed_in from lookup
+    const employedInLabel = mapCode(employedInOptions, apiData.career.employed_in)
+
     const enrichedProfile: ProfileViewData = {
       ...baseProfile,
       location: locationParts.length ? locationParts.join(', ') : baseProfile.location,
@@ -190,6 +201,8 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
       occupation: occupationLabel || baseProfile.occupation,
       qualification: qualificationLabel || baseProfile.qualification,
       profileManagedBy: managedByLabel || baseProfile.profileManagedBy,
+      disability: disabilityLabel || baseProfile.disability,
+      employedIn: employedInLabel || baseProfile.employedIn,
       familyDetails: baseProfile.familyDetails && {
         ...baseProfile.familyDetails,
         fatherOccupation: mapCode(fathersOccupation, apiData.family.fatherOccupation) || baseProfile.familyDetails.fatherOccupation,
@@ -209,6 +222,9 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
         interest: mapCodesArray(interests, apiData.lifeStyleData.interest) || baseProfile.lifestyleData.interest,
         sports: mapCodesArray(sports, apiData.lifeStyleData.sports) || baseProfile.lifestyleData.sports,
         cuisine: mapCodesArray(cuisines, apiData.lifeStyleData.cuisine) || baseProfile.lifestyleData.cuisine,
+        books: mapCodesArray(books, apiData.lifeStyleData.books) || baseProfile.lifestyleData.books,
+        dress: mapCodesArray(dress, apiData.lifeStyleData.dress) || baseProfile.lifestyleData.dress,
+        favMusic: mapCodesArray(music, apiData.lifeStyleData.favMusic) || baseProfile.lifestyleData.favMusic,
       },
     }
 

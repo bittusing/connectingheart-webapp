@@ -218,10 +218,13 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
     bodyType: formatBodyType(data.about.bodyType),
     thalassemia: data.about.thalassemia === 'no3' ? 'No' : data.about.thalassemia || 'N/A',
     hivPositive: data.about.hivPositive === 'N' ? 'No' : data.about.hivPositive || 'N/A',
+    disability: data.about.disability || '',
 
     // Education & career
     school: data.education.school || '',
     qualification: data.education.qualification || '',
+    otherUGDegree: data.education.otherUGDegree || '',
+    aboutEducation: data.education.aboutEducation || '',
     aboutCareer: data.career.aboutMyCareer || '',
     employedIn: formatEmployment(data.career.employed_in),
     occupation: data.career.occupation || '',
@@ -266,6 +269,17 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
       interest: data.lifeStyleData.interest,
       sports: data.lifeStyleData.sports,
       cuisine: data.lifeStyleData.cuisine,
+      movies: data.lifeStyleData.movies,
+      books: data.lifeStyleData.books,
+      dress: data.lifeStyleData.dress,
+      favRead: data.lifeStyleData.favRead,
+      favTVShow: data.lifeStyleData.favTVShow,
+      vacayDestination: data.lifeStyleData.vacayDestination,
+      openToPets: formatYesNo(data.lifeStyleData.openToPets),
+      ownAHouse: formatYesNo(data.lifeStyleData.ownAHouse),
+      ownACar: formatYesNo(data.lifeStyleData.ownACar),
+      favMusic: data.lifeStyleData.favMusic,
+      foodICook: formatYesNo(data.lifeStyleData.foodICook),
     },
 
     matchDetails: {
@@ -280,6 +294,9 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
           phoneNumber: data.contact.phoneNumber,
           email: data.contact.email,
           name: data.contact.name,
+          alternateEmail: data.contact.alternateEmail,
+          altMobileNumber: data.contact.altMobileNumber,
+          landline: data.contact.landline,
         }
       : undefined,
   }

@@ -90,7 +90,7 @@ function App() {
           <Route path="dashboard/shortlist" element={<ShortlistedProfilesPage />} />
           <Route path="dashboard/ignored" element={<IgnoredProfilesPage />} />
           <Route path="dashboard/blocked" element={<BlockedProfilesPage />} />
-        <Route path="dashboard/myprofile" element={<MyProfilePage />} />
+          <Route path="dashboard/myprofile" element={<MyProfilePage />} />
         <Route path="dashboard/editprofilebasic" element={<EditProfileBasicPage />} />
         <Route path="dashboard/editabout" element={<EditAboutPage />} />
         <Route path="dashboard/editeducation" element={<EditEducationPage />} />
@@ -99,7 +99,7 @@ function App() {
         <Route path="dashboard/editcontact" element={<EditContactPage />} />
         <Route path="dashboard/edithoroscope" element={<EditHoroscopePage />} />
         <Route path="dashboard/editlifestyle" element={<EditLifestylePage />} />
-        <Route path="dashboard/profile/:id" element={<ProfileViewPage />} />
+          <Route path="dashboard/profile/:id" element={<ProfileViewPage />} />
           <Route path="dashboard/membership" element={<MembershipPage />} />
           <Route path="dashboard/security" element={<ChangePasswordPage />} />
           <Route path="dashboard/delete" element={<DeleteProfilePage />} />

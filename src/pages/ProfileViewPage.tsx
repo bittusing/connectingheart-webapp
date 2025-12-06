@@ -452,6 +452,58 @@ export const ProfileViewPage = () => {
             </div>
           </div>
         )}
+        {profile.bodyType && (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">Body Type</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{profile.bodyType}</p>
+            </div>
+          </div>
+        )}
+        {profile.disability && (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">Disability</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{profile.disability}</p>
+            </div>
+          </div>
+        )}
+        {profile.thalassemia && profile.thalassemia !== 'N/A' && (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">Thalassemia</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{profile.thalassemia}</p>
+            </div>
+          </div>
+        )}
+        {profile.hivPositive && profile.hivPositive !== 'N/A' && (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">HIV Positive</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{profile.hivPositive}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* About Me */}
@@ -467,29 +519,74 @@ export const ProfileViewPage = () => {
       )}
 
       {/* Career */}
-      {profile.occupation && (
+      {(profile.occupation || profile.employedIn || profile.organisationName || profile.aboutCareer || profile.interestedInSettlingAbroad) && (
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Career</h3>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-              <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+          {profile.occupation && (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-900 dark:text-white">Occupation</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{profile.occupation}</p>
+              </div>
             </div>
-            <p className="text-sm font-medium text-slate-900 dark:text-white">{profile.occupation}</p>
-          </div>
+          )}
+          {profile.employedIn && (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-900 dark:text-white">Employed In</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{profile.employedIn}</p>
+              </div>
+            </div>
+          )}
+          {profile.organisationName && (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-900 dark:text-white">Organisation</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{profile.organisationName}</p>
+              </div>
+            </div>
+          )}
           {profile.aboutCareer && (
             <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+              <h4 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">About Career</h4>
               <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                 {profile.aboutCareer}
               </p>
+            </div>
+          )}
+          {profile.interestedInSettlingAbroad && (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-900 dark:text-white">Interested in Settling Abroad</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{profile.interestedInSettlingAbroad}</p>
+              </div>
             </div>
           )}
         </div>
       )}
 
       {/* Education */}
-      {(profile.qualification || profile.school) && (
+      {(profile.qualification || profile.school || profile.otherUGDegree || profile.aboutEducation) && (
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Education</h3>
           {profile.qualification && (
@@ -503,10 +600,21 @@ export const ProfileViewPage = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-slate-900 dark:text-white">{profile.qualification}</p>
+                {profile.otherUGDegree && (
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{profile.otherUGDegree}</p>
+                )}
                 {profile.school && (
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{profile.school}</p>
                 )}
               </div>
+            </div>
+          )}
+          {profile.aboutEducation && (
+            <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+              <h4 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">About Education</h4>
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                {profile.aboutEducation}
+              </p>
             </div>
           )}
         </div>
@@ -535,8 +643,17 @@ export const ProfileViewPage = () => {
           {profile.contactDetails.phoneNumber && (
             <InfoRow label="Phone Number" value={profile.contactDetails.phoneNumber} />
           )}
+          {profile.contactDetails.altMobileNumber && (
+            <InfoRow label="Alternate Mobile" value={profile.contactDetails.altMobileNumber} />
+          )}
+          {profile.contactDetails.landline && (
+            <InfoRow label="Landline" value={profile.contactDetails.landline} />
+          )}
           {profile.contactDetails.email && (
             <InfoRow label="Email" value={profile.contactDetails.email} />
+          )}
+          {profile.contactDetails.alternateEmail && (
+            <InfoRow label="Alternate Email" value={profile.contactDetails.alternateEmail} />
           )}
         </div>
       )}
@@ -745,6 +862,162 @@ export const ProfileViewPage = () => {
                 <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.sports.join(', ')}</p>
               </div>
             )}
+            {lifestyle.cuisine && lifestyle.cuisine.length > 0 && (
+              <div>
+                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Favourite Cuisine</h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.cuisine.join(', ')}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Additional Lifestyle Preferences */}
+        {(lifestyle.movies || lifestyle.favRead || lifestyle.favTVShow || lifestyle.vacayDestination || 
+          lifestyle.books || lifestyle.dress || lifestyle.favMusic || lifestyle.foodICook ||
+          lifestyle.openToPets || lifestyle.ownAHouse || lifestyle.ownACar) && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Other Preferences</h3>
+            
+            <div className="grid gap-4 sm:grid-cols-2">
+              {lifestyle.movies && (
+                <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                  <div className="mb-2 flex items-center gap-2">
+                    <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Favourite Movies</h4>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.movies}</p>
+                </div>
+              )}
+              
+              {lifestyle.favTVShow && (
+                <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                  <div className="mb-2 flex items-center gap-2">
+                    <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Favourite TV Show</h4>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.favTVShow}</p>
+                </div>
+              )}
+              
+              {lifestyle.favRead && (
+                <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                  <div className="mb-2 flex items-center gap-2">
+                    <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Favourite Read</h4>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.favRead}</p>
+                </div>
+              )}
+              
+              {lifestyle.vacayDestination && (
+                <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                  <div className="mb-2 flex items-center gap-2">
+                    <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Vacation Destination</h4>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.vacayDestination}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Array fields */}
+            {lifestyle.books && lifestyle.books.length > 0 && (
+              <div>
+                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Favourite Books</h4>
+                <div className="flex flex-wrap gap-2">
+                  {lifestyle.books.map((book, idx) => (
+                    <span key={idx} className="rounded-full bg-pink-100 px-3 py-1 text-sm text-pink-700 dark:bg-pink-900/20 dark:text-pink-300">
+                      {book}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {lifestyle.dress && lifestyle.dress.length > 0 && (
+              <div>
+                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Dress Style</h4>
+                <div className="flex flex-wrap gap-2">
+                  {lifestyle.dress.map((style, idx) => (
+                    <span key={idx} className="rounded-full bg-pink-100 px-3 py-1 text-sm text-pink-700 dark:bg-pink-900/20 dark:text-pink-300">
+                      {style}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {lifestyle.favMusic && lifestyle.favMusic.length > 0 && (
+              <div>
+                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Favourite Music</h4>
+                <div className="flex flex-wrap gap-2">
+                  {lifestyle.favMusic.map((music, idx) => (
+                    <span key={idx} className="rounded-full bg-pink-100 px-3 py-1 text-sm text-pink-700 dark:bg-pink-900/20 dark:text-pink-300">
+                      {music}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Yes/No fields */}
+            <div className="grid gap-3 sm:grid-cols-3">
+              {lifestyle.foodICook && (
+                <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
+                  <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Food I Cook</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{lifestyle.foodICook}</p>
+                  </div>
+                </div>
+              )}
+              
+              {lifestyle.openToPets && (
+                <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
+                  <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Open to Pets</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{lifestyle.openToPets}</p>
+                  </div>
+                </div>
+              )}
+              
+              {lifestyle.ownAHouse && (
+                <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
+                  <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  <div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Owns a House</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{lifestyle.ownAHouse}</p>
+                  </div>
+                </div>
+              )}
+              
+              {lifestyle.ownACar && (
+                <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
+                  <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  <div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Owns a Car</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{lifestyle.ownACar}</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

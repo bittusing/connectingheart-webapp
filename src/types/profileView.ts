@@ -75,6 +75,9 @@ export type ProfileDetailData = {
     phoneNumber?: string
     email?: string
     name?: string
+    alternateEmail?: string
+    altMobileNumber?: string
+    landline?: string
   }
   kundali: {
     city?: string

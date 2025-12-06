@@ -19,10 +19,13 @@ export type ProfileViewData = {
   bodyType?: string
   thalassemia?: string
   hivPositive?: string
+  disability?: string
 
   // Educational Details
   school?: string
   qualification?: string
+  otherUGDegree?: string
+  aboutEducation?: string
 
   // Career Details
   aboutCareer?: string
@@ -79,6 +82,17 @@ export type ProfileViewData = {
     interest?: string[]
     sports?: string[]
     cuisine?: string[]
+    movies?: string
+    books?: string[]
+    dress?: string[]
+    favRead?: string
+    favTVShow?: string
+    vacayDestination?: string
+    openToPets?: string
+    ownAHouse?: string
+    ownACar?: string
+    favMusic?: string[]
+    foodICook?: string
   }
   // All profile pictures for carousel
   allProfilePics?: Array<{
@@ -93,5 +107,8 @@ export type ProfileViewData = {
     phoneNumber?: string
     email?: string
     name?: string
+    alternateEmail?: string
+    altMobileNumber?: string
+    landline?: string
   }
 }
