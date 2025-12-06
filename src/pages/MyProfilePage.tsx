@@ -79,7 +79,7 @@ const calculateAge = (dob: string | undefined): number | null => {
 export const MyProfilePage = () => {
   const navigate = useNavigate()
   const { profile, loading, error, refetch } = useMyProfileData()
-  const { profile: userProfile } = useUserProfile()
+  const { profile: userProfile, refetch: refetchUserProfile } = useUserProfile()
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadPreview, setUploadPreview] = useState<string>('')
@@ -119,10 +119,13 @@ export const MyProfilePage = () => {
 
   const profileId = profile.miscellaneous.heartsId ? `HEARTS-${profile.miscellaneous.heartsId}` : 'N/A'
   const enriched = profile.enriched || {}
+  // Use avatarUrl from userProfile (same as drawer) or construct from profilePic
   const primaryPic = profile.miscellaneous.profilePic?.find((pic) => pic.primary) || profile.miscellaneous.profilePic?.[0]
-  const avatarUrl = primaryPic
+  const avatarUrlFromProfile = primaryPic?.id
     ? `https://backendapp.connectingheart.co.in/api/profile/file/${profile.miscellaneous.heartsId}/${primaryPic.id}`
     : null
+  // Prefer userProfile.avatarUrl (same source as drawer) for consistency
+  const avatarUrl = userProfile?.avatarUrl || avatarUrlFromProfile
   const age = calculateAge(profile.critical.dob)
   const displayName = profile.basic.name || 'Not Filled'
   const displayAge = age !== null ? `${age} yrs` : ''
@@ -172,13 +175,31 @@ export const MyProfilePage = () => {
         body: formData,
       })
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || 'Failed to upload image')
+      // Get response text first to handle potential non-JSON responses
+      const responseText = await response.text()
+      
+      // Try to parse as JSON, handling cases where response might have a prefix like "1 {...}"
+      let data: any = {}
+      let parseSuccess = false
+      
+      try {
+        // Remove any leading numbers or whitespace (API might return "1 {...}")
+        const cleanedText = responseText.trim().replace(/^\d+\s*/, '')
+        if (cleanedText) {
+          data = JSON.parse(cleanedText)
+          parseSuccess = true
+        }
+      } catch (parseError) {
+        // If parsing fails, log but don't fail if response is ok
+        console.warn('Response parsing warning:', parseError, 'Response text:', responseText.substring(0, 100))
       }
 
-      const data = await response.json()
-      if (data.status === 'success' || data.code === 'CH200') {
+      // Check for success - if response status is 200-299, consider it success
+      // The API might return 200 even if the JSON format is unusual
+      const isSuccess = response.status >= 200 && response.status < 300
+      
+      if (isSuccess) {
+        // Success - refetch profile data
         showToast('Profile picture uploaded successfully!', 'success')
         if (uploadPreview) {
           URL.revokeObjectURL(uploadPreview)
@@ -187,9 +208,20 @@ export const MyProfilePage = () => {
         setSelectedFile(null)
         setUploadPreview('')
         setUploadError(null)
+        // Refetch profile to get updated image
         await refetch()
+        // Also refetch user profile if available
+        if (refetchUserProfile) {
+          try {
+            await refetchUserProfile()
+          } catch {
+            // Ignore user profile refetch errors
+          }
+        }
       } else {
-        throw new Error(data.message || 'Failed to upload image')
+        // Response not ok - show error
+        const errorMessage = parseSuccess ? (data.message || data.error || 'Failed to upload image') : `Failed to upload image (Status: ${response.status})`
+        throw new Error(errorMessage)
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to upload image'

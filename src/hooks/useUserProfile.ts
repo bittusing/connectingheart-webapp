@@ -55,8 +55,8 @@ export const useUserProfile = () => {
   const [error, setError] = useState<string | null>(null)
   const hasFetchedRef = useRef(false)
 
-  const fetchProfile = useCallback(async () => {
-    if (hasFetchedRef.current) return
+  const fetchProfile = useCallback(async (force = false) => {
+    if (hasFetchedRef.current && !force) return
     
     try {
       setLoading(true)
@@ -99,8 +99,8 @@ export const useUserProfile = () => {
     loading,
     error,
     refetch: async () => {
-      await fetchProfile()
-      return profile
+      const updatedProfile = await fetchProfile(true) // Force refetch
+      return updatedProfile || profile
     },
   }
 }
