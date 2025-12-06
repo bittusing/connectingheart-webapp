@@ -60,6 +60,17 @@ const formatYesNo = (value: string | undefined): string => {
   return map[value.toLowerCase()] || value
 }
 
+const formatGender = (gender: string | undefined): string => {
+  if (!gender) return 'Not Filled'
+  const genderMap: Record<string, string> = {
+    m: 'Male',
+    f: 'Female',
+    male: 'Male',
+    female: 'Female',
+  }
+  return genderMap[gender.toLowerCase()] || gender
+}
+
 const calculateAge = (dob: string | undefined): number | null => {
   if (!dob) return null
   try {
@@ -371,7 +382,7 @@ export const MyProfilePage = () => {
         </div>
         <div className="mt-4 space-y-3">
           <DetailRow label="Name" value={profile.basic.name || 'Not Filled'} />
-          <DetailRow label="Gender" value={userProfile?.gender || 'Not Filled'} />
+          <DetailRow label="Gender" value={formatGender(userProfile?.gender)} />
           <DetailRow label="Religion" value={enriched.religionLabel || 'Not Filled'} />
           <DetailRow label="Mother Tongue" value={enriched.motherTongueLabel || 'Not Filled'} />
           <DetailRow label="Country" value={enriched.countryLabel || 'Not Filled'} />
