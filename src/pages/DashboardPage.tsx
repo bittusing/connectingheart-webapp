@@ -4,12 +4,14 @@ import { SectionRail } from '../components/dashboard/SectionRail'
 import { StatsGrid } from '../components/dashboard/StatsGrid'
 import { useUserProfile } from '../hooks/useUserProfile'
 import { useJustJoinedCount } from '../hooks/useJustJoinedCount'
+import { useAcceptanceCount } from '../hooks/useAcceptanceCount'
 import { statTiles } from '../data/dashboardContent'
 import { DashboardBannerSlider } from '../components/dashboard/DashboardBannerSlider'
 
 export const DashboardPage = () => {
   const { profile } = useUserProfile()
   const { count: justJoinedCount, loading: justJoinedLoading } = useJustJoinedCount()
+  const { count: acceptanceCount, loading: acceptanceLoading } = useAcceptanceCount()
 
   const completionPercentage =
     profile && 'isVerified' in profile && profile.isVerified ? 100 : 80
@@ -37,12 +39,13 @@ export const DashboardPage = () => {
       if (tile.label === 'Acceptance') {
         return {
           ...tile,
+          value: acceptanceLoading ? '...' : acceptanceCount,
           href: '/acceptance',
         }
       }
       return tile
     })
-  }, [justJoinedCount, justJoinedLoading])
+  }, [justJoinedCount, justJoinedLoading, acceptanceCount, acceptanceLoading])
 
   const celebrationSlides = useMemo(
     () => [
