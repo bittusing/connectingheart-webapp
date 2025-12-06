@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import {
   PaperAirplaneIcon,
   PhoneIcon,
@@ -11,6 +11,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowLeftIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { useProfileDetail } from '../hooks/useProfileDetail'
 import { useProfileActions } from '../hooks/useProfileActions'
@@ -83,6 +84,7 @@ const CriticalField = ({ label, value }: { label: string; value?: string }) => {
 export const ProfileViewPage = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const [activeTab, setActiveTab] = useState<TabType>('basic')
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { profile, loading, error, refetch } = useProfileDetail(id)
@@ -94,8 +96,25 @@ export const ProfileViewPage = () => {
     unshortlistProfile,
     ignoreProfile,
     unignoreProfile,
+    declineInterest,
     pendingAction,
   } = useProfileActions()
+  
+  // Check if user came from acceptance page
+  const [isFromAcceptance, setIsFromAcceptance] = useState(false)
+  
+  useEffect(() => {
+    // Check location state first (most reliable)
+    if (location.state?.from === 'acceptance') {
+      setIsFromAcceptance(true)
+      return
+    }
+    // Fallback: check referrer
+    if (typeof window !== 'undefined' && document.referrer) {
+      const referrerUrl = new URL(document.referrer)
+      setIsFromAcceptance(referrerUrl.pathname.includes('/acceptance'))
+    }
+  }, [location.state])
   const { unlockProfile, isUnlocking } = useUnlockProfile()
   const [toasts, setToasts] = useState<ToastMessage[]>([])
   const [hasSentInterest, setHasSentInterest] = useState(false)
@@ -258,7 +277,24 @@ export const ProfileViewPage = () => {
   }
 
   const handleChat = async () => {
-    showToast('Chat coming soon.', 'success')
+    showToast('Chat Coming Soon', 'success')
+  }
+
+  const handleDeclined = async () => {
+    if (!profileClientId) {
+      showToast('Profile information unavailable. Please refresh and try again.', 'error')
+      return
+    }
+
+    try {
+      const response = await declineInterest(profileClientId)
+      showToast(response?.message || 'Interest declined successfully', 'success')
+      // Navigate back to acceptance page after declining
+      navigate('/acceptance', { replace: true })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to decline interest'
+      showToast(message, 'error')
+    }
   }
 
   useEffect(() => {
@@ -980,56 +1016,93 @@ export const ProfileViewPage = () => {
       {/* Fixed Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-700 bg-slate-900 shadow-lg dark:border-slate-700 lg:left-[280px]">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-1.5 px-2 py-2.5 sm:gap-2 sm:px-4 sm:py-3">
-          <button
-            onClick={hasSentInterest ? handleUnsendInterest : handleSendInterest}
-            disabled={isInterestPending}
-            className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-[10px] font-semibold text-white shadow-md transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2.5 sm:text-xs ${
-              hasSentInterest
-                ? 'bg-slate-800 hover:bg-slate-700'
-                : 'bg-pink-500 hover:bg-pink-600 shadow-pink-500/30 hover:shadow-lg hover:shadow-pink-500/40'
-            }`}
-            aria-label={hasSentInterest ? 'Withdraw Interest' : 'Send Interest'}
-          >
-            <PaperAirplaneIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="leading-tight">
-              {isInterestPending ? 'Please wait...' : hasSentInterest ? 'Withdraw Interest' : 'Send Interest'}
-            </span>
-          </button>
-          <button
-            onClick={() => handleAction('contact')}
-            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 sm:px-3 sm:py-2.5 sm:text-xs"
-            aria-label="Contact"
-          >
-            <PhoneIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="leading-tight">Contact</span>
-          </button>
-          <button
-            onClick={handleShortlist}
-            disabled={isShortlistPending}
-            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2.5 sm:text-xs"
-            aria-label="Shortlist"
-          >
-            <UserPlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="leading-tight">{isShortlistPending ? 'Please wait...' : isShortlisted ? 'Unshortlist' : 'Shortlist'}</span>
-          </button>
-          <button
-            onClick={handleIgnore}
-            disabled={isIgnorePending}
-            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2.5 sm:text-xs"
-            aria-label="Ignore"
-          >
-            <NoSymbolIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="leading-tight">{isIgnorePending ? 'Please wait...' : isIgnored ? 'Undo Ignore' : 'Ignore'}</span>
-          </button>
-          <button
-            onClick={handleChat}
-            // disabled={isChatPending}
-            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 sm:px-3 sm:py-2.5 sm:text-xs"
-            aria-label="Chat"
-          >
-            <ChatBubbleLeftRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="leading-tight">Chat</span>
-          </button>
+          {isFromAcceptance ? (
+            // Custom buttons for acceptance page
+            <>
+              <button
+                onClick={handleDeclined}
+                disabled={pendingAction?.type === 'decline-interest' && pendingAction?.profileId === profileClientId}
+                className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-red-500 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-red-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2.5 sm:text-xs"
+                aria-label="Declined"
+              >
+                <XMarkIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="leading-tight">
+                  {pendingAction?.type === 'decline-interest' && pendingAction?.profileId === profileClientId
+                    ? 'Please wait...'
+                    : 'Declined'}
+                </span>
+              </button>
+              <button
+                onClick={() => handleAction('contact')}
+                className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 sm:px-3 sm:py-2.5 sm:text-xs"
+                aria-label="Contact"
+              >
+                <PhoneIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="leading-tight">Contact</span>
+              </button>
+              <button
+                onClick={handleChat}
+                className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 sm:px-3 sm:py-2.5 sm:text-xs"
+                aria-label="Chat"
+              >
+                <ChatBubbleLeftRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="leading-tight">Chat</span>
+              </button>
+            </>
+          ) : (
+            // Default buttons for other pages
+            <>
+              <button
+                onClick={hasSentInterest ? handleUnsendInterest : handleSendInterest}
+                disabled={isInterestPending}
+                className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-[10px] font-semibold text-white shadow-md transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2.5 sm:text-xs ${
+                  hasSentInterest
+                    ? 'bg-slate-800 hover:bg-slate-700'
+                    : 'bg-pink-500 hover:bg-pink-600 shadow-pink-500/30 hover:shadow-lg hover:shadow-pink-500/40'
+                }`}
+                aria-label={hasSentInterest ? 'Withdraw Interest' : 'Send Interest'}
+              >
+                <PaperAirplaneIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="leading-tight">
+                  {isInterestPending ? 'Please wait...' : hasSentInterest ? 'Withdraw Interest' : 'Send Interest'}
+                </span>
+              </button>
+              <button
+                onClick={() => handleAction('contact')}
+                className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 sm:px-3 sm:py-2.5 sm:text-xs"
+                aria-label="Contact"
+              >
+                <PhoneIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="leading-tight">Contact</span>
+              </button>
+              <button
+                onClick={handleShortlist}
+                disabled={isShortlistPending}
+                className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2.5 sm:text-xs"
+                aria-label="Shortlist"
+              >
+                <UserPlusIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="leading-tight">{isShortlistPending ? 'Please wait...' : isShortlisted ? 'Unshortlist' : 'Shortlist'}</span>
+              </button>
+              <button
+                onClick={handleIgnore}
+                disabled={isIgnorePending}
+                className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2.5 sm:text-xs"
+                aria-label="Ignore"
+              >
+                <NoSymbolIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="leading-tight">{isIgnorePending ? 'Please wait...' : isIgnored ? 'Undo Ignore' : 'Ignore'}</span>
+              </button>
+              <button
+                onClick={handleChat}
+                className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 sm:px-3 sm:py-2.5 sm:text-xs"
+                aria-label="Chat"
+              >
+                <ChatBubbleLeftRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="leading-tight">Chat</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 

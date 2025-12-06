@@ -67,7 +67,9 @@ export const ProfileActionCard = ({
 
   const handleCardClick = () => {
     // Navigate to profile view page using profile id
-    navigate(`/dashboard/profile/${profile.id}`)
+    // Check if we're on acceptance page by checking current pathname
+    const isFromAcceptance = window.location.pathname.includes('/acceptance')
+    navigate(`/dashboard/profile/${profile.id}`, { state: isFromAcceptance ? { from: 'acceptance' } : undefined })
   }
 
   const handleActionClick = (e: React.MouseEvent, actionKey: ProfileActionType) => {
