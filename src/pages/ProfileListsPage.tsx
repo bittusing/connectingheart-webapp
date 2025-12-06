@@ -25,6 +25,7 @@ type ProfileListTemplateProps = {
   dualButton?: DualButtonConfig
   hideButtons?: boolean
   notificationType?: NotificationType
+  skipLocationLookups?: boolean // Skip city/state/country lookups if location is not displayed
 }
 
 type ToastVariant = 'success' | 'error'
@@ -44,6 +45,7 @@ const ProfileListTemplate = ({
   dualButton,
   hideButtons,
   notificationType,
+  skipLocationLookups = false,
 }: ProfileListTemplateProps) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [displayedProfiles, setDisplayedProfiles] = useState<number>(5) // Start with 5 profiles
@@ -53,6 +55,7 @@ const ProfileListTemplate = ({
   // Get all profiles - use allProfiles for infinite scroll, profiles for desktop pagination
   const { profiles, allProfiles, loading, error, totalProfiles, totalPages, refetch } = useProfiles(endpoint, {
     page: currentPage,
+    skipLocationLookups,
   })
   const {
     sendInterest,
@@ -449,6 +452,7 @@ export const AllProfilesPage = () => (
     title="All Profiles"
     subtitle="Browse every compatible profile curated for you."
     endpoint="dashboard/getAllProfiles"
+    skipLocationLookups={true}
   />
 )
 export const DailyRecommendationsPage = () => (
@@ -457,6 +461,7 @@ export const DailyRecommendationsPage = () => (
     subtitle="Fresh suggestions based on your preferences and activity."
     endpoint="interest/getDailyRecommendations"
     note="Updated every 24 hours"
+    skipLocationLookups={true}
   />
 )
 export const ProfileVisitorsPage = () => (
@@ -464,6 +469,7 @@ export const ProfileVisitorsPage = () => (
     title="Profile Visitors"
     subtitle="Members who recently viewed your profile."
     endpoint="dashboard/getProfileVisitors"
+    skipLocationLookups={true}
   />
 )
 

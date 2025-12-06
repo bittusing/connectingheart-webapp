@@ -9,6 +9,7 @@ import { useCountryLookup } from './useCountryLookup'
 type UseProfilesOptions = {
   page?: number
   pageSize?: number
+  skipLocationLookups?: boolean // Skip city/state/country lookups if location is not displayed
 }
 
 type RefetchOptions = {
@@ -39,7 +40,7 @@ export const useProfiles = (
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [allProfiles, setAllProfiles] = useState<ProfileCardData[]>([])
-  const { page = 1, pageSize = ITEMS_PER_PAGE } = options
+  const { page = 1, pageSize = ITEMS_PER_PAGE, skipLocationLookups = false } = options
   const lookupCacheRef = useRef<{
     casteLabelMap: Record<string, string>
     countryLabelMap: Record<string, string>
@@ -60,7 +61,7 @@ export const useProfiles = (
       }
       setError(null)
 
-      // Fetch lookup data for caste labels
+      // Fetch lookup data for caste labels (always needed as caste is displayed)
       let lookupData: Record<string, { label: string; value: string | number }[]> = {}
       try {
         lookupData = await fetchLookup()
@@ -78,14 +79,16 @@ export const useProfiles = (
       })
       lookupCacheRef.current.casteLabelMap = casteLabelMap
 
-      // Build country label map
+      // Build country label map (only if location lookups are needed)
       const countryLabelMap: Record<string, string> = {}
-      countryOptions.forEach((option) => {
-        if (option.value) {
-          countryLabelMap[String(option.value)] = option.label
-        }
-      })
-      lookupCacheRef.current.countryLabelMap = countryLabelMap
+      if (!skipLocationLookups) {
+        countryOptions.forEach((option) => {
+          if (option.value) {
+            countryLabelMap[String(option.value)] = option.label
+          }
+        })
+        lookupCacheRef.current.countryLabelMap = countryLabelMap
+      }
 
       const response = await get<ApiProfileResponse | ApiProfile[]>(endpoint)
       
@@ -110,57 +113,59 @@ export const useProfiles = (
         throw new Error(response.message || 'Failed to fetch profiles')
       }
 
-      // Fetch state and city labels for all profiles
+      // Fetch state and city labels for all profiles (only if location lookups are needed)
       const stateLabelMap: Record<string, string> = {}
       const cityLabelMap: Record<string, string> = {}
 
-      try {
-        // Group required states by country
-        const statesByCountry = new Map<string, Set<string>>()
-        const citiesByState = new Map<string, Set<string>>()
+      if (!skipLocationLookups) {
+        try {
+          // Group required states by country
+          const statesByCountry = new Map<string, Set<string>>()
+          const citiesByState = new Map<string, Set<string>>()
 
-        profilesToTransform.forEach((profile) => {
-          if (profile.country && profile.state) {
-            if (!statesByCountry.has(profile.country)) {
-              statesByCountry.set(profile.country, new Set())
+          profilesToTransform.forEach((profile) => {
+            if (profile.country && profile.state) {
+              if (!statesByCountry.has(profile.country)) {
+                statesByCountry.set(profile.country, new Set())
+              }
+              statesByCountry.get(profile.country)!.add(profile.state)
             }
-            statesByCountry.get(profile.country)!.add(profile.state)
-          }
-          if (profile.state && profile.city) {
-            if (!citiesByState.has(profile.state)) {
-              citiesByState.set(profile.state, new Set())
-            }
-            citiesByState.get(profile.state)!.add(profile.city)
-          }
-        })
-
-        // Resolve state labels
-        for (const [countryId, stateCodes] of statesByCountry.entries()) {
-          const stateOptions = await fetchStates(countryId)
-          stateCodes.forEach((code) => {
-            const match = stateOptions.find((opt) => String(opt.value) === String(code))
-            if (match && match.value) {
-              stateLabelMap[String(code)] = match.label
+            if (profile.state && profile.city) {
+              if (!citiesByState.has(profile.state)) {
+                citiesByState.set(profile.state, new Set())
+              }
+              citiesByState.get(profile.state)!.add(profile.city)
             }
           })
+
+          // Resolve state labels
+          for (const [countryId, stateCodes] of statesByCountry.entries()) {
+            const stateOptions = await fetchStates(countryId)
+            stateCodes.forEach((code) => {
+              const match = stateOptions.find((opt) => String(opt.value) === String(code))
+              if (match && match.value) {
+                stateLabelMap[String(code)] = match.label
+              }
+            })
+          }
+
+          // Resolve city labels
+          for (const [stateId, cityCodes] of citiesByState.entries()) {
+            const cityOptions = await fetchCities(stateId)
+            cityCodes.forEach((code) => {
+              const match = cityOptions.find((opt) => String(opt.value) === String(code))
+              if (match && match.value) {
+                cityLabelMap[String(code)] = match.label
+              }
+            })
+          }
+        } catch (error) {
+          console.error('Failed to resolve state/city labels for profiles', error)
         }
 
-        // Resolve city labels
-        for (const [stateId, cityCodes] of citiesByState.entries()) {
-          const cityOptions = await fetchCities(stateId)
-          cityCodes.forEach((code) => {
-            const match = cityOptions.find((opt) => String(opt.value) === String(code))
-            if (match && match.value) {
-              cityLabelMap[String(code)] = match.label
-            }
-          })
-        }
-      } catch (error) {
-        console.error('Failed to resolve state/city labels for profiles', error)
+        lookupCacheRef.current.stateLabelMap = stateLabelMap
+        lookupCacheRef.current.cityLabelMap = cityLabelMap
       }
-
-      lookupCacheRef.current.stateLabelMap = stateLabelMap
-      lookupCacheRef.current.cityLabelMap = cityLabelMap
 
       // Transform profiles and enrich with labels
       const transformedProfiles = transformApiProfiles(profilesToTransform).map((card, index) => {
@@ -170,16 +175,21 @@ export const useProfiles = (
         const casteCode = source.cast ? String(source.cast) : undefined
         const casteLabel = casteCode ? casteLabelMap[casteCode] : undefined
 
-        const cityLabel = source.city ? cityLabelMap[String(source.city)] : undefined
-        const stateLabel = source.state ? stateLabelMap[String(source.state)] : undefined
-        const countryLabel = source.country ? countryLabelMap[String(source.country)] : undefined
+        // Only map location if lookups were performed
+        let location = card.location
+        if (!skipLocationLookups) {
+          const cityLabel = source.city ? cityLabelMap[String(source.city)] : undefined
+          const stateLabel = source.state ? stateLabelMap[String(source.state)] : undefined
+          const countryLabel = source.country ? countryLabelMap[String(source.country)] : undefined
 
-        const locationParts = [cityLabel, stateLabel, countryLabel].filter(Boolean)
+          const locationParts = [cityLabel, stateLabel, countryLabel].filter(Boolean)
+          location = locationParts.length > 0 ? locationParts.join(', ') : card.location
+        }
 
         return {
           ...card,
           caste: casteLabel ?? card.caste,
-          location: locationParts.length > 0 ? locationParts.join(', ') : card.location,
+          location,
         }
       })
 

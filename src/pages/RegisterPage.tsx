@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { Button } from '../components/common/Button'
+import { Alert } from '../components/common/Alert'
 import { OtpModal } from '../components/forms/OtpModal'
 import { SelectModal } from '../components/forms/SelectModal'
 import { TextInput } from '../components/forms/TextInput'
@@ -106,6 +107,8 @@ export const RegisterPage = () => {
   const [otpModalOpen, setOtpModalOpen] = useState(false)
   const [otpLoading, setOtpLoading] = useState(false)
   const [countryCodeModalOpen, setCountryCodeModalOpen] = useState(false)
+  const [showAlert, setShowAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState('')
 
   const handleBasicSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -138,7 +141,10 @@ export const RegisterPage = () => {
       setOtpLoading(true)
       const response = await generateOtp(phoneNumber, extension)
       if (response.status === 'success') {
-        setOtpModalOpen(true)
+        // Show alert instead of directly opening OTP modal
+        const fullPhoneNumber = `${extension}${phoneNumber}`
+        setAlertMessage(`OTP has been sent to ${fullPhoneNumber}. Please check your mobile.`)
+        setShowAlert(true)
         showToast('OTP sent to your mobile number', 'success')
       } else {
         showToast(response.message || 'Failed to send OTP', 'error')
@@ -157,6 +163,12 @@ export const RegisterPage = () => {
     } finally {
       setOtpLoading(false)
     }
+  }
+
+  const handleAlertConfirm = () => {
+    setShowAlert(false)
+    // Open OTP modal after alert is confirmed
+    setOtpModalOpen(true)
   }
 
   const handleOtpVerify = async (otp: string) => {
@@ -372,6 +384,9 @@ export const RegisterPage = () => {
           </form>
         </div>
       </div>
+      {showAlert && (
+        <Alert message={alertMessage} onConfirm={handleAlertConfirm} />
+      )}
       <OtpModal
         open={otpModalOpen}
         onClose={() => {

@@ -1,14 +1,11 @@
-import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { navItems } from '../../data/dashboardContent'
 import { DashboardIcon } from './DashboardIcon'
 import { useUserProfile } from '../../hooks/useUserProfile'
 import { PencilIcon } from '@heroicons/react/24/outline'
 import { getGenderPlaceholder } from '../../utils/imagePlaceholders'
-
-const handleLogout = () => {
-  window.localStorage.removeItem('connectingheart-token')
-  window.location.href = '/login'
-}
+import { ConfirmModal } from '../forms/ConfirmModal'
 
 type DashboardSidebarProps = {
   showUserProfile?: boolean
@@ -16,6 +13,23 @@ type DashboardSidebarProps = {
 
 export const DashboardSidebar = ({ showUserProfile = false }: DashboardSidebarProps) => {
   const { profile } = useUserProfile()
+  const navigate = useNavigate()
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(true)
+  }
+
+  const handleLogoutConfirm = () => {
+    window.localStorage.removeItem('connectingheart-token')
+    window.localStorage.removeItem('connectingheart-user-id')
+    setShowLogoutConfirm(false)
+    navigate('/login', { replace: true })
+  }
+
+  const handleLogoutCancel = () => {
+    setShowLogoutConfirm(false)
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -127,6 +141,15 @@ export const DashboardSidebar = ({ showUserProfile = false }: DashboardSidebarPr
           )
         })}
       </nav>
+      <ConfirmModal
+        open={showLogoutConfirm}
+        title="You want to Logout"
+        description="Are you sure you want to logout from your account?"
+        cancelLabel="No"
+        confirmLabel="Yes"
+        onCancel={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+      />
     </div>
   )
 }

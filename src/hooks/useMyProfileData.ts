@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { useApiClient } from './useApiClient'
 import { useLookup } from './useLookup'
 import { useCountryLookup } from './useCountryLookup'
@@ -175,8 +175,20 @@ export const useMyProfileData = () => {
   const [profile, setProfile] = useState<MyProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const hasFetchedRef = useRef(false)
+  const countryOptionsRef = useRef(countryOptions)
 
-  const fetchProfile = useCallback(async () => {
+  // Update ref when countryOptions change
+  useEffect(() => {
+    countryOptionsRef.current = countryOptions
+  }, [countryOptions])
+
+  const fetchProfile = useCallback(async (force = false) => {
+    // Prevent multiple simultaneous fetches unless forced
+    if (hasFetchedRef.current && !force) {
+      return
+    }
+
     try {
       setLoading(true)
       setError(null)
@@ -215,8 +227,11 @@ export const useMyProfileData = () => {
         const cuisines = fetchedLookupData.cuisines || []
         const music = fetchedLookupData.music || []
 
+        // Use ref for countryOptions to avoid dependency issues
+        const currentCountryOptions = countryOptionsRef.current
+
         // Map location
-        const countryLabel = mapCode(countryOptions, apiData.miscellaneous.country)
+        const countryLabel = mapCode(currentCountryOptions, apiData.miscellaneous.country)
         let stateLabel: string | undefined
         let cityLabel: string | undefined
 
@@ -236,7 +251,7 @@ export const useMyProfileData = () => {
         // Map family based out of
         let familyBasedOutOfLabel: string | undefined
         if (apiData.family.familyBasedOutOf) {
-          familyBasedOutOfLabel = mapCode(countryOptions, apiData.family.familyBasedOutOf)
+          familyBasedOutOfLabel = mapCode(currentCountryOptions, apiData.family.familyBasedOutOf)
         }
 
         const enrichedProfile: MyProfileData = {
@@ -284,6 +299,7 @@ export const useMyProfileData = () => {
         }
 
         setProfile(enrichedProfile)
+        hasFetchedRef.current = true
       } else {
         throw new Error('Failed to fetch profile data')
       }
@@ -294,17 +310,25 @@ export const useMyProfileData = () => {
     } finally {
       setLoading(false)
     }
-  }, [get, fetchLookup, fetchStates, fetchCities, countryOptions])
+  }, [get, fetchLookup, fetchStates, fetchCities])
 
   useEffect(() => {
-    void fetchProfile()
+    // Only fetch once on mount, unless explicitly refetched
+    if (!hasFetchedRef.current) {
+      void fetchProfile()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Empty deps - only run on mount
+
+  const refetch = useCallback(async () => {
+    await fetchProfile(true) // Force refetch
   }, [fetchProfile])
 
   return {
     profile,
     loading,
     error,
-    refetch: fetchProfile,
+    refetch,
   }
 }
 
