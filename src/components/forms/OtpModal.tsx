@@ -34,18 +34,47 @@ export const OtpModal = ({ open, onClose, onVerify }: OtpModalProps) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl">
         <h3 className="font-display text-2xl font-semibold text-slate-900">
-          Enter OTP
+          Verify OTP
         </h3>
         <p className="mt-2 text-sm text-slate-500">
-          We sent a 6-digit verification code to your mobile number.
+          Check your Phone and Fill the OTP
         </p>
-        <input
-          ref={inputRef}
-          value={otp}
-          onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))}
-          className="mt-6 w-full rounded-2xl border border-slate-200 px-4 py-3 text-center text-2xl tracking-[0.3em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
-          placeholder="••••••"
-        />
+        <div className="mt-6 flex gap-2 justify-center">
+          {[0, 1, 2, 3, 4, 5].map((index) => (
+            <input
+              key={index}
+              ref={index === 0 ? inputRef : undefined}
+              type="text"
+              maxLength={1}
+              value={otp[index] || ''}
+              onChange={(event) => {
+                const value = event.target.value.replace(/\D/g, '')
+                if (value) {
+                  const newOtp = otp.split('')
+                  newOtp[index] = value
+                  const updatedOtp = newOtp.join('').slice(0, 6)
+                  setOtp(updatedOtp)
+                  // Auto-focus next input
+                  if (index < 5 && value) {
+                    const nextInput = event.target.parentElement?.children[index + 1] as HTMLInputElement
+                    nextInput?.focus()
+                  }
+                } else {
+                  const newOtp = otp.split('')
+                  newOtp[index] = ''
+                  setOtp(newOtp.join(''))
+                }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Backspace' && !otp[index] && index > 0) {
+                  const prevInput = event.target.parentElement?.children[index - 1] as HTMLInputElement
+                  prevInput?.focus()
+                }
+              }}
+              className="w-12 h-12 rounded-xl border border-slate-200 text-center text-xl font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
+            />
+          ))}
+        </div>
         {error && <p className="mt-2 text-sm text-pink-600">{error}</p>}
         <div className="mt-6 flex items-center justify-center gap-3">
           <button
@@ -56,7 +85,7 @@ export const OtpModal = ({ open, onClose, onVerify }: OtpModalProps) => {
             Cancel
           </button>
           <Button size="lg" onClick={handleVerify}>
-            Verify OTP
+            Confirm
           </Button>
         </div>
       </div>

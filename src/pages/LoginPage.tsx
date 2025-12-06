@@ -194,6 +194,11 @@ export const LoginPage = () => {
             <Button type="submit" size="lg" disabled={status === 'loading'}>
               {status === 'loading' ? 'Signing in...' : 'Sign in'}
             </Button>
+            <div className="text-center">
+              <Link to="/forgot-password" className="text-sm text-brand-500 hover:text-brand-600">
+                Forgot Password
+              </Link>
+            </div>
           </form>
         </AuthCard>
       </div>

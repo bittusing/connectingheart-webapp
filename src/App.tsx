@@ -4,6 +4,7 @@ import { DashboardLayout } from './components/layout/DashboardLayout'
 import { GlobalToastContainer } from './components/common/GlobalToastContainer'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import {
   AllProfilesPage,
   DailyRecommendationsPage,
@@ -62,6 +63,7 @@ function App() {
         <Route index element={<RootRedirect />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="policy" element={<PolicyPage />} />
         <Route path="under-verification" element={<VerificationPendingPage />} />
       </Route>
