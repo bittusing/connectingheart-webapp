@@ -49,10 +49,11 @@ export const useProfileActions = () => {
   )
 
   const unsendInterest = useCallback(
-    (targetId: string) =>
-      runAction('unsend-interest', targetId, () =>
-        api.post<{ targetId: string }, ApiResponse>('interest/unsendInterest', { targetId }),
-      ),
+    (targetId: string, useReceiverId: boolean = false) =>
+      runAction('unsend-interest', targetId, () => {
+        const payload = useReceiverId ? { receiver_id: targetId } : { targetId }
+        return api.post<{ targetId?: string; receiver_id?: string }, ApiResponse>('interest/unsendInterest', payload)
+      }),
     [api, runAction],
   )
 

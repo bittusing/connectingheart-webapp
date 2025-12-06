@@ -52,6 +52,10 @@ const ProfileListTemplate = ({
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
   const hasUpdatedNotification = useRef(false)
+  const endpointRef = useRef(endpoint)
+  useEffect(() => {
+    endpointRef.current = endpoint
+  }, [endpoint])
   // Get all profiles - use allProfiles for infinite scroll, profiles for desktop pagination
   const { profiles, allProfiles, loading, error, totalProfiles, totalPages, refetch } = useProfiles(endpoint, {
     page: currentPage,
@@ -231,7 +235,9 @@ const ProfileListTemplate = ({
 
       switch (singleButton.actionType) {
         case 'unsend-interest':
-          response = await unsendInterest(profileId)
+          // Use receiver_id for InterestSentPage (endpoint: dashboard/getMyInterestedProfiles)
+          const useReceiverId = endpointRef.current === 'dashboard/getMyInterestedProfiles'
+          response = await unsendInterest(profileId, useReceiverId)
           successMessage = response?.message ?? 'Interest cancelled successfully.'
           notificationTypeForUpdate = 'interestSent'
           break
