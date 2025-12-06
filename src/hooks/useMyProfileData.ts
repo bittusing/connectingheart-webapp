@@ -33,6 +33,7 @@ type MyProfileApiData = {
   }
   about: {
     managedBy: string
+    description?: string
     aboutYourself?: string
     disability?: string
     bodyType?: string
@@ -48,9 +49,9 @@ type MyProfileApiData = {
   career: {
     employed_in: string
     occupation: string
-    aboutCareer?: string
+    aboutMyCareer?: string
     organisationName?: string
-    interestedInSettingAbroad?: string
+    interestedInSettlingAbroad?: string
   }
   family: {
     familyStatus: string
@@ -66,11 +67,14 @@ type MyProfileApiData = {
     gothra: string
     livingWithParents: string
     familyBasedOutOf: string
+    aboutMyFamily?: string
     aboutFamily?: string
   }
   contact: {
     email: string
     phoneNumber: string
+    alternateEmail?: string
+    altMobileNumber?: string
     alternateMobileNo?: string
     alternateEmailId?: string
     landline?: string
@@ -82,6 +86,9 @@ type MyProfileApiData = {
     nakshatra?: string
     placeOfBirth?: string
     timeOfBirth?: string
+    countryOfBirth?: string
+    stateOfBirth?: string
+    cityOfBirth?: string
   }
   lifeStyleData: {
     movies?: string
@@ -123,6 +130,7 @@ export type MyProfileData = MyProfileApiData & {
     qualificationLabel?: string
     employedInLabel?: string
     occupationLabel?: string
+    interestedInSettlingAbroadLabel?: string
     maritalStatusLabel?: string
     manglikLabel?: string
     horoscopeLabel?: string
@@ -132,6 +140,9 @@ export type MyProfileData = MyProfileApiData & {
     motherOccupationLabel?: string
     familyBasedOutOfLabel?: string
     managedByLabel?: string
+    disabilityLabel?: string
+    bodyTypeLabel?: string
+    thalassemiaLabel?: string
     dietaryHabitsLabel?: string
     drinkingHabitsLabel?: string
     smokingHabitsLabel?: string
@@ -182,12 +193,16 @@ export const useMyProfileData = () => {
         const motherTongue = fetchedLookupData.motherTongue || fetchedLookupData.languages || []
         const qualifications = fetchedLookupData.highestEducation || fetchedLookupData.qualification || []
         const occupations = fetchedLookupData.occupation || []
+        const employedInOptions = fetchedLookupData.employed_in || []
         const maritalStatuses = fetchedLookupData.maritalStatus || []
         const manglikOptions = fetchedLookupData.manglik || []
         const horoscopes = fetchedLookupData.horoscopes || fetchedLookupData.rashi || []
         const rashiOptions = fetchedLookupData.rashi || fetchedLookupData.horoscopes || []
         const nakshatraOptions = fetchedLookupData.nakshatra || []
         const managedByOptions = fetchedLookupData.managedBy || []
+        const disabilityOptions = fetchedLookupData.disability || []
+        const bodyTypeOptions = fetchedLookupData.bodyType || []
+        const thalassemiaOptions = fetchedLookupData.thalassemia || []
         const dietaryHabitsOptions = fetchedLookupData.dietaryHabits || []
         const drinkingHabitsOptions = fetchedLookupData.drinkingHabits || []
         const smokingHabitsOptions = fetchedLookupData.smokingHabits || []
@@ -234,8 +249,14 @@ export const useMyProfileData = () => {
             religionLabel: mapCode(religions, apiData.basic.religion),
             motherTongueLabel: mapCode(motherTongue, apiData.basic.motherTongue),
             qualificationLabel: mapCode(qualifications, apiData.education.qualification),
-            employedInLabel: mapCode(occupations, apiData.career.employed_in),
+            employedInLabel: mapCode(employedInOptions, apiData.career.employed_in),
             occupationLabel: mapCode(occupations, apiData.career.occupation),
+            interestedInSettlingAbroadLabel:
+              apiData.career.interestedInSettlingAbroad === 'Y'
+                ? 'Yes'
+                : apiData.career.interestedInSettlingAbroad === 'N'
+                  ? 'No'
+                  : undefined,
             maritalStatusLabel: mapCode(maritalStatuses, apiData.critical.maritalStatus),
             manglikLabel: mapCode(manglikOptions, apiData.horoscope.manglik),
             horoscopeLabel: mapCode(horoscopes, apiData.horoscope.horoscope),
@@ -245,6 +266,9 @@ export const useMyProfileData = () => {
             motherOccupationLabel: mapCode(occupations, apiData.family.motherOccupation),
             familyBasedOutOfLabel,
             managedByLabel: mapCode(managedByOptions, apiData.about.managedBy),
+            disabilityLabel: mapCode(disabilityOptions, apiData.about.disability),
+            bodyTypeLabel: mapCode(bodyTypeOptions, apiData.about.bodyType),
+            thalassemiaLabel: mapCode(thalassemiaOptions, apiData.about.thalassemia),
             dietaryHabitsLabel: mapCode(dietaryHabitsOptions, apiData.lifeStyleData.dietaryHabits),
             drinkingHabitsLabel: mapCode(drinkingHabitsOptions, apiData.lifeStyleData.drinkingHabits),
             smokingHabitsLabel: mapCode(smokingHabitsOptions, apiData.lifeStyleData.smokingHabits),

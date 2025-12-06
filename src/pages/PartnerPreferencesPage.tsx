@@ -321,38 +321,38 @@ export const PartnerPreferencesPage = () => {
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Basic Preferences</h2>
           <div className="space-y-6">
-            <RangeGroup
-              label="Age"
-              minLabel="Min Age"
-              maxLabel="Max Age"
-              minValue={formState.minAge}
-              maxValue={formState.maxAge}
-              options={optionSets.age}
-              onMinChange={(value) => setFormState((prev) => ({ ...prev, minAge: value }))}
-              onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxAge: value }))}
-            />
+        <RangeGroup
+          label="Age"
+          minLabel="Min Age"
+          maxLabel="Max Age"
+          minValue={formState.minAge}
+          maxValue={formState.maxAge}
+          options={optionSets.age}
+          onMinChange={(value) => setFormState((prev) => ({ ...prev, minAge: value }))}
+          onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxAge: value }))}
+        />
 
-            <RangeGroup
-              label="Height"
-              minLabel="Min Height"
-              maxLabel="Max Height"
-              minValue={formState.minHeight}
-              maxValue={formState.maxHeight}
-              options={optionSets.height}
-              onMinChange={(value) => setFormState((prev) => ({ ...prev, minHeight: value }))}
-              onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxHeight: value }))}
-            />
+        <RangeGroup
+          label="Height"
+          minLabel="Min Height"
+          maxLabel="Max Height"
+          minValue={formState.minHeight}
+          maxValue={formState.maxHeight}
+          options={optionSets.height}
+          onMinChange={(value) => setFormState((prev) => ({ ...prev, minHeight: value }))}
+          onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxHeight: value }))}
+        />
 
-            <RangeGroup
-              label="Income"
-              minLabel="Min Income"
-              maxLabel="Max Income"
-              minValue={formState.minIncome}
-              maxValue={formState.maxIncome}
-              options={optionSets.income}
-              onMinChange={(value) => setFormState((prev) => ({ ...prev, minIncome: value }))}
-              onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxIncome: value }))}
-            />
+        <RangeGroup
+          label="Income"
+          minLabel="Min Income"
+          maxLabel="Max Income"
+          minValue={formState.minIncome}
+          maxValue={formState.maxIncome}
+          options={optionSets.income}
+          onMinChange={(value) => setFormState((prev) => ({ ...prev, minIncome: value }))}
+          onMaxChange={(value) => setFormState((prev) => ({ ...prev, maxIncome: value }))}
+        />
           </div>
         </div>
 
@@ -360,34 +360,34 @@ export const PartnerPreferencesPage = () => {
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Location & Background</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            <MultiSelectField
-              label="Country"
-              placeholder="Select country"
-              options={countryOptions}
-              selectedValues={formState.countries}
-              onChange={(values) => handleMultiChange('countries', values)}
-            />
-            <MultiSelectField
-              label="Residential Status"
-              placeholder="Select residential status"
-              options={optionSets.residential}
-              selectedValues={formState.residentialStatuses}
-              onChange={(values) => handleMultiChange('residentialStatuses', values)}
-            />
-            <MultiSelectField
-              label="Occupation"
-              placeholder="Select occupation"
-              options={optionSets.occupation}
-              selectedValues={formState.occupations}
-              onChange={(values) => handleMultiChange('occupations', values)}
-            />
-            <MultiSelectField
-              label="Mother Tongue"
-              placeholder="Select mother tongue"
-              options={optionSets.motherTongue}
-              selectedValues={formState.motherTongues}
-              onChange={(values) => handleMultiChange('motherTongues', values)}
-            />
+          <MultiSelectField
+            label="Country"
+            placeholder="Select country"
+            options={countryOptions}
+            selectedValues={formState.countries}
+            onChange={(values) => handleMultiChange('countries', values)}
+          />
+          <MultiSelectField
+            label="Residential Status"
+            placeholder="Select residential status"
+            options={optionSets.residential}
+            selectedValues={formState.residentialStatuses}
+            onChange={(values) => handleMultiChange('residentialStatuses', values)}
+          />
+          <MultiSelectField
+            label="Occupation"
+            placeholder="Select occupation"
+            options={optionSets.occupation}
+            selectedValues={formState.occupations}
+            onChange={(values) => handleMultiChange('occupations', values)}
+          />
+          <MultiSelectField
+            label="Mother Tongue"
+            placeholder="Select mother tongue"
+            options={optionSets.motherTongue}
+            selectedValues={formState.motherTongues}
+            onChange={(values) => handleMultiChange('motherTongues', values)}
+          />
           </div>
         </div>
 
@@ -395,35 +395,35 @@ export const PartnerPreferencesPage = () => {
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Religion & Family</h2>
           <div className="space-y-6">
-            <CheckboxGroup
-              label="Religion"
-              options={optionSets.religion}
-              selectedValues={formState.religions}
-              onToggle={(value) => handleToggle('religions', value)}
-            />
+        <CheckboxGroup
+          label="Religion"
+          options={optionSets.religion}
+          selectedValues={formState.religions}
+          onToggle={(value) => handleToggle('religions', value)}
+        />
 
-            <CheckboxGroup
-              label="Marital Status"
-              options={optionSets.maritalStatus}
-              selectedValues={formState.maritalStatuses}
-              onToggle={(value) => handleToggle('maritalStatuses', value)}
-            />
+        <CheckboxGroup
+          label="Marital Status"
+          options={optionSets.maritalStatus}
+          selectedValues={formState.maritalStatuses}
+          onToggle={(value) => handleToggle('maritalStatuses', value)}
+        />
 
             <div className="grid gap-4 md:grid-cols-2">
-              <MultiSelectField
-                label="Caste"
-                placeholder="Select caste"
-                options={optionSets.caste}
-                selectedValues={formState.castes}
-                onChange={(values) => handleMultiChange('castes', values)}
-              />
-              <MultiSelectField
-                label="Education"
-                placeholder="Select education"
-                options={optionSets.education}
-                selectedValues={formState.educations}
-                onChange={(values) => handleMultiChange('educations', values)}
-              />
+          <MultiSelectField
+            label="Caste"
+            placeholder="Select caste"
+            options={optionSets.caste}
+            selectedValues={formState.castes}
+            onChange={(values) => handleMultiChange('castes', values)}
+          />
+          <MultiSelectField
+            label="Education"
+            placeholder="Select education"
+            options={optionSets.education}
+            selectedValues={formState.educations}
+            onChange={(values) => handleMultiChange('educations', values)}
+          />
             </div>
           </div>
         </div>
@@ -432,19 +432,19 @@ export const PartnerPreferencesPage = () => {
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Horoscope</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            <MultiSelectField
-              label="Horoscope"
-              placeholder="Select horoscope"
-              options={optionSets.horoscope}
-              selectedValues={formState.horoscopes}
-              onChange={(values) => handleMultiChange('horoscopes', values)}
-            />
-            <CheckboxGroup
-              label="Manglik"
-              options={optionSets.manglik}
-              selectedValues={formState.manglik}
-              onToggle={(value) => handleToggle('manglik', value)}
-            />
+          <MultiSelectField
+            label="Horoscope"
+            placeholder="Select horoscope"
+            options={optionSets.horoscope}
+            selectedValues={formState.horoscopes}
+            onChange={(values) => handleMultiChange('horoscopes', values)}
+          />
+          <CheckboxGroup
+            label="Manglik"
+            options={optionSets.manglik}
+            selectedValues={formState.manglik}
+            onToggle={(value) => handleToggle('manglik', value)}
+          />
           </div>
         </div>
 
@@ -462,8 +462,8 @@ export const PartnerPreferencesPage = () => {
               {submitting ? 'Saving...' : 'Save Preferences'}
             </Button>
           </div>
-        </div>
-      </form>
+          </div>
+        </form>
     </section>
   )
 

@@ -184,9 +184,9 @@ export const ProfileActionCard = ({
               </div>
             )}
             <span className={singleButton.actionType === 'accept-again' || singleButton.actionType === 'unblock' ? 'text-white' : 'text-yellow-400'}>
-              {pendingActionType === singleButton.actionType && pendingProfileId === profile.id
-                ? 'Please wait...'
-                : singleButton.label}
+            {pendingActionType === singleButton.actionType && pendingProfileId === profile.id
+              ? 'Please wait...'
+              : singleButton.label}
             </span>
           </button>
         </div>

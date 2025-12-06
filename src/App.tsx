@@ -43,6 +43,13 @@ import { PartnerPreferenceEditPage } from './pages/PartnerPreferenceEditPage'
 import { AboutYouPage } from './pages/AboutYouPage'
 import { AcceptancePage } from './pages/AcceptancePage'
 import { EditProfileBasicPage } from './pages/EditProfileBasicPage'
+import { EditAboutPage } from './pages/EditAboutPage'
+import { EditEducationPage } from './pages/EditEducationPage'
+import { EditCareerPage } from './pages/EditCareerPage'
+import { EditFamilyPage } from './pages/EditFamilyPage'
+import { EditContactPage } from './pages/EditContactPage'
+import { EditHoroscopePage } from './pages/EditHoroscopePage'
+import { EditLifestylePage } from './pages/EditLifestylePage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { RootRedirect } from './routes/RootRedirect'
 
@@ -66,7 +73,6 @@ function App() {
         <Route path="dashboard/familydetails" element={<FamilyDetailsPage />} />
         <Route path="dashboard/partnerpreferences" element={<PartnerPreferencesPage />} />
         <Route path="dashboard/aboutyou" element={<AboutYouPage />} />
-        <Route path="editprofile/basic" element={<EditProfileBasicPage />} />
         <Route element={<DashboardLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="dashboard/notification" element={<NotificationPage />} />
@@ -84,8 +90,16 @@ function App() {
           <Route path="dashboard/shortlist" element={<ShortlistedProfilesPage />} />
           <Route path="dashboard/ignored" element={<IgnoredProfilesPage />} />
           <Route path="dashboard/blocked" element={<BlockedProfilesPage />} />
-          <Route path="dashboard/myprofile" element={<MyProfilePage />} />
-          <Route path="dashboard/profile/:id" element={<ProfileViewPage />} />
+        <Route path="dashboard/myprofile" element={<MyProfilePage />} />
+        <Route path="dashboard/editprofilebasic" element={<EditProfileBasicPage />} />
+        <Route path="dashboard/editabout" element={<EditAboutPage />} />
+        <Route path="dashboard/editeducation" element={<EditEducationPage />} />
+        <Route path="dashboard/editcareer" element={<EditCareerPage />} />
+        <Route path="dashboard/editfamily" element={<EditFamilyPage />} />
+        <Route path="dashboard/editcontact" element={<EditContactPage />} />
+        <Route path="dashboard/edithoroscope" element={<EditHoroscopePage />} />
+        <Route path="dashboard/editlifestyle" element={<EditLifestylePage />} />
+        <Route path="dashboard/profile/:id" element={<ProfileViewPage />} />
           <Route path="dashboard/membership" element={<MembershipPage />} />
           <Route path="dashboard/security" element={<ChangePasswordPage />} />
           <Route path="dashboard/delete" element={<DeleteProfilePage />} />

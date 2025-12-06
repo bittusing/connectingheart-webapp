@@ -1,8 +1,11 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PencilIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { PencilIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useMyProfileData } from '../hooks/useMyProfileData'
 import { useUserProfile } from '../hooks/useUserProfile'
 import { getGenderPlaceholder } from '../utils/imagePlaceholders'
+import { Button } from '../components/common/Button'
+import { showToast } from '../utils/toast'
 
 const formatDate = (dateString: string | undefined): string => {
   if (!dateString) return ''
@@ -57,10 +60,41 @@ const formatYesNo = (value: string | undefined): string => {
   return map[value.toLowerCase()] || value
 }
 
+const calculateAge = (dob: string | undefined): number | null => {
+  if (!dob) return null
+  try {
+    const birthDate = new Date(dob)
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    return age
+  } catch {
+    return null
+  }
+}
+
 export const MyProfilePage = () => {
   const navigate = useNavigate()
-  const { profile, loading, error } = useMyProfileData()
+  const { profile, loading, error, refetch } = useMyProfileData()
   const { profile: userProfile } = useUserProfile()
+  const [uploadModalOpen, setUploadModalOpen] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [uploadPreview, setUploadPreview] = useState<string>('')
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'https://backend.prod.connectingheart.co/api').replace(/\/$/, '')
+
+  useEffect(() => {
+    return () => {
+      if (uploadPreview) {
+        URL.revokeObjectURL(uploadPreview)
+      }
+    }
+  }, [uploadPreview])
 
   if (loading) {
     return (
@@ -89,6 +123,82 @@ export const MyProfilePage = () => {
   const avatarUrl = primaryPic
     ? `https://backendapp.connectingheart.co.in/api/profile/file/${profile.miscellaneous.heartsId}/${primaryPic.id}`
     : null
+  const age = calculateAge(profile.critical.dob)
+  const displayName = profile.basic.name || 'Not Filled'
+  const displayAge = age !== null ? `${age} yrs` : ''
+  const displayLocation = [enriched.cityLabel, enriched.stateLabel, enriched.countryLabel].filter(Boolean).join(', ') || 'Not Filled'
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please select an image file.')
+      return
+    }
+
+    setSelectedFile(file)
+    if (uploadPreview) {
+      URL.revokeObjectURL(uploadPreview)
+    }
+    setUploadPreview(URL.createObjectURL(file))
+    setUploadError(null)
+  }
+
+  const uploadProfileImage = async () => {
+    if (!selectedFile) {
+      setUploadError('Please choose a file to upload.')
+      return
+    }
+
+    const token = window.localStorage.getItem('connectingheart-token')
+    if (!token) {
+      setUploadError('Please log in again to upload.')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('profilePhoto', selectedFile)
+    formData.append('primary', 'true')
+
+    setUploadingImage(true)
+    setUploadError(null)
+    try {
+      const response = await fetch(`${apiBaseUrl}/profile/uploadProfilePic`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || 'Failed to upload image')
+      }
+
+      const data = await response.json()
+      if (data.status === 'success' || data.code === 'CH200') {
+        showToast('Profile picture uploaded successfully!', 'success')
+        if (uploadPreview) {
+          URL.revokeObjectURL(uploadPreview)
+        }
+        setUploadModalOpen(false)
+        setSelectedFile(null)
+        setUploadPreview('')
+        setUploadError(null)
+        await refetch()
+      } else {
+        throw new Error(data.message || 'Failed to upload image')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to upload image'
+      setUploadError(message)
+      showToast(message, 'error')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
 
 
   return (
@@ -98,45 +208,130 @@ export const MyProfilePage = () => {
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
           <div className="relative">
             <img
-              src={avatarUrl || getGenderPlaceholder(profile.basic.name)}
-              alt={profile.basic.name || 'Profile'}
+              src={uploadPreview || avatarUrl || getGenderPlaceholder(userProfile?.gender || 'M')}
+              alt={displayName}
               className="h-32 w-32 rounded-full object-cover ring-4 ring-pink-100 dark:ring-pink-900/30"
               onError={(e) => {
                 e.currentTarget.onerror = null
-                e.currentTarget.src = getGenderPlaceholder(profile.basic.name)
+                e.currentTarget.src = getGenderPlaceholder(userProfile?.gender || 'M')
               }}
             />
             <button
-              onClick={() => navigate('/editprofile/basic')}
+              onClick={() => setUploadModalOpen(true)}
               className="absolute bottom-0 right-0 rounded-full bg-pink-500 p-2 text-white shadow-lg transition hover:bg-pink-600"
             >
               <PencilIcon className="h-4 w-4" />
             </button>
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <div className="flex items-center justify-center gap-2 sm:justify-start">
-              <p className="font-display text-2xl font-semibold text-slate-900 dark:text-white">{profileId}</p>
-              <button
-                onClick={() => navigate('/dashboard/personaldetails')}
-                className="rounded-lg bg-pink-50 p-1.5 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
-              >
-                <PencilIcon className="h-4 w-4" />
-              </button>
-            </div>
-            <button className="mt-4 flex items-center justify-center gap-2 rounded-full bg-pink-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-pink-600 sm:inline-flex">
-              <PhotoIcon className="h-4 w-4" />
-              <span>+ Add More Photos</span>
-            </button>
+            <p className="font-display text-2xl font-semibold text-slate-900 dark:text-white">{profileId}</p>
+            {displayName && displayName !== 'Not Filled' && (
+              <p className="mt-1 text-lg font-medium text-slate-700 dark:text-slate-300">{displayName}</p>
+            )}
+            {displayAge && (
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{displayAge}</p>
+            )}
+            {displayLocation && displayLocation !== 'Not Filled' && (
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-500">{displayLocation}</p>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Image Upload Modal */}
+      {uploadModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4" onClick={() => !uploadingImage && setUploadModalOpen(false)}>
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Image Upload</h3>
+              <button
+                onClick={() => {
+                  if (!uploadingImage) {
+                    setUploadModalOpen(false)
+                    setSelectedFile(null)
+                    if (uploadPreview) {
+                      URL.revokeObjectURL(uploadPreview)
+                    }
+                    setUploadPreview('')
+                    setUploadError(null)
+                  }
+                }}
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                disabled={uploadingImage}
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Choose File
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  disabled={uploadingImage}
+                  className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-4 file:rounded-lg file:border-0 file:bg-pink-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-pink-600 hover:file:bg-pink-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                />
+                {selectedFile && (
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{selectedFile.name}</p>
+                )}
+              </div>
+
+              {uploadPreview && (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
+                  <img
+                    src={uploadPreview}
+                    alt="Preview"
+                    className="mx-auto max-h-48 w-full rounded-lg object-contain"
+                  />
+                </div>
+              )}
+
+              {uploadError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                  {uploadError}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={uploadProfileImage}
+                  disabled={!selectedFile || uploadingImage}
+                  className="flex-1"
+                >
+                  {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setUploadModalOpen(false)
+                    setSelectedFile(null)
+                    if (uploadPreview) {
+                      URL.revokeObjectURL(uploadPreview)
+                    }
+                    setUploadPreview('')
+                    setUploadError(null)
+                  }}
+                  disabled={uploadingImage}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Profile Details Section */}
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Profile Details</h2>
           <button
-            onClick={() => navigate('/dashboard/personaldetails')}
+            onClick={() => navigate('/dashboard/editprofilebasic')}
             className="rounded-lg bg-pink-50 p-2 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
           >
             <PencilIcon className="h-5 w-5" />
@@ -159,13 +354,15 @@ export const MyProfilePage = () => {
       {/* Critical Field Section */}
       <div className="rounded-3xl border border-yellow-200 bg-yellow-50 p-6 shadow-sm dark:border-yellow-800 dark:bg-yellow-900/20">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-semibold text-red-600 dark:text-red-400">Critical Field</h2>
-          <button
+          <h2 className="font-display text-xl font-semibold text-red-600 dark:text-red-400">
+            Critical Field
+          </h2>
+          {/* <button
             onClick={() => navigate('/dashboard/personaldetails')}
             className="rounded-lg bg-yellow-100 p-2 text-yellow-700 transition hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300"
           >
             <PencilIcon className="h-5 w-5" />
-          </button>
+          </button> */}
         </div>
         <div className="mt-4 space-y-3">
           <DetailRow
@@ -175,7 +372,7 @@ export const MyProfilePage = () => {
           />
           <DetailRow
             label="Marital Status"
-            value={formatMaritalStatus(profile.critical.maritalStatus) || 'Not Filled'}
+            value={enriched.maritalStatusLabel || 'Not Filled'}
             isNotFilled={!profile.critical.maritalStatus}
           />
         </div>
@@ -186,7 +383,7 @@ export const MyProfilePage = () => {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">About Me</h2>
           <button
-            onClick={() => navigate('/dashboard/aboutyou')}
+            onClick={() => navigate('/dashboard/editabout')}
             className="rounded-lg bg-pink-50 p-2 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
           >
             <PencilIcon className="h-5 w-5" />
@@ -195,28 +392,32 @@ export const MyProfilePage = () => {
         <div className="mt-4 space-y-3">
           <DetailRow
             label="Tell us About YourSelf"
-            value={profile.about.aboutYourself || 'Not Filled'}
-            isNotFilled={!profile.about.aboutYourself}
+            value={profile.about.description || profile.about.aboutYourself || 'Not Filled'}
+            isNotFilled={!profile.about.description && !profile.about.aboutYourself}
           />
-          <DetailRow label="Profile Managed By" value={enriched.managedByLabel || 'Not Filled'} />
+          <DetailRow
+            label="Profile Managed By"
+            value={enriched.managedByLabel || 'Not Filled'}
+            isNotFilled={!profile.about.managedBy}
+          />
           <DetailRow
             label="Disability"
-            value={profile.about.disability || 'Not Filled'}
+            value={enriched.disabilityLabel || 'Not Filled'}
             isNotFilled={!profile.about.disability}
           />
           <DetailRow
             label="Body Type"
-            value={profile.about.bodyType || 'Not Filled'}
+            value={enriched.bodyTypeLabel || 'Not Filled'}
             isNotFilled={!profile.about.bodyType}
           />
           <DetailRow
             label="Thalassemia"
-            value={profile.about.thalassemia || 'Not Filled'}
+            value={enriched.thalassemiaLabel || 'Not Filled'}
             isNotFilled={!profile.about.thalassemia}
           />
           <DetailRow
             label="HIV Positive"
-            value={profile.about.hivPositive || 'Not Filled'}
+            value={formatYesNo(profile.about.hivPositive)}
             isNotFilled={!profile.about.hivPositive}
           />
         </div>
@@ -227,7 +428,7 @@ export const MyProfilePage = () => {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Education</h2>
           <button
-            onClick={() => navigate('/dashboard/careerdetails')}
+            onClick={() => navigate('/dashboard/editeducation')}
             className="rounded-lg bg-pink-50 p-2 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
           >
             <PencilIcon className="h-5 w-5" />
@@ -258,7 +459,7 @@ export const MyProfilePage = () => {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Career</h2>
           <button
-            onClick={() => navigate('/dashboard/careerdetails')}
+            onClick={() => navigate('/dashboard/editcareer')}
             className="rounded-lg bg-pink-50 p-2 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
           >
             <PencilIcon className="h-5 w-5" />
@@ -267,20 +468,28 @@ export const MyProfilePage = () => {
         <div className="mt-4 space-y-3">
           <DetailRow
             label="About My Career"
-            value={profile.career.aboutCareer || 'Not Filled'}
-            isNotFilled={!profile.career.aboutCareer}
+            value={profile.career.aboutMyCareer || 'Not Filled'}
+            isNotFilled={!profile.career.aboutMyCareer}
           />
-          <DetailRow label="Employed In" value={enriched.employedInLabel || 'Not Filled'} />
-          <DetailRow label="Occupation" value={enriched.occupationLabel || 'Not Filled'} />
+          <DetailRow
+            label="Employed In"
+            value={enriched.employedInLabel || 'Not Filled'}
+            isNotFilled={!profile.career.employed_in}
+          />
+          <DetailRow
+            label="Occupation"
+            value={enriched.occupationLabel || 'Not Filled'}
+            isNotFilled={!profile.career.occupation}
+          />
           <DetailRow
             label="Organisation Name"
             value={profile.career.organisationName || 'Not Filled'}
             isNotFilled={!profile.career.organisationName}
           />
           <DetailRow
-            label="Interested In Setting Abroad"
-            value={profile.career.interestedInSettingAbroad || 'Not Filled'}
-            isNotFilled={!profile.career.interestedInSettingAbroad}
+            label="Interested In Settling Abroad"
+            value={enriched.interestedInSettlingAbroadLabel || 'Not Filled'}
+            isNotFilled={!profile.career.interestedInSettlingAbroad}
           />
         </div>
       </div>
@@ -290,7 +499,7 @@ export const MyProfilePage = () => {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Family</h2>
           <button
-            onClick={() => navigate('/dashboard/familydetails')}
+            onClick={() => navigate('/dashboard/editfamily')}
             className="rounded-lg bg-pink-50 p-2 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
           >
             <PencilIcon className="h-5 w-5" />
@@ -299,8 +508,8 @@ export const MyProfilePage = () => {
         <div className="mt-4 space-y-3">
           <DetailRow
             label="About My Family"
-            value={profile.family.aboutFamily || 'Not Filled'}
-            isNotFilled={!profile.family.aboutFamily}
+            value={profile.family.aboutMyFamily || profile.family.aboutFamily || 'Not Filled'}
+            isNotFilled={!profile.family.aboutMyFamily && !profile.family.aboutFamily}
           />
           <DetailRow
             label="Family Status"
@@ -313,7 +522,7 @@ export const MyProfilePage = () => {
             isNotFilled={!profile.family.familyType}
           />
           <DetailRow
-            label="Family values"
+            label="Family Values"
             value={profile.family.familyValues || 'Not Filled'}
             isNotFilled={!profile.family.familyValues}
           />
@@ -375,7 +584,7 @@ export const MyProfilePage = () => {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Contact Details</h2>
           <button
-            onClick={() => navigate('/dashboard/personaldetails')}
+            onClick={() => navigate('/dashboard/editcontact')}
             className="rounded-lg bg-pink-50 p-2 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
           >
             <PencilIcon className="h-5 w-5" />
@@ -386,13 +595,13 @@ export const MyProfilePage = () => {
           <DetailRow label="Email Id" value={profile.contact.email || 'Not Filled'} />
           <DetailRow
             label="Alternate Mobile No"
-            value={profile.contact.alternateMobileNo || 'Not Filled'}
-            isNotFilled={!profile.contact.alternateMobileNo}
+            value={profile.contact.altMobileNumber || profile.contact.alternateMobileNo || 'Not Filled'}
+            isNotFilled={!profile.contact.altMobileNumber && !profile.contact.alternateMobileNo}
           />
           <DetailRow
             label="Alternate Email Id"
-            value={profile.contact.alternateEmailId || 'Not Filled'}
-            isNotFilled={!profile.contact.alternateEmailId}
+            value={profile.contact.alternateEmail || profile.contact.alternateEmailId || 'Not Filled'}
+            isNotFilled={!profile.contact.alternateEmail && !profile.contact.alternateEmailId}
           />
           <DetailRow
             label="Landline"
@@ -407,7 +616,7 @@ export const MyProfilePage = () => {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Horoscope</h2>
           <button
-            onClick={() => navigate('/dashboard/srcmdetails')}
+            onClick={() => navigate('/dashboard/edithoroscope')}
             className="rounded-lg bg-pink-50 p-2 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
           >
             <PencilIcon className="h-5 w-5" />
@@ -444,7 +653,7 @@ export const MyProfilePage = () => {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Life Style</h2>
           <button
-            onClick={() => navigate('/dashboard/socialdetails')}
+            onClick={() => navigate('/dashboard/editlifestyle')}
             className="rounded-lg bg-pink-50 p-2 text-pink-600 transition hover:bg-pink-100 dark:bg-pink-900/20 dark:text-pink-400"
           >
             <PencilIcon className="h-5 w-5" />
