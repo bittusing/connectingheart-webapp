@@ -72,15 +72,15 @@ export const ProfileCard = ({ profile, actionLabel, onClick }: ProfileCardProps)
       <div className="flex flex-1 flex-col justify-between p-3 text-slate-600 sm:p-4 dark:text-slate-300">
         <div className="space-y-1 text-left sm:space-y-1.5">
           <p className="text-sm font-bold text-slate-900 sm:text-base dark:text-white">{heartsIdDisplay}</p>
-          <p className="text-xs text-slate-700 sm:text-sm dark:text-slate-300">
+          <p className="text-sm font-bold text-slate-900 sm:text-base dark:text-white">
             {profile.age} yrs • {profile.height}
           </p>
           <p className="text-xs font-semibold text-slate-900 sm:text-sm dark:text-white">{profile.income}</p>
           {profile.caste && (
-            <p className="text-xs text-slate-600 dark:text-slate-400">{profile.caste}</p>
+            <p className="text-sm font-bold text-slate-900 sm:text-base dark:text-white">{profile.caste}</p>
           )}
           {locationParts.length > 0 ? (
-            <p className="text-[10px] text-slate-500 sm:text-xs dark:text-slate-400">
+            <p className="text-sm font-bold text-slate-900 sm:text-base dark:text-white">
               {locationParts.join(', ')}
             </p>
           ) : (
