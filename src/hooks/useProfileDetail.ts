@@ -39,7 +39,7 @@ export const useProfileDetail = (profileId: string | undefined): UseProfileDetai
         const apiData = response.data
         const baseProfile = transformProfileDetail(apiData)
         setProfile(baseProfile)
-
+      console.log("baseProfile",apiData,baseProfile);
         // Enrich labels in the background without blocking initial render
         void enrichProfileWithLookups({
           apiData,
@@ -122,6 +122,9 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     // Extract all lookup options
     const casts = effectiveLookup.casts
     const occupations = effectiveLookup.occupation
+    const fathersOccupation = effectiveLookup.fathersOccupation
+    const mothersOccupation = effectiveLookup.mothersOccupation
+    const managedByOptions = effectiveLookup.managedBy
     const motherTongue = effectiveLookup.motherTongue || effectiveLookup.languages
     const cuisines = effectiveLookup.cuisines
     const hobbies = effectiveLookup.hobbies
@@ -177,16 +180,20 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     const nakshatraLabel = mapCode(nakshatraOptions, apiData.kundali.nakshatra)
     const manglikLabel = mapCode(manglikOptions, apiData.kundali.manglik)
 
+    // Map managedBy from lookup
+    const managedByLabel = mapCode(managedByOptions, apiData.about.managedBy)
+
     const enrichedProfile: ProfileViewData = {
       ...baseProfile,
       location: locationParts.length ? locationParts.join(', ') : baseProfile.location,
       caste: mapCode(casts, apiData.basic.cast) || baseProfile.caste,
       occupation: occupationLabel || baseProfile.occupation,
       qualification: qualificationLabel || baseProfile.qualification,
+      profileManagedBy: managedByLabel || baseProfile.profileManagedBy,
       familyDetails: baseProfile.familyDetails && {
         ...baseProfile.familyDetails,
-        fatherOccupation: mapCode(occupations, apiData.family.fatherOccupation) || baseProfile.familyDetails.fatherOccupation,
-        motherOccupation: mapCode(occupations, apiData.family.motherOccupation) || baseProfile.familyDetails.motherOccupation,
+        fatherOccupation: mapCode(fathersOccupation, apiData.family.fatherOccupation) || baseProfile.familyDetails.fatherOccupation,
+        motherOccupation: mapCode(mothersOccupation, apiData.family.motherOccupation) || baseProfile.familyDetails.motherOccupation,
         familyBasedOutOf: familyBasedOutOfLabel || baseProfile.familyDetails.familyBasedOutOf,
       },
       kundaliDetails: baseProfile.kundaliDetails && {

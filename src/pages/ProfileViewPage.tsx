@@ -873,8 +873,8 @@ export const ProfileViewPage = () => {
         {/* Gradient Overlay with Profile Info */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-6 pb-12">
           <div className="space-y-2">
-            {profile.profileId && (
-              <p className="text-xs font-semibold text-white/90">ID - {profile.profileId}</p>
+            {profile.profileId && profile.name !== profile.profileId && (
+              <p className="text-xs font-semibold text-white/90">{profile.profileId}</p>
             )}
             <p className="text-2xl font-bold text-white sm:text-3xl">
               {profile.name}, {profile.age}

@@ -119,14 +119,10 @@ const formatManglik = (manglik?: string): string => {
   return manglikMap[manglik.toLowerCase()] || manglik
 }
 
-// Format managed by
+// Format managed by - will be enriched from lookup in useProfileDetail hook
 const formatManagedBy = (managed?: string): string => {
-  if (!managed) return ''
-  const managedMap: Record<string, string> = {
-    fami0: 'Family',
-    self: 'Self',
-  }
-  return managedMap[managed.toLowerCase()] || managed
+  // Return raw value, will be mapped from lookup API
+  return managed || ''
 }
 
 // Format Y/N to Yes/No
@@ -211,6 +207,7 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
     verified: data.miscellaneous.isMembershipActive,
     isShortlisted: Boolean(data.miscellaneous.isShortlisted),
     isIgnored: Boolean((data.miscellaneous as { isIgnored?: boolean })?.isIgnored),
+    gender: data.miscellaneous.gender,
 
     // Basic details
     dateOfBirth: formatDate(data.critical.dob),

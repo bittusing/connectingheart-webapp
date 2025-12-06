@@ -11,6 +11,7 @@ export type ProfileDetailData = {
     state: string
     city: string
     heartsId: number
+    gender?: string
     profilePic: Array<{
       s3Link: string
       id: string
