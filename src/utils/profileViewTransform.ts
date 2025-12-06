@@ -215,8 +215,8 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
     caste: data.basic.cast || '',
     aboutMe: data.about.description || '',
     profileManagedBy: formatManagedBy(data.about.managedBy),
-    bodyType: formatBodyType(data.about.bodyType),
-    thalassemia: data.about.thalassemia === 'no3' ? 'No' : data.about.thalassemia || 'N/A',
+    bodyType: data.about.bodyType || '', // Will be enriched from lookup
+    thalassemia: data.about.thalassemia || '', // Will be enriched from lookup
     hivPositive: data.about.hivPositive === 'N' ? 'No' : data.about.hivPositive || 'N/A',
     disability: data.about.disability || '',
 
@@ -261,7 +261,7 @@ export const transformProfileDetail = (data: ProfileDetailData) => {
     },
 
     lifestyleData: {
-      dietaryHabits: formatDietaryHabits(data.lifeStyleData.dietaryHabits),
+      dietaryHabits: data.lifeStyleData.dietaryHabits || '', // Will be enriched from lookup
       drinkingHabits: formatHabits(data.lifeStyleData.drinkingHabits),
       smokingHabits: formatHabits(data.lifeStyleData.smokingHabits),
       languages: data.lifeStyleData.languages,

@@ -139,6 +139,9 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     const qualificationOptions = effectiveLookup.highestEducation || effectiveLookup.qualification
     const disabilityOptions = effectiveLookup.disability
     const employedInOptions = effectiveLookup.employed_in
+    const bodyTypeOptions = effectiveLookup.bodyType
+    const thalassemiaOptions = effectiveLookup.thalassemia
+    const dietaryHabitsOptions = effectiveLookup.dietaryHabits
 
     // Location enrichment
     const countryCode = apiData.miscellaneous.country
@@ -194,6 +197,15 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
     // Map employed_in from lookup
     const employedInLabel = mapCode(employedInOptions, apiData.career.employed_in)
 
+    // Map bodyType from lookup
+    const bodyTypeLabel = mapCode(bodyTypeOptions, apiData.about.bodyType)
+
+    // Map thalassemia from lookup
+    const thalassemiaLabel = mapCode(thalassemiaOptions, apiData.about.thalassemia)
+
+    // Map dietary habits from lookup
+    const dietaryHabitsLabel = mapCode(dietaryHabitsOptions, apiData.lifeStyleData.dietaryHabits)
+
     const enrichedProfile: ProfileViewData = {
       ...baseProfile,
       location: locationParts.length ? locationParts.join(', ') : baseProfile.location,
@@ -203,6 +215,8 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
       profileManagedBy: managedByLabel || baseProfile.profileManagedBy,
       disability: disabilityLabel || baseProfile.disability,
       employedIn: employedInLabel || baseProfile.employedIn,
+      bodyType: bodyTypeLabel || baseProfile.bodyType,
+      thalassemia: thalassemiaLabel || baseProfile.thalassemia,
       familyDetails: baseProfile.familyDetails && {
         ...baseProfile.familyDetails,
         fatherOccupation: mapCode(fathersOccupation, apiData.family.fatherOccupation) || baseProfile.familyDetails.fatherOccupation,
@@ -217,6 +231,7 @@ const enrichProfileWithLookups = async (context: EnrichContext): Promise<void> =
       },
       lifestyleData: baseProfile.lifestyleData && {
         ...baseProfile.lifestyleData,
+        dietaryHabits: dietaryHabitsLabel || baseProfile.lifestyleData.dietaryHabits,
         languages: mapCodesArray(motherTongue, apiData.lifeStyleData.languages) || baseProfile.lifestyleData.languages,
         hobbies: mapCodesArray(hobbies, apiData.lifeStyleData.hobbies) || baseProfile.lifestyleData.hobbies,
         interest: mapCodesArray(interests, apiData.lifeStyleData.interest) || baseProfile.lifestyleData.interest,

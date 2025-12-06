@@ -386,6 +386,16 @@ export const ProfileViewPage = () => {
   const profilePlaceholder = getGenderPlaceholder(profile.gender)
   const viewerPlaceholder = getGenderPlaceholder(currentUserProfile?.gender)
 
+  // Determine pronouns based on profile's gender
+  // If profile is male (M), use "He/His", if female (F), use "She/Her"
+  const isProfileMale = profile.gender === 'M'
+  const pronouns = {
+    subject: isProfileMale ? 'He' : 'She',
+    object: isProfileMale ? 'Him' : 'Her',
+    possessive: isProfileMale ? 'His' : 'Her',
+    reflexive: isProfileMale ? 'Him' : 'Her',
+  }
+
   const renderBasicDetails = () => (
     <div ref={basicSectionRef} className="space-y-6">
       {/* Profile Attributes */}
@@ -732,7 +742,7 @@ export const ProfileViewPage = () => {
 
         {family.aboutMyFamily && (
           <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
-            <h4 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">About her family</h4>
+            <h4 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">About {pronouns.possessive.toLowerCase()} family</h4>
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
               {family.aboutMyFamily}
             </p>
@@ -799,7 +809,7 @@ export const ProfileViewPage = () => {
             
             {/* Habits Cards */}
             <div>
-              <h4 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Her Habits</h4>
+              <h4 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">{pronouns.possessive} Habits</h4>
               <div className="grid gap-3 sm:grid-cols-3">
                 {lifestyle.drinkingHabits && (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-700 dark:bg-slate-800/50">
@@ -808,7 +818,7 @@ export const ProfileViewPage = () => {
                       <path d="M18,20H13V14.94A9,9,0,0,0,21,6a8.72,8.72,0,0,0-.67-3.39,1,1,0,0,0-.22-.32L20,2.21a.92.92,0,0,0-.21-.13A.94.94,0,0,0,19.51,2l-.1,0H4.59L4.5,2a.94.94,0,0,0-.29.06A2.12,2.12,0,0,0,4,2.2l-.12.09a1,1,0,0,0-.22.32A8.72,8.72,0,0,0,3,6a9,9,0,0,0,8,8.94V20H6a1,1,0,0,0,0,2H18a1,1,0,0,0,0-2ZM5,6a6.91,6.91,0,0,1,.29-2H18.71A6.91,6.91,0,0,1,19,6,7,7,0,0,1,5,6Z" />
                     </svg>
                     <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">
-                      {lifestyle.drinkingHabits === 'No' ? 'She does not drink' : lifestyle.drinkingHabits === 'Yes' ? 'She drinks' : `She ${lifestyle.drinkingHabits.toLowerCase()}`}
+                      {lifestyle.drinkingHabits === 'No' ? `${pronouns.subject} does not drink` : lifestyle.drinkingHabits === 'Yes' ? `${pronouns.subject} drinks` : `${pronouns.subject} ${lifestyle.drinkingHabits.toLowerCase()}`}
                     </p>
                   </div>
                 )}
@@ -819,7 +829,7 @@ export const ProfileViewPage = () => {
                       <path d="M19,2a1,1,0,0,0-1,1V8.46l-1,.67V3a1,1,0,0,0-2,0V9.13l-1-.67V3a1,1,0,0,0-2,0V9a1,1,0,0,0,.45.83L15,11.54V21a1,1,0,0,0,2,0V11.54l2.55-1.71A1,1,0,0,0,20,9V3A1,1,0,0,0,19,2ZM9,2H9A5,5,0,0,0,4,7v6a1,1,0,0,0,1,1H8v7a1,1,0,0,0,2,0V3A1,1,0,0,0,9,2ZM8,12H6V7A3,3,0,0,1,8,4.17Z" />
                     </svg>
                     <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">
-                      {lifestyle.dietaryHabits === 'Vegetarian' ? 'She is a vegetarian' : lifestyle.dietaryHabits === 'Non Vegetarian' ? 'She is non-vegetarian' : `She is ${lifestyle.dietaryHabits.toLowerCase()}`}
+                      {lifestyle.dietaryHabits === 'Vegetarian' ? `${pronouns.subject} is a vegetarian` : lifestyle.dietaryHabits === 'Non Vegetarian' ? `${pronouns.subject} is non-vegetarian` : `${pronouns.subject} is ${lifestyle.dietaryHabits.toLowerCase()}`}
                     </p>
                   </div>
                 )}
@@ -830,7 +840,7 @@ export const ProfileViewPage = () => {
                       <path fillRule="evenodd" clipRule="evenodd" d="M15.708 7.692a2.77 2.77 0 0 0 .834-1.984 2.792 2.792 0 0 0-2.792-2.791v1.25c.85 0 1.542.691 1.542 1.541S14.6 7.25 13.75 7.25V8.5c1.867 0 3.333 1.525 3.333 3.392v1.858h1.25v-1.867c0-1.85-1.066-3.45-2.625-4.191ZM1.667 14.583h12.5v2.5h-12.5v-2.5Zm15.417 0h1.25v2.5h-1.25v-2.5Zm-.834 0H15v2.5h1.25v-2.5ZM12.083 9.75h1.275c1.559 0 2.892 1.125 2.892 2.633v1.367H15v-1.083c0-1.092-.767-1.709-1.642-1.709h-1.275a2.792 2.792 0 0 1 0-5.583v1.25c-.85 0-1.541.608-1.541 1.458s.691 1.667 1.541 1.667Z" />
                     </svg>
                     <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">
-                      {lifestyle.smokingHabits === 'No' ? 'She does not smoke' : lifestyle.smokingHabits === 'Yes' ? 'She smokes' : `She ${lifestyle.smokingHabits.toLowerCase()}`}
+                      {lifestyle.smokingHabits === 'No' ? `${pronouns.subject} does not smoke` : lifestyle.smokingHabits === 'Yes' ? `${pronouns.subject} smokes` : `${pronouns.subject} ${lifestyle.smokingHabits.toLowerCase()}`}
                     </p>
                   </div>
                 )}
@@ -840,25 +850,25 @@ export const ProfileViewPage = () => {
             {/* Interests, Hobbies, etc. */}
             {lifestyle.hobbies && lifestyle.hobbies.length > 0 && (
               <div>
-                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Her hobbies are</h4>
+                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">{pronouns.possessive} hobbies are</h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.hobbies.join(', ')}</p>
               </div>
             )}
             {lifestyle.interest && lifestyle.interest.length > 0 && (
               <div>
-                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Her interests are</h4>
+                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">{pronouns.possessive} interests are</h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.interest.join(', ')}</p>
               </div>
             )}
             {lifestyle.languages && lifestyle.languages.length > 0 && (
               <div>
-                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">She can speak</h4>
+                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">{pronouns.subject} can speak</h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.languages.join(', ')}</p>
               </div>
             )}
             {lifestyle.sports && lifestyle.sports.length > 0 && (
               <div>
-                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Sports she enjoys</h4>
+                <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Sports {pronouns.object.toLowerCase()} enjoys</h4>
                 <p className="text-sm text-slate-600 dark:text-slate-400">{lifestyle.sports.join(', ')}</p>
               </div>
             )}
@@ -872,14 +882,14 @@ export const ProfileViewPage = () => {
         )}
 
         {/* Additional Lifestyle Preferences */}
-        {(lifestyle.movies || lifestyle.favRead || lifestyle.favTVShow || lifestyle.vacayDestination || 
+        {lifestyle && (lifestyle.movies || lifestyle.favRead || lifestyle.favTVShow || lifestyle.vacayDestination || 
           lifestyle.books || lifestyle.dress || lifestyle.favMusic || lifestyle.foodICook ||
           lifestyle.openToPets || lifestyle.ownAHouse || lifestyle.ownACar) && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Other Preferences</h3>
             
             <div className="grid gap-4 sm:grid-cols-2">
-              {lifestyle.movies && (
+              {lifestyle?.movies && (
                 <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-2 flex items-center gap-2">
                     <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -891,7 +901,7 @@ export const ProfileViewPage = () => {
                 </div>
               )}
               
-              {lifestyle.favTVShow && (
+              {lifestyle?.favTVShow && (
                 <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-2 flex items-center gap-2">
                     <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -903,7 +913,7 @@ export const ProfileViewPage = () => {
                 </div>
               )}
               
-              {lifestyle.favRead && (
+              {lifestyle?.favRead && (
                 <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-2 flex items-center gap-2">
                     <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -915,7 +925,7 @@ export const ProfileViewPage = () => {
                 </div>
               )}
               
-              {lifestyle.vacayDestination && (
+              {lifestyle?.vacayDestination && (
                 <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-2 flex items-center gap-2">
                     <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -929,7 +939,7 @@ export const ProfileViewPage = () => {
             </div>
 
             {/* Array fields */}
-            {lifestyle.books && lifestyle.books.length > 0 && (
+            {lifestyle?.books && lifestyle.books.length > 0 && (
               <div>
                 <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Favourite Books</h4>
                 <div className="flex flex-wrap gap-2">
@@ -942,7 +952,7 @@ export const ProfileViewPage = () => {
               </div>
             )}
             
-            {lifestyle.dress && lifestyle.dress.length > 0 && (
+            {lifestyle?.dress && lifestyle.dress.length > 0 && (
               <div>
                 <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Dress Style</h4>
                 <div className="flex flex-wrap gap-2">
@@ -955,7 +965,7 @@ export const ProfileViewPage = () => {
               </div>
             )}
             
-            {lifestyle.favMusic && lifestyle.favMusic.length > 0 && (
+            {lifestyle?.favMusic && lifestyle.favMusic.length > 0 && (
               <div>
                 <h4 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Favourite Music</h4>
                 <div className="flex flex-wrap gap-2">
@@ -970,7 +980,7 @@ export const ProfileViewPage = () => {
 
             {/* Yes/No fields */}
             <div className="grid gap-3 sm:grid-cols-3">
-              {lifestyle.foodICook && (
+              {lifestyle?.foodICook && (
                 <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
                   <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -982,7 +992,7 @@ export const ProfileViewPage = () => {
                 </div>
               )}
               
-              {lifestyle.openToPets && (
+              {lifestyle?.openToPets && (
                 <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
                   <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -994,7 +1004,7 @@ export const ProfileViewPage = () => {
                 </div>
               )}
               
-              {lifestyle.ownAHouse && (
+              {lifestyle?.ownAHouse && (
                 <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
                   <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -1006,7 +1016,7 @@ export const ProfileViewPage = () => {
                 </div>
               )}
               
-              {lifestyle.ownACar && (
+              {lifestyle?.ownACar && (
                 <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
                   <svg className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -1046,10 +1056,10 @@ export const ProfileViewPage = () => {
       <div ref={matchSectionRef} className="space-y-6">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Who is she looking for...
+            Who is {pronouns.object.toLowerCase()} looking for...
           </h3>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-            These are her desired partner qualities
+            These are {pronouns.possessive.toLowerCase()} desired partner qualities
           </p>
           {partnerQualities.length > 0 && (
             <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">
@@ -1060,9 +1070,9 @@ export const ProfileViewPage = () => {
 
         {/* Match Summary with Images */}
         <div className="flex items-center justify-between gap-2 sm:gap-4">
-          {/* Her Preference */}
+          {/* Profile Preference */}
           <div className="flex flex-col items-center gap-2">
-            <p className="text-[10px] font-medium text-slate-600 dark:text-slate-400 sm:text-xs">Her Preference</p>
+            <p className="text-[10px] font-medium text-slate-600 dark:text-slate-400 sm:text-xs">{pronouns.possessive} Preference</p>
             <div className="relative h-14 w-14 overflow-hidden rounded-full ring-2 ring-pink-500 sm:h-20 sm:w-20">
               <img
                 src={profileImage}
@@ -1087,7 +1097,7 @@ export const ProfileViewPage = () => {
           <div className="flex flex-1 flex-col items-center gap-2 sm:flex-initial">
             <div className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 dark:border-slate-700 dark:bg-slate-800 sm:px-4 sm:py-3">
               <p className="text-center text-[10px] font-medium text-slate-700 dark:text-slate-300 sm:text-sm">
-                You match {matchedCount}/{totalCount} of her preference
+                You match {matchedCount}/{totalCount} of {pronouns.possessive.toLowerCase()} preference
               </p>
             </div>
             {matchPercentage && (
