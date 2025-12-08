@@ -4,6 +4,7 @@ import { ChevronDownIcon, CheckIcon } from '@heroicons/react/24/outline'
 import { Button } from '../components/common/Button'
 import { useLookupOptions } from '../hooks/useLookupOptions'
 import { useCountryLookup } from '../hooks/useCountryLookup'
+import { useLookup } from '../hooks/useLookup'
 import { useApiClient } from '../hooks/useApiClient'
 import type { LookupOption, ProfileSearchPayload } from '../types/api'
 
@@ -164,7 +165,9 @@ const MultiSelectField = ({
 }
 
 const initialMultiFilters = {
-  country: [] as string[],
+  country: '' as string,
+  state: '' as string,
+  city: [] as string[],
   religion: [] as string[],
   motherTongue: [] as string[],
   maritalStatus: [] as string[],
@@ -201,6 +204,11 @@ export const SearchPage = () => {
   const [profileSearchLoading, setProfileSearchLoading] = useState(false)
   const { options, loading } = useLookupOptions()
   const { countries, loading: countryLoading } = useCountryLookup()
+  const { fetchStates, fetchCities } = useLookup()
+  const [states, setStates] = useState<LookupOption[]>([])
+  const [cities, setCities] = useState<LookupOption[]>([])
+  const [loadingStates, setLoadingStates] = useState(false)
+  const [loadingCities, setLoadingCities] = useState(false)
 
   const getOptions = useMemo(
     () => (key: string, fallbackKeys: string[] = []): LookupOption[] => {
@@ -242,16 +250,85 @@ export const SearchPage = () => {
     }
   }
 
+  // Fetch states when country changes
+  useEffect(() => {
+    if (!multiFilters.country) {
+      setStates([])
+      setCities([])
+      setMultiFilters((prev) => ({ ...prev, state: '', city: [] }))
+      return
+    }
+
+    const loadStates = async () => {
+      try {
+        setLoadingStates(true)
+        const stateList = await fetchStates(multiFilters.country)
+        setStates(stateList)
+        setMultiFilters((prev) => ({ ...prev, state: '', city: [] }))
+        setCities([])
+      } catch (error) {
+        console.error('Error loading states:', error)
+        setStates([])
+      } finally {
+        setLoadingStates(false)
+      }
+    }
+    loadStates()
+  }, [multiFilters.country, fetchStates])
+
+  // Fetch cities when state changes
+  useEffect(() => {
+    if (!multiFilters.state) {
+      setCities([])
+      setMultiFilters((prev) => ({ ...prev, city: [] }))
+      return
+    }
+
+    const loadCities = async () => {
+      try {
+        setLoadingCities(true)
+        const cityList = await fetchCities(multiFilters.state)
+        setCities(cityList)
+        setMultiFilters((prev) => ({ ...prev, city: [] }))
+      } catch (error) {
+        console.error('Error loading cities:', error)
+        setCities([])
+      } finally {
+        setLoadingCities(false)
+      }
+    }
+    loadCities()
+  }, [multiFilters.state, fetchCities])
+
   const handleAdvancedSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const payload: ProfileSearchPayload = {}
 
-    const multiFilterKeys = Object.keys(multiFilters) as (keyof typeof multiFilters)[]
-    multiFilterKeys.forEach((key) => {
-      if (multiFilters[key].length > 0) {
-        payload[key] = [...multiFilters[key]]
-      }
-    })
+    // Add country (single select)
+    if (multiFilters.country) {
+      payload.country = [multiFilters.country]
+    }
+
+    // Add state (single select)
+    if (multiFilters.state) {
+      payload.state = [multiFilters.state]
+    }
+
+    // Add city (multi select)
+    if (multiFilters.city.length > 0) {
+      payload.city = [...multiFilters.city]
+    }
+
+    // Add other multi-select filters
+    if (multiFilters.religion.length > 0) {
+      payload.religion = [...multiFilters.religion]
+    }
+    if (multiFilters.motherTongue.length > 0) {
+      payload.motherTongue = [...multiFilters.motherTongue]
+    }
+    if (multiFilters.maritalStatus.length > 0) {
+      payload.maritalStatus = [...multiFilters.maritalStatus]
+    }
 
     const buildRangePayload = (range: RangeState) => {
       const min = range.min ? Number(range.min) : undefined
@@ -357,13 +434,29 @@ export const SearchPage = () => {
           Combine multiple filters to narrow down your results.
         </p>
         <div className="grid gap-4 md:grid-cols-2">
-          <MultiSelectField
+          <SelectField
             label="Country"
+            value={multiFilters.country}
             placeholder="Select country"
-            values={multiFilters.country}
             options={countryOptions}
             disabled={isLookupLoading}
-            onChange={(values) => setMultiFilters((prev) => ({ ...prev, country: values }))}
+            onChange={(value) => setMultiFilters((prev) => ({ ...prev, country: value }))}
+          />
+          <SelectField
+            label="State"
+            value={multiFilters.state}
+            placeholder={multiFilters.country ? (loadingStates ? 'Loading states...' : 'Select state') : 'Select country first'}
+            options={states}
+            disabled={!multiFilters.country || loadingStates || isLookupLoading}
+            onChange={(value) => setMultiFilters((prev) => ({ ...prev, state: value }))}
+          />
+          <MultiSelectField
+            label="City"
+            placeholder={multiFilters.state ? (loadingCities ? 'Loading cities...' : 'Select cities') : 'Select state first'}
+            values={multiFilters.city}
+            options={cities}
+            disabled={!multiFilters.state || loadingCities || isLookupLoading}
+            onChange={(values) => setMultiFilters((prev) => ({ ...prev, city: values }))}
           />
           <MultiSelectField
             label="Religion"

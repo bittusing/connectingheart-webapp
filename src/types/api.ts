@@ -52,6 +52,8 @@ export type RangeFilterPayload = {
 export type ProfileSearchPayload = {
   profileId?: string
   country?: string[]
+  state?: string[]
+  city?: string[]
   religion?: string[]
   motherTongue?: string[]
   maritalStatus?: string[]

@@ -96,6 +96,8 @@ export const MyProfilePage = () => {
   const [uploadPreview, setUploadPreview] = useState<string>('')
   const [uploadingImage, setUploadingImage] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [uploadingPhotoId, setUploadingPhotoId] = useState<string | null>(null)
+  const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null)
 
   const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'https://backend.prod.connectingheart.co/api').replace(/\/$/, '')
 
@@ -135,6 +137,10 @@ export const MyProfilePage = () => {
   const avatarUrlFromProfile = primaryPic?.id
     ? `https://backendapp.connectingheart.co.in/api/profile/file/${profile.miscellaneous.heartsId}/${primaryPic.id}`
     : null
+  
+  // Debug: Log profile pictures
+  console.log('Profile Pictures:', profile.miscellaneous.profilePic)
+  console.log('Hearts ID:', profile.miscellaneous.heartsId)
   // Prefer userProfile.avatarUrl (same source as drawer) for consistency
   const avatarUrl = userProfile?.avatarUrl || avatarUrlFromProfile
   const age = calculateAge(profile.critical.dob)
@@ -241,6 +247,118 @@ export const MyProfilePage = () => {
     } finally {
       setUploadingImage(false)
     }
+  }
+
+  const handleUploadAdditionalPhoto = async (file: File) => {
+    const token = window.localStorage.getItem('connectingheart-token')
+    if (!token) {
+      showToast('Please log in again to upload.', 'error')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('profilePhoto', file)
+    formData.append('primary', 'false')
+
+    setUploadingPhotoId('uploading')
+    try {
+      const response = await fetch(`${apiBaseUrl}/profile/uploadProfilePic`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
+
+      const responseText = await response.text()
+      let data: any = {}
+      
+      try {
+        const cleanedText = responseText.trim().replace(/^\d+\s*/, '')
+        if (cleanedText) {
+          data = JSON.parse(cleanedText)
+        }
+      } catch (parseError) {
+        console.warn('Response parsing warning:', parseError)
+      }
+
+      if (response.ok || response.status >= 200 && response.status < 300) {
+        showToast('Photo uploaded successfully!', 'success')
+        await refetch()
+        if (refetchUserProfile) {
+          try {
+            await refetchUserProfile()
+          } catch {
+            // Ignore user profile refetch errors
+          }
+        }
+      } else {
+        throw new Error(data.message || data.error || 'Failed to upload photo')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to upload photo'
+      showToast(message, 'error')
+    } finally {
+      setUploadingPhotoId(null)
+    }
+  }
+
+  const handleDeletePhoto = async (photoId: string) => {
+    if (!confirm('Are you sure you want to delete this photo?')) {
+      return
+    }
+
+    const token = window.localStorage.getItem('connectingheart-token')
+    if (!token) {
+      showToast('Please log in again to delete.', 'error')
+      return
+    }
+
+    setDeletingPhotoId(photoId)
+    try {
+      const response = await fetch(`${apiBaseUrl}/profile/deleteProfilePic/${photoId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      })
+
+      if (response.ok || response.status >= 200 && response.status < 300) {
+        showToast('Photo deleted successfully!', 'success')
+        await refetch()
+        if (refetchUserProfile) {
+          try {
+            await refetchUserProfile()
+          } catch {
+            // Ignore user profile refetch errors
+          }
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || errorData.error || 'Failed to delete photo')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete photo'
+      showToast(message, 'error')
+    } finally {
+      setDeletingPhotoId(null)
+    }
+  }
+
+  const handlePhotoFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select an image file.', 'error')
+      return
+    }
+
+    handleUploadAdditionalPhoto(file)
+    // Reset input
+    event.target.value = ''
   }
 
 
@@ -368,6 +486,134 @@ export const MyProfilePage = () => {
           </div>
         </div>
       )}
+
+      {/* Photo Gallery Section */}
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">Photos</h2>
+        </div>
+        {profile.miscellaneous.profilePic && profile.miscellaneous.profilePic.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {/* Display existing photos */}
+            {profile.miscellaneous.profilePic.map((pic) => {
+              const imageUrl = `https://backendapp.connectingheart.co.in/api/profile/file/${profile.miscellaneous.heartsId}/${pic.id}`
+              const isDeleting = deletingPhotoId === pic.id
+              return (
+                <div key={pic.id || pic._id} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
+                  <img
+                    src={imageUrl}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null
+                      e.currentTarget.src = getGenderPlaceholder(userProfile?.gender || 'M')
+                    }}
+                  />
+                  {pic.primary && (
+                    <div className="absolute top-2 left-2 bg-pink-500 text-white text-xs font-semibold px-2 py-1 rounded">
+                      Primary
+                    </div>
+                  )}
+                  <button
+                    onClick={() => !isDeleting && handleDeletePhoto(pic.id)}
+                    disabled={isDeleting}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Delete photo"
+                  >
+                    {isDeleting ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    ) : (
+                      <XMarkIcon className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              )
+            })}
+            
+            {/* Add More Photos Button */}
+            <label className="relative flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 transition hover:border-pink-400 hover:bg-pink-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:border-pink-500 dark:hover:bg-pink-900/20">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoFileSelect}
+                disabled={uploadingPhotoId !== null}
+                className="hidden"
+              />
+              {uploadingPhotoId === 'uploading' ? (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-pink-500 border-r-transparent"></div>
+                  <span className="text-xs text-slate-600 dark:text-slate-400">Uploading...</span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <svg
+                    className="h-8 w-8 text-slate-400 dark:text-slate-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Add Photo</span>
+                </div>
+              )}
+            </label>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {/* Show placeholder when no photos */}
+            <div className="aspect-square rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 dark:border-slate-600 dark:bg-slate-800 flex items-center justify-center">
+              <div className="text-center">
+                <img
+                  src={getGenderPlaceholder(userProfile?.gender || 'M')}
+                  alt="No photos"
+                  className="h-24 w-24 mx-auto opacity-50"
+                />
+                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">No photos yet</p>
+              </div>
+            </div>
+            
+            {/* Add More Photos Button */}
+            <label className="relative flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 transition hover:border-pink-400 hover:bg-pink-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:border-pink-500 dark:hover:bg-pink-900/20">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoFileSelect}
+                disabled={uploadingPhotoId !== null}
+                className="hidden"
+              />
+              {uploadingPhotoId === 'uploading' ? (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-pink-500 border-r-transparent"></div>
+                  <span className="text-xs text-slate-600 dark:text-slate-400">Uploading...</span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <svg
+                    className="h-8 w-8 text-slate-400 dark:text-slate-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Add Photo</span>
+                </div>
+              )}
+            </label>
+          </div>
+        )}
+      </div>
 
       {/* Profile Details Section */}
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
