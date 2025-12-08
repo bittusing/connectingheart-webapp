@@ -132,15 +132,20 @@ export const MyProfilePage = () => {
 
   const profileId = profile.miscellaneous.heartsId ? `HEARTS-${profile.miscellaneous.heartsId}` : 'N/A'
   const enriched = profile.enriched || {}
+  // Get clientID - check if it exists in miscellaneous, otherwise use userProfile._id or heartsId as fallback
+  // The API might return clientID in miscellaneous or we might need to get it from userProfile
+  const clientID = (profile.miscellaneous as any).clientID || (profile as any).clientID || userProfile?._id || profile.miscellaneous.heartsId?.toString()
   // Use avatarUrl from userProfile (same as drawer) or construct from profilePic
   const primaryPic = profile.miscellaneous.profilePic?.find((pic) => pic.primary) || profile.miscellaneous.profilePic?.[0]
-  const avatarUrlFromProfile = primaryPic?.id
-    ? `https://backendapp.connectingheart.co.in/api/profile/file/${profile.miscellaneous.heartsId}/${primaryPic.id}`
+  const avatarUrlFromProfile = primaryPic?.id && clientID
+    ? `https://backendapp.connectingheart.co.in/api/profile/file/${clientID}/${primaryPic.id}`
     : null
   
   // Debug: Log profile pictures
   console.log('Profile Pictures:', profile.miscellaneous.profilePic)
+  console.log('Client ID:', clientID)
   console.log('Hearts ID:', profile.miscellaneous.heartsId)
+  console.log('Miscellaneous:', profile.miscellaneous)
   // Prefer userProfile.avatarUrl (same source as drawer) for consistency
   const avatarUrl = userProfile?.avatarUrl || avatarUrlFromProfile
   const age = calculateAge(profile.critical.dob)
@@ -496,7 +501,8 @@ export const MyProfilePage = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {/* Display existing photos */}
             {profile.miscellaneous.profilePic.map((pic) => {
-              const imageUrl = `https://backendapp.connectingheart.co.in/api/profile/file/${profile.miscellaneous.heartsId}/${pic.id}`
+              // Use clientID for image URL (same as other parts of the app)
+              const imageUrl = `https://backendapp.connectingheart.co.in/api/profile/file/${clientID}/${pic.id}`
               const isDeleting = deletingPhotoId === pic.id
               return (
                 <div key={pic.id || pic._id} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
