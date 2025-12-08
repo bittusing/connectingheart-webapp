@@ -26,8 +26,10 @@ export type ProfileDetailData = {
   }
   basic: {
     cast?: string
-    height?: number
+    height?: string
     state?: string
+    city?: string
+    country?: string
   }
   critical: {
     dob?: string
@@ -53,7 +55,7 @@ export type ProfileDetailData = {
     occupation?: string
     organisationName?: string
     interestedInSettlingAbroad?: string
-    income?: number
+    income?: string
   }
   family: {
     familyStatus?: string
@@ -93,14 +95,14 @@ export type ProfileDetailData = {
     habits?: string
     assets?: string
     movies?: string
-    languages?: string[]
+    languages?: string | string[] // Can be comma-separated string or array
     foodICook?: string
-    hobbies?: string[]
-    interest?: string[]
-    books?: string[]
-    dress?: string[]
-    sports?: string[]
-    cuisine?: string[]
+    hobbies?: string | string[] // Can be comma-separated string or array
+    interest?: string | string[] // Can be comma-separated string or array
+    books?: string | string[] // Can be comma-separated string or array
+    dress?: string | string[] // Can be comma-separated string or array
+    sports?: string | string[] // Can be comma-separated string or array
+    cuisine?: string | string[] // Can be comma-separated string or array
     favRead?: string
     favTVShow?: string
     vacayDestination?: string
@@ -110,7 +112,7 @@ export type ProfileDetailData = {
     openToPets?: string
     ownAHouse?: string
     ownACar?: string
-    favMusic?: string[]
+    favMusic?: string | string[] // Can be comma-separated string or array
   }
   matchData?: Array<{
     label: string

@@ -121,12 +121,16 @@ export const ProfileViewPage = () => {
   const [isShortlisted, setIsShortlisted] = useState(false)
   const [isIgnored, setIsIgnored] = useState(false)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
+  const [isContactDetailsModalOpen, setIsContactDetailsModalOpen] = useState(false)
+  const [shouldHighlightContact, setShouldHighlightContact] = useState(false)
+  const hasManuallyClosedContactModal = useRef(false)
   
   // Refs for scroll-based tab switching
   const basicSectionRef = useRef<HTMLDivElement>(null)
   const familySectionRef = useRef<HTMLDivElement>(null)
   const kundaliSectionRef = useRef<HTMLDivElement>(null)
   const matchSectionRef = useRef<HTMLDivElement>(null)
+  const contactSectionRef = useRef<HTMLDivElement>(null)
 
   const handleAction = (action: string) => {
     if (action === 'contact') {
@@ -194,6 +198,12 @@ export const ProfileViewPage = () => {
     if (!isUnlocking) {
       setIsUnlockModalOpen(false)
     }
+  }
+
+  const handleCloseContactModal = () => {
+    setIsContactDetailsModalOpen(false)
+    setShouldHighlightContact(false)
+    hasManuallyClosedContactModal.current = true
   }
 
   const handleUnlockContact = async () => {
@@ -301,8 +311,36 @@ export const ProfileViewPage = () => {
     setHasSentInterest(false)
     setIsShortlisted(Boolean(profile?.isShortlisted))
     setIsIgnored(Boolean(profile?.isIgnored))
+    // Reset the manual close flag when profile changes
+    hasManuallyClosedContactModal.current = false
     console.log("profile",profile);
   }, [profile?.id, profile?.isShortlisted, profile?.isIgnored])
+
+  // Show contact details modal when profile is unlocked and contact details are available
+  // Only show if user hasn't manually closed it
+  useEffect(() => {
+    if (
+      profile?.isUnlocked && 
+      profile?.contactDetails && 
+      !isContactDetailsModalOpen && 
+      !hasManuallyClosedContactModal.current
+    ) {
+      // Small delay to ensure UI is ready
+      const timer = setTimeout(() => {
+        setIsContactDetailsModalOpen(true)
+        setShouldHighlightContact(true)
+        // Scroll to contact section
+        setTimeout(() => {
+          contactSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }, 200)
+        // Remove highlight after 3 seconds
+        setTimeout(() => {
+          setShouldHighlightContact(false)
+        }, 3000)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [profile?.isUnlocked, profile?.contactDetails, isContactDetailsModalOpen])
 
   // Scroll-based auto tab switching
   useEffect(() => {
@@ -643,7 +681,14 @@ export const ProfileViewPage = () => {
 
       {/* Contact Information */}
       {profile.isUnlocked && profile.contactDetails && (
-        <div className="space-y-3">
+        <div 
+          ref={contactSectionRef}
+          className={`space-y-3 rounded-lg border-2 p-4 transition-all duration-500 ${
+            shouldHighlightContact
+              ? 'border-pink-500 bg-pink-50 shadow-lg dark:border-pink-400 dark:bg-pink-900/20'
+              : 'border-transparent'
+          }`}
+        >
           <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Contact Information
           </h3>
@@ -768,6 +813,7 @@ export const ProfileViewPage = () => {
 
   const renderKundaliDetails = () => {
     const kundali = profile.kundaliDetails
+    console.log('kundali', kundali)
     const lifestyle = profile.lifestyleData
 
     return (
@@ -776,16 +822,16 @@ export const ProfileViewPage = () => {
         {(kundali?.rashi || kundali?.nakshatra || kundali?.timeOfBirth || kundali?.manglik || kundali?.horoscope) && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Kundali & Astro</h3>
-            {kundali?.timeOfBirth && (
+            {kundali?.timeOfBirth ? (
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
                   <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">{kundali.timeOfBirth}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{kundali?.timeOfBirth || ''}</p>
               </div>
-            )}
+            ) : null}
             {kundali?.rashi && <InfoRow label="Rashi" value={kundali.rashi} />}
             {kundali?.nakshatra && <InfoRow label="Nakshatra" value={kundali.nakshatra} />}
             {kundali?.manglik && <InfoRow label="Manglik" value={kundali.manglik} />}
@@ -1398,6 +1444,84 @@ export const ProfileViewPage = () => {
         onCancel={handleUnlockCancel}
         onConfirm={handleUnlockContact}
       />
+
+      {/* Contact Details Modal */}
+      {isContactDetailsModalOpen && profile?.contactDetails && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
+                Contact Information
+              </h3>
+              <button
+                onClick={handleCloseContactModal}
+                className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                aria-label="Close"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              {profile.contactDetails.name && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Name</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {profile.contactDetails.name}
+                  </span>
+                </div>
+              )}
+              {profile.contactDetails.phoneNumber && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Phone Number</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {profile.contactDetails.phoneNumber}
+                  </span>
+                </div>
+              )}
+              {profile.contactDetails.altMobileNumber && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Alternate Mobile</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {profile.contactDetails.altMobileNumber}
+                  </span>
+                </div>
+              )}
+              {profile.contactDetails.landline && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Landline</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {profile.contactDetails.landline}
+                  </span>
+                </div>
+              )}
+              {profile.contactDetails.email && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Email</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white break-all">
+                    {profile.contactDetails.email}
+                  </span>
+                </div>
+              )}
+              {profile.contactDetails.alternateEmail && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Alternate Email</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white break-all">
+                    {profile.contactDetails.alternateEmail}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={handleCloseContactModal}
+                className="rounded-full bg-pink-500 px-6 py-2 text-sm font-semibold text-white transition hover:bg-pink-600"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="pointer-events-none fixed top-6 right-6 z-50 space-y-3">
         {toasts.map((toast) => (
