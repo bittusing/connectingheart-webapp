@@ -28,7 +28,7 @@ export const SRCMDetailsPage = () => {
   const navigate = useNavigate()
   const api = useApiClient()
   const { updateLastActiveScreen } = useUpdateLastActiveScreen()
-  const { profile: userProfile, loading: profileLoading } = useUserProfile()
+  const { loading: profileLoading } = useUserProfile()
 
   const [formData, setFormData] = useState({
     idProofName: '',
@@ -113,13 +113,12 @@ export const SRCMDetailsPage = () => {
     }
 
     const formDataUpload = new FormData()
-    formDataUpload.append('profilePhoto', selectedFile)
-    formDataUpload.append('primary', 'false')
+    formDataUpload.append('srcmPhoto', selectedFile)
 
     setUploadingImage(true)
     setUploadError(null)
     try {
-      const response = await fetch(`${apiBaseUrl}/profile/uploadProfilePic`, {
+      const response = await fetch(`${apiBaseUrl}/srcmDetails/uploadSrcmId`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -140,29 +139,18 @@ export const SRCMDetailsPage = () => {
       }
 
       if (response.ok || (response.status >= 200 && response.status < 300)) {
-        // API returns: {"fileName":"1765187534896-blob","id":1765187535026}
-        // Construct image URL using the id
-        const fileId = data?.id || data?.data?.id || data?.fileName
+        // API returns: {"fileName":"1765258323184-school.jpg"}
+        const fileName = data?.fileName || data?.data?.fileName
         
-        // Get userId from userProfile or fetch it
-        let userId = userProfile?._id
-        if (!userId) {
-          try {
-            const userResponse = await api.get<GetUserResponse>('auth/getUser')
-            userId = userResponse.data?._id
-          } catch {
-            // If fetch fails, we'll use fileId directly or show error
-          }
-        }
-        
-        if (fileId && userId) {
-          const imageBaseUrl = 'https://backendapp.connectingheart.co.in'
-          const uploadedUrl = `${imageBaseUrl}/api/profile/file/${userId}/${fileId}`
+        if (fileName) {
+          // Construct image URL: https://www.connectingheart.co.in/api/srcmDetails/file/{fileName}
+          // const imageBaseUrl = 'https://backendapp.connectingheart.co.in/'
+          const uploadedUrl = `${apiBaseUrl}/srcmDetails/file/${fileName}`
           
           setFormData((prev) => ({
             ...prev,
             idProofData: uploadedUrl,
-            idProofName: selectedFile.name,
+            idProofName: fileName, // Store fileName for submit
           }))
           
           showToast('Image uploaded successfully!', 'success')
@@ -176,7 +164,7 @@ export const SRCMDetailsPage = () => {
           setUploadPreview('')
           setUploadError(null)
         } else {
-          throw new Error('Upload response missing file ID or user ID')
+          throw new Error('Upload response missing fileName')
         }
       } else {
         throw new Error(data?.message || data?.error || 'Failed to upload image')
@@ -194,19 +182,39 @@ export const SRCMDetailsPage = () => {
     setSubmitting(true)
 
     try {
-      const payload = {
-        srcmDetails: {
-          idProof: formData.idProofData || undefined,
-          idProofName: formData.idProofName || undefined,
-          idNumber: formData.srcmIdNumber || undefined,
-          satsangCenter: formData.satsangCenter || undefined,
-          preceptorName: formData.preceptorName || undefined,
-          preceptorMobile: formData.preceptorMobile || undefined,
-          preceptorEmail: formData.preceptorEmail || undefined,
-        },
+      // Payload format: {"srcmIdNumber":"565465","preceptorsName":"dinesh","preceptorsContactNumber":9315857918,"preceptorsEmail":"abc@gmail.com","srcmIdFilename":"1764149608296-blob"}
+      const payload: {
+        srcmIdNumber?: string
+        preceptorsName?: string
+        preceptorsContactNumber?: string | number
+        preceptorsEmail?: string
+        satsangCenter?: string
+        srcmIdFilename?: string
+      } = {}
+
+      if (formData.srcmIdNumber) {
+        payload.srcmIdNumber = formData.srcmIdNumber
+      }
+      if (formData.preceptorName) {
+        payload.preceptorsName = formData.preceptorName
+      }
+      if (formData.preceptorMobile) {
+        // Convert to number if it's a valid number string
+        const mobileNum = formData.preceptorMobile.replace(/\D/g, '')
+        payload.preceptorsContactNumber = mobileNum ? Number(mobileNum) : formData.preceptorMobile
+      }
+      if (formData.preceptorEmail) {
+        payload.preceptorsEmail = formData.preceptorEmail
+      }
+      if (formData.satsangCenter) {
+        payload.satsangCenter = formData.satsangCenter
+      }
+      // Extract fileName from idProofName (stored during upload)
+      if (formData.idProofName) {
+        payload.srcmIdFilename = formData.idProofName
       }
 
-      const response = await api.patch<typeof payload, UpdateResponse>('personalDetails', payload)
+      const response = await api.patch<typeof payload, UpdateResponse>('srcmDetails/updateSrcmDetails', payload)
 
       if (response.status === 'success' || response.code === 'CH200') {
         showToast('SRCM details updated successfully', 'success')
@@ -376,7 +384,7 @@ export const SRCMDetailsPage = () => {
               ) : (
                 <div className="h-40 w-full rounded-2xl border border-dashed border-slate-300 bg-slate-50" />
               )}
-              <input type="file" accept="image/*" onChange={handleFileSelect} />
+              <input type="file" accept="image/*" required={true} onChange={handleFileSelect} />
               <Button
                 type="button"
                 className="w-full"

@@ -142,8 +142,8 @@ export const RegisterPage = () => {
       const response = await generateOtp(phoneNumber, extension)
       if (response.status === 'success') {
         // Show alert instead of directly opening OTP modal
-        const fullPhoneNumber = `${extension}${phoneNumber}`
-        setAlertMessage(`OTP has been sent to ${fullPhoneNumber}. Please check your mobile.`)
+        // const fullPhoneNumber = `${extension}${phoneNumber}`
+        setAlertMessage(`For any assistance, please WhatsApp/Call: +91 9450312512`)
         setShowAlert(true)
         showToast('OTP sent to your mobile number', 'success')
       } else {
