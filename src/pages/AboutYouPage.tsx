@@ -22,7 +22,7 @@ export const AboutYouPage = () => {
   const navigate = useNavigate()
   const api = useApiClient()
   const { updateLastActiveScreen } = useUpdateLastActiveScreen()
-  const { loading: profileLoading } = useUserProfile()
+  const { profile: userProfile, loading: profileLoading } = useUserProfile()
 
   const [formData, setFormData] = useState({
     aboutMe: '',
@@ -103,9 +103,11 @@ export const AboutYouPage = () => {
     }
 
     const uploadData = new FormData()
-    uploadData.append('file', selectedFile)
+    uploadData.append('profilePhoto', selectedFile)
+    uploadData.append('primary', 'true') // Set primary to true for profile picture
 
     setUploadingImage(true)
+    setUploadError(null)
     try {
       const response = await fetch(`${apiBaseUrl}/profile/uploadProfilePic`, {
         method: 'POST',
@@ -115,38 +117,64 @@ export const AboutYouPage = () => {
         body: uploadData,
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to upload image')
+      const responseText = await response.text()
+      let data: any = {}
+      
+      try {
+        const cleanedText = responseText.trim().replace(/^\d+\s*/, '')
+        if (cleanedText) {
+          data = JSON.parse(cleanedText)
+        }
+      } catch (parseError) {
+        console.warn('Response parsing warning:', parseError)
       }
 
-      const data = await response.json()
-      const uploadedUrl =
-        data?.data?.url ||
-        data?.data?.imageUrl ||
-        data?.data?.fileUrl ||
-        data?.data?.path ||
-        data?.url ||
-        ''
-
-      if (!uploadedUrl) {
-        throw new Error('Upload response missing image url')
+      if (response.ok || (response.status >= 200 && response.status < 300)) {
+        // API returns: {"fileName":"1765187534896-blob","id":1765187535026}
+        // Construct image URL using the id
+        const fileId = data?.id || data?.data?.id || data?.fileName
+        
+        // Get userId from userProfile or fetch it
+        let userId = userProfile?._id
+        if (!userId) {
+          try {
+            const userResponse = await api.get<GetUserResponse>('auth/getUser')
+            userId = userResponse.data?._id
+          } catch {
+            // If fetch fails, we'll use fileId directly or show error
+          }
+        }
+        
+        if (fileId && userId) {
+          const imageBaseUrl = 'https://backendapp.connectingheart.co.in'
+          const uploadedUrl = `${imageBaseUrl}/api/profile/file/${userId}/${fileId}`
+          
+          setFormData((prev) => ({
+            ...prev,
+            profilePic: uploadedUrl,
+            profilePicName: selectedFile.name,
+          }))
+          
+          showToast('Image uploaded successfully!', 'success')
+          
+          // Close modal and reset upload state immediately after upload
+          if (uploadPreview) {
+            URL.revokeObjectURL(uploadPreview)
+          }
+          setUploadModalOpen(false)
+          setSelectedFile(null)
+          setUploadPreview('')
+          setUploadError(null)
+        } else {
+          throw new Error('Upload response missing file ID or user ID')
+        }
+      } else {
+        throw new Error(data?.message || data?.error || 'Failed to upload image')
       }
-
-      setFormData((prev) => ({
-        ...prev,
-        profilePic: uploadedUrl,
-        profilePicName: selectedFile.name,
-      }))
-      if (uploadPreview) {
-        URL.revokeObjectURL(uploadPreview)
-      }
-      setUploadPreview('')
-      setSelectedFile(null)
-      setUploadModalOpen(false)
-      setUploadError(null)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to upload image'
       setUploadError(message)
+      showToast(message, 'error')
     } finally {
       setUploadingImage(false)
     }
@@ -154,6 +182,14 @@ export const AboutYouPage = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+    
+    // Validate that image is required
+    if (!formData.profilePic) {
+      showToast('Please upload profile picture before submitting.', 'error')
+      setUploadModalOpen(true)
+      return
+    }
+    
     setSubmitting(true)
 
     try {
@@ -259,13 +295,13 @@ export const AboutYouPage = () => {
             <Button type="submit" size="lg" disabled={submitting}>
               {submitting ? 'Creating profile...' : 'Create my profile'}
             </Button>
-            <button
+            {/* <button
               type="button"
               className="text-sm font-semibold text-pink-500 underline"
               onClick={handleSkip}
             >
               I will fill this later
-            </button>
+            </button> */}
             <button
               type="button"
               className="text-sm font-semibold text-slate-500 hover:text-slate-700"

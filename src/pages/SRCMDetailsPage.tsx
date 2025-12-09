@@ -28,7 +28,7 @@ export const SRCMDetailsPage = () => {
   const navigate = useNavigate()
   const api = useApiClient()
   const { updateLastActiveScreen } = useUpdateLastActiveScreen()
-  const { loading: profileLoading } = useUserProfile()
+  const { profile: userProfile, loading: profileLoading } = useUserProfile()
 
   const [formData, setFormData] = useState({
     idProofName: '',
@@ -113,9 +113,11 @@ export const SRCMDetailsPage = () => {
     }
 
     const formDataUpload = new FormData()
-    formDataUpload.append('file', selectedFile)
+    formDataUpload.append('profilePhoto', selectedFile)
+    formDataUpload.append('primary', 'false')
 
     setUploadingImage(true)
+    setUploadError(null)
     try {
       const response = await fetch(`${apiBaseUrl}/profile/uploadProfilePic`, {
         method: 'POST',
@@ -125,39 +127,64 @@ export const SRCMDetailsPage = () => {
         body: formDataUpload,
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to upload image')
+      const responseText = await response.text()
+      let data: any = {}
+      
+      try {
+        const cleanedText = responseText.trim().replace(/^\d+\s*/, '')
+        if (cleanedText) {
+          data = JSON.parse(cleanedText)
+        }
+      } catch (parseError) {
+        console.warn('Response parsing warning:', parseError)
       }
 
-      const data = await response.json()
-      const uploadedUrl =
-        data?.data?.url ||
-        data?.data?.imageUrl ||
-        data?.data?.fileUrl ||
-        data?.data?.path ||
-        data?.url ||
-        ''
-
-      if (!uploadedUrl) {
-        throw new Error('Upload response missing image url')
+      if (response.ok || (response.status >= 200 && response.status < 300)) {
+        // API returns: {"fileName":"1765187534896-blob","id":1765187535026}
+        // Construct image URL using the id
+        const fileId = data?.id || data?.data?.id || data?.fileName
+        
+        // Get userId from userProfile or fetch it
+        let userId = userProfile?._id
+        if (!userId) {
+          try {
+            const userResponse = await api.get<GetUserResponse>('auth/getUser')
+            userId = userResponse.data?._id
+          } catch {
+            // If fetch fails, we'll use fileId directly or show error
+          }
+        }
+        
+        if (fileId && userId) {
+          const imageBaseUrl = 'https://backendapp.connectingheart.co.in'
+          const uploadedUrl = `${imageBaseUrl}/api/profile/file/${userId}/${fileId}`
+          
+          setFormData((prev) => ({
+            ...prev,
+            idProofData: uploadedUrl,
+            idProofName: selectedFile.name,
+          }))
+          
+          showToast('Image uploaded successfully!', 'success')
+          
+          // Close modal and reset upload state immediately after upload
+          if (uploadPreview) {
+            URL.revokeObjectURL(uploadPreview)
+          }
+          setUploadModalOpen(false)
+          setSelectedFile(null)
+          setUploadPreview('')
+          setUploadError(null)
+        } else {
+          throw new Error('Upload response missing file ID or user ID')
+        }
+      } else {
+        throw new Error(data?.message || data?.error || 'Failed to upload image')
       }
-
-      setFormData((prev) => ({
-        ...prev,
-        idProofData: uploadedUrl,
-        idProofName: selectedFile.name,
-      }))
-      if (uploadPreview) {
-        URL.revokeObjectURL(uploadPreview)
-      }
-      setUploadModalOpen(false)
-      setSelectedFile(null)
-      setUploadPreview('')
-      setUploadError(null)
-      setUploadError(null)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to upload image'
       setUploadError(message)
+      showToast(message, 'error')
     } finally {
       setUploadingImage(false)
     }
@@ -215,6 +242,14 @@ export const SRCMDetailsPage = () => {
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault()
+    
+    // Validate that image is required
+    if (!formData.idProofData) {
+      showToast('Please upload SRCM ID Proof image before submitting.', 'error')
+      setUploadModalOpen(true)
+      return
+    }
+    
     setConfirmOpen(true)
   }
 
