@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/common/Button'
-import { SelectButton, ToggleGroup } from '../components/forms/FormComponents'
+import { SelectButton } from '../components/forms/FormComponents'
 import { SelectModal } from '../components/forms/SelectModal'
 import { TextInput } from '../components/forms/TextInput'
 import { useApiClient } from '../hooks/useApiClient'
@@ -48,7 +48,7 @@ export const CareerDetailsPage = () => {
       qualification: '',
       otherUGDegree: '',
     },
-    employed_in: 'Private Sector',
+    employed_in: 'pvtSct', // Default to Private Sector value
     occupation: '',
     income: '',
   })
@@ -111,19 +111,35 @@ export const CareerDetailsPage = () => {
 
   // Load existing data from profile
   useEffect(() => {
-    if (profile) {
+    if (profile && dataLoaded) {
+      // Map employed_in value to lookup value if it's a label
+      let employedInValue = profile.employed_in || 'pvtSct'
+      if (lookupData.employed_in) {
+        const foundByLabel = lookupData.employed_in.find((e) => e.label === profile.employed_in)
+        if (foundByLabel) {
+          employedInValue = foundByLabel.value
+        } else {
+          // If not found by label, check if it's already a value
+          const foundByValue = lookupData.employed_in.find((e) => e.value === profile.employed_in)
+          if (foundByValue) {
+            employedInValue = foundByValue.value
+          }
+        }
+      }
+      
       setFormData((prev) => ({
         ...prev,
         education: {
           qualification: profile.education?.qualification || '',
           otherUGDegree: profile.education?.otherUGDegree || '',
         },
-        employed_in: profile.employed_in || 'Private Sector',
+        employed_in: employedInValue,
         occupation: profile.occupation || '',
         income: profile.income?.toString() || '',
       }))
     }
-  }, [profile])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, dataLoaded])
 
   const getPickerOptions = (field: PickerField): string[] => {
     switch (field) {
@@ -212,21 +228,34 @@ export const CareerDetailsPage = () => {
     setSubmitting(true)
 
     try {
-      // Get income value from lookup
-      const incomeOption = lookupData.income?.find((i) => i.label === formData.income)
-      const incomeValue = incomeOption?.value
-        ? typeof incomeOption.value === 'number'
-          ? incomeOption.value
-          : parseFloat(incomeOption.value.toString())
-        : undefined
+      // Get income value - formData.income is already the lookup value (string), convert to number
+      let incomeValue: number | undefined
+      if (formData.income) {
+        // Try to find by value first (since formData.income stores the value)
+        const incomeOption = lookupData.income?.find(
+          (i) => i.value?.toString() === formData.income || i.label === formData.income
+        )
+        if (incomeOption?.value) {
+          incomeValue = typeof incomeOption.value === 'number' 
+            ? incomeOption.value 
+            : parseFloat(incomeOption.value.toString())
+        } else {
+          // If not found, try parsing the formData.income directly
+          const parsed = parseFloat(formData.income)
+          if (!isNaN(parsed)) {
+            incomeValue = parsed
+          }
+        }
+      }
 
       // Prepare payload
       const payload: any = {
-        employed_in: formData.employed_in,
+        employed_in: formData.employed_in || undefined,
         occupation: formData.occupation || undefined,
         income: incomeValue,
       }
 
+      // Always include education if qualification exists
       if (formData.education.qualification) {
         payload.education = {
           qualification: formData.education.qualification,
@@ -337,11 +366,11 @@ export const CareerDetailsPage = () => {
               Work Experience
             </p>
             <div className="mt-4 space-y-4">
-              <ToggleGroup
+              <SelectButton
                 label="Employed In"
-                value={formData.employed_in}
-                options={['Private Sector', 'Government', 'Business', 'Not Working']}
-                onChange={(value) => setFormData((prev) => ({ ...prev, employed_in: value }))}
+                value={getPickerValue('employed_in')}
+                placeholder="Select Employed In"
+                onClick={() => setActivePicker('employed_in')}
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <SelectButton
@@ -378,9 +407,9 @@ export const CareerDetailsPage = () => {
       {activePicker && (
         <SelectModal
           isOpen
-          title={`Select ${activePicker.charAt(0).toUpperCase() + activePicker.slice(1)}`}
+          title={activePicker === 'employed_in' ? 'Select Employed_in' : `Select ${activePicker.charAt(0).toUpperCase() + activePicker.slice(1)}`}
           options={getPickerOptions(activePicker)}
-          searchable={['occupation'].includes(activePicker)}
+          searchable={['occupation', 'employed_in'].includes(activePicker)}
           selected={getPickerValue(activePicker)}
           onClose={() => setActivePicker(null)}
           onConfirm={setPickerValue}

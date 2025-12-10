@@ -236,11 +236,29 @@ export const FamilyDetailsPage = () => {
     setSubmitting(true)
 
     try {
+      // Get familyIncome as number from lookup
+      let familyIncomeValue: number | undefined
+      if (formData.familyIncome) {
+        const incomeOption = lookupData.income?.find(
+          (i) => i.value?.toString() === formData.familyIncome || i.label === formData.familyIncome
+        )
+        if (incomeOption?.value) {
+          familyIncomeValue = typeof incomeOption.value === 'number'
+            ? incomeOption.value
+            : parseFloat(incomeOption.value.toString())
+        } else {
+          const parsed = parseFloat(formData.familyIncome)
+          if (!isNaN(parsed)) {
+            familyIncomeValue = parsed
+          }
+        }
+      }
+
       const payload: any = {
         familyStatus: formData.familyStatus || undefined,
         familyType: formData.familyType || undefined,
         familyValues: formData.familyValues || undefined,
-        familyIncome: formData.familyIncome ? Number(formData.familyIncome) : undefined,
+        familyIncome: familyIncomeValue,
         fatherOccupation: formData.fatherOccupation || undefined,
         motherOccupation: formData.motherOccupation || undefined,
         brothers: formData.brothers,
@@ -252,11 +270,12 @@ export const FamilyDetailsPage = () => {
         familyBasedOutOf: formData.familyBaseLocationValue || undefined,
       }
 
+      // Remove undefined fields
       Object.keys(payload).forEach((key) => {
         if (payload[key] === undefined) delete payload[key]
       })
 
-      const response = await api.patch<typeof payload, { status?: string; code?: string; message?: string }>('personalDetails', payload)
+      const response = await api.patch<typeof payload, { status?: string; code?: string; message?: string }>('family', payload)
 
       if (response.status === 'success' || response.code === 'CH200') {
         showToast('Family details updated successfully', 'success')

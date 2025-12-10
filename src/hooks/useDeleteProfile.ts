@@ -20,7 +20,7 @@ export const useDeleteProfile = () => {
     async (payload: DeleteProfilePayload) => {
       setIsDeleting(true)
       try {
-        const response = await api.delete<DeleteProfileResponse>('/api/auth/deleteProfile', {
+        const response = await api.delete<DeleteProfileResponse>('/auth/deleteProfile', {
           body: JSON.stringify(payload),
         })
         return response

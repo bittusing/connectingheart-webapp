@@ -110,7 +110,7 @@ export const MyProfilePage = () => {
     cityLabel?: string
   }>({})
 
-  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'https://backend.prod.connectingheart.co/api').replace(/\/$/, '')
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'https://backendapp.connectingheart.co/api').replace(/\/$/, '')
 
   useEffect(() => {
     return () => {
@@ -699,6 +699,7 @@ export const MyProfilePage = () => {
           <DetailRow label="Gender" value={formatGender(userProfile?.gender)} />
           <DetailRow label="Religion" value={enriched.religionLabel || 'Not Filled'} />
           <DetailRow label="Mother Tongue" value={enriched.motherTongueLabel || 'Not Filled'} />
+          <DetailRow label="Residential Status" value={enriched.residentialStatusLabel || 'Not Filled'} />
           <DetailRow label="Country" value={enriched.countryLabel || 'Not Filled'} />
           <DetailRow label="State" value={enriched.stateLabel || 'Not Filled'} />
           <DetailRow label="City" value={enriched.cityLabel || 'Not Filled'} />

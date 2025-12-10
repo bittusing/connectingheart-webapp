@@ -8,6 +8,7 @@ type MyProfileApiData = {
     country: string
     state: string
     city: string
+    residentialStatus?: string
     heartsId: number
     profilePic: Array<{
       s3Link: string
@@ -26,6 +27,7 @@ type MyProfileApiData = {
     name: string
     income: number
     motherTongue: string
+    residentialStatus?: string
   }
   critical: {
     dob: string
@@ -126,6 +128,7 @@ export type MyProfileData = MyProfileApiData & {
     cityLabel?: string
     castLabel?: string
     religionLabel?: string
+    residentialStatusLabel?: string
     motherTongueLabel?: string
     qualificationLabel?: string
     employedInLabel?: string
@@ -206,6 +209,7 @@ export const useMyProfileData = () => {
         const fetchedLookupData = await fetchLookup()
         const casts = fetchedLookupData.casts || []
         const religions = fetchedLookupData.religion || []
+        const residentialStatuses = fetchedLookupData.residentialStatus || []
         const motherTongue = fetchedLookupData.motherTongue || fetchedLookupData.languages || []
         const qualifications = fetchedLookupData.highestEducation || fetchedLookupData.qualification || []
         const occupations = fetchedLookupData.occupation || []
@@ -269,6 +273,10 @@ export const useMyProfileData = () => {
             cityLabel,
             castLabel: mapCode(casts, apiData.basic.cast),
             religionLabel: mapCode(religions, apiData.basic.religion),
+            residentialStatusLabel: mapCode(
+              residentialStatuses,
+              apiData.basic.residentialStatus || apiData.miscellaneous.residentialStatus,
+            ),
             motherTongueLabel: mapCode(motherTongue, apiData.basic.motherTongue),
             qualificationLabel: mapCode(qualifications, apiData.education.qualification),
             employedInLabel: mapCode(employedInOptions, apiData.career.employed_in),

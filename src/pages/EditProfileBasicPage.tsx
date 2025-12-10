@@ -72,6 +72,7 @@ export const EditProfileBasicPage = () => {
 
   const [formData, setFormData] = useState({
     religion: '',
+    residentialStatus: '',
     motherTongue: '',
     country: '',
     state: '',
@@ -137,6 +138,7 @@ export const EditProfileBasicPage = () => {
 
       setFormData({
         religion: profile.basic.religion || '',
+        residentialStatus: profile.miscellaneous.residentialStatus || '',
         motherTongue: profile.basic.motherTongue || '',
         country: profile.miscellaneous.country || '',
         state: profile.miscellaneous.state || '',
@@ -222,6 +224,7 @@ export const EditProfileBasicPage = () => {
       // Prepare payload matching the API structure (flat structure with section)
       const updatePayload: any = {
         religion: formData.religion || undefined,
+        residentialStatus: formData.residentialStatus || undefined,
         motherTongue: formData.motherTongue || undefined,
         country: formData.country || undefined,
         state: formData.state || undefined,
@@ -279,6 +282,7 @@ export const EditProfileBasicPage = () => {
 
   // Get lookup options from API response
   const religions = lookupData.religion || []
+  const residentialStatusOptions = lookupData.residentialStatus || []
   const motherTongueOptions = lookupData.motherTongue || lookupData.languages || []
   const casts = lookupData.casts || []
   const incomeOptions = lookupData.income || []
@@ -291,6 +295,8 @@ export const EditProfileBasicPage = () => {
     switch (activePicker) {
       case 'religion':
         return religions.map((opt) => opt.label)
+      case 'residentialStatus':
+        return residentialStatusOptions.map((opt) => opt.label)
       case 'motherTongue':
         return motherTongueOptions.map((opt) => opt.label)
       case 'income':
@@ -320,6 +326,11 @@ export const EditProfileBasicPage = () => {
     switch (activePicker) {
       case 'religion': {
         const selected = religions.find((r) => r.label === label)
+        selectedValue = selected?.value || ''
+        break
+      }
+      case 'residentialStatus': {
+        const selected = residentialStatusOptions.find((r) => r.label === label)
         selectedValue = selected?.value || ''
         break
       }
@@ -373,6 +384,13 @@ export const EditProfileBasicPage = () => {
               value={displayLabels.religion}
               placeholder="Select Religion"
               onClick={() => setActivePicker('religion')}
+            />
+
+            <SelectButton
+              label="Residential Status"
+              value={displayLabels.residentialStatus}
+              placeholder="Select Residential Status"
+              onClick={() => setActivePicker('residentialStatus')}
             />
 
             <SelectButton
