@@ -102,19 +102,31 @@ export const ProfileViewPage = () => {
     pendingAction,
   } = useProfileActions()
   
-  // Check if user came from acceptance page
+  // Check if user came from acceptance page or interestsent page
   const [isFromAcceptance, setIsFromAcceptance] = useState(false)
+  const [isFromInterestSent, setIsFromInterestSent] = useState(false)
   
   useEffect(() => {
     // Check location state first (most reliable)
     if (location.state?.from === 'acceptance') {
       setIsFromAcceptance(true)
+      setIsFromInterestSent(false)
+      return
+    }
+    if (location.state?.from === 'interestsent') {
+      setIsFromInterestSent(true)
+      setIsFromAcceptance(false)
       return
     }
     // Fallback: check referrer
     if (typeof window !== 'undefined' && document.referrer) {
-      const referrerUrl = new URL(document.referrer)
-      setIsFromAcceptance(referrerUrl.pathname.includes('/acceptance'))
+      try {
+        const referrerUrl = new URL(document.referrer)
+        setIsFromAcceptance(referrerUrl.pathname.includes('/acceptance'))
+        setIsFromInterestSent(referrerUrl.pathname.includes('/interestsent'))
+      } catch {
+        // Invalid URL, ignore
+      }
     }
   }, [location.state])
   const { unlockProfile, isUnlocking } = useUnlockProfile()
@@ -310,13 +322,14 @@ export const ProfileViewPage = () => {
   }
 
   useEffect(() => {
-    setHasSentInterest(false)
+    // If user came from interestsent page, they have already sent interest
+    setHasSentInterest(isFromInterestSent || false)
     setIsShortlisted(Boolean(profile?.isShortlisted))
     setIsIgnored(Boolean(profile?.isIgnored))
     // Reset the manual close flag when profile changes
     hasManuallyClosedContactModal.current = false
     console.log("profile",profile);
-  }, [profile?.id, profile?.isShortlisted, profile?.isIgnored])
+  }, [profile?.id, profile?.isShortlisted, profile?.isIgnored, isFromInterestSent])
 
   // Show contact details modal when profile is unlocked and contact details are available
   // Only show if user hasn't manually closed it

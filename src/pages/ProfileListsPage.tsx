@@ -235,9 +235,8 @@ const ProfileListTemplate = ({
 
       switch (singleButton.actionType) {
         case 'unsend-interest':
-          // Use receiver_id for InterestSentPage (endpoint: dashboard/getMyInterestedProfiles)
-          const useReceiverId = endpointRef.current === 'dashboard/getMyInterestedProfiles'
-          response = await unsendInterest(profileId, useReceiverId)
+          // Always use receiver_id for unsendInterest
+          response = await unsendInterest(profileId)
           successMessage = response?.message ?? 'Interest cancelled successfully.'
           notificationTypeForUpdate = 'interestSent'
           break
