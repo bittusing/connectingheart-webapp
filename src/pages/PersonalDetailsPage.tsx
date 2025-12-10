@@ -582,11 +582,27 @@ export const PersonalDetailsPage = () => {
                 onChange={(value) => setFormData((prev) => ({ ...prev, gender: value }))}
               />
               <div className="grid gap-4 md:grid-cols-2">
-                <TextInput
+                {/* altest 18 years old */}
+                {/* <TextInput
                   label="Date of Birth"
                   type="date"
                   value={formData.dob}
                   onChange={(event) => setFormData((prev) => ({ ...prev, dob: event.target.value }))}
+                  required
+                /> */}
+                 <TextInput
+                  label="Date of Birth"
+                  type="date"
+                  min={new Date(new Date().setFullYear(new Date().getFullYear() - 100)).toISOString().split('T')[0]}
+                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                  placeholder="Select date of birth"
+                  value={formData.dob ? formData.dob.slice(0, 10) : ''}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      dob: e.target.value ? new Date(e.target.value).toISOString() : '',
+                    }))
+                  }
                   required
                 />
                 <SelectButton

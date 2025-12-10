@@ -139,6 +139,10 @@ export type MyProfileData = MyProfileApiData & {
     fatherOccupationLabel?: string
     motherOccupationLabel?: string
     familyBasedOutOfLabel?: string
+    familyStatusLabel?: string
+    familyTypeLabel?: string
+    familyValuesLabel?: string
+    familyIncomeLabel?: string
     managedByLabel?: string
     disabilityLabel?: string
     bodyTypeLabel?: string
@@ -170,7 +174,7 @@ const mapCodesArray = (options: Array<{ label: string; value: string }>, codes: 
 
 export const useMyProfileData = () => {
   const { get } = useApiClient()
-  const { lookupData, fetchLookup, fetchStates, fetchCities } = useLookup()
+  const { fetchLookup, fetchStates, fetchCities } = useLookup()
   const { countries: countryOptions } = useCountryLookup()
   const [profile, setProfile] = useState<MyProfileData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -205,7 +209,10 @@ export const useMyProfileData = () => {
         const motherTongue = fetchedLookupData.motherTongue || fetchedLookupData.languages || []
         const qualifications = fetchedLookupData.highestEducation || fetchedLookupData.qualification || []
         const occupations = fetchedLookupData.occupation || []
+        const fatherOccupationOptions = fetchedLookupData.fathersOccupation || fetchedLookupData.occupation || []
+        const motherOccupationOptions = fetchedLookupData.mothersOccupation || fetchedLookupData.occupation || []
         const employedInOptions = fetchedLookupData.employed_in || []
+        const incomeOptions = fetchedLookupData.income || []
         const maritalStatuses = fetchedLookupData.maritalStatus || []
         const manglikOptions = fetchedLookupData.manglik || []
         const horoscopes = fetchedLookupData.horoscopes || fetchedLookupData.rashi || []
@@ -222,7 +229,7 @@ export const useMyProfileData = () => {
         const hobbies = fetchedLookupData.hobbies || []
         const interests = fetchedLookupData.interests || []
         const books = fetchedLookupData.books || []
-        const dress = fetchedLookupData.dress || []
+        const dress = fetchedLookupData.dressStyle || fetchedLookupData.dress || []
         const sports = fetchedLookupData.sports || []
         const cuisines = fetchedLookupData.cuisines || []
         const music = fetchedLookupData.music || []
@@ -277,9 +284,13 @@ export const useMyProfileData = () => {
             horoscopeLabel: mapCode(horoscopes, apiData.horoscope.horoscope),
             rashiLabel: mapCode(rashiOptions, apiData.horoscope.rashi),
             nakshatraLabel: mapCode(nakshatraOptions, apiData.horoscope.nakshatra),
-            fatherOccupationLabel: mapCode(occupations, apiData.family.fatherOccupation),
-            motherOccupationLabel: mapCode(occupations, apiData.family.motherOccupation),
+            fatherOccupationLabel: mapCode(fatherOccupationOptions, apiData.family.fatherOccupation),
+            motherOccupationLabel: mapCode(motherOccupationOptions, apiData.family.motherOccupation),
             familyBasedOutOfLabel,
+            familyStatusLabel: mapCode(fetchedLookupData.familyStatus || [], apiData.family.familyStatus),
+            familyTypeLabel: mapCode(fetchedLookupData.familyType || [], apiData.family.familyType),
+            familyValuesLabel: mapCode(fetchedLookupData.familyValues || [], apiData.family.familyValues),
+            familyIncomeLabel: mapCode(incomeOptions, String(apiData.family.familyIncome)),
             managedByLabel: mapCode(managedByOptions, apiData.about.managedBy),
             disabilityLabel: mapCode(disabilityOptions, apiData.about.disability),
             bodyTypeLabel: mapCode(bodyTypeOptions, apiData.about.bodyType),

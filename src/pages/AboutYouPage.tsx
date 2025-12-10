@@ -184,8 +184,8 @@ export const AboutYouPage = () => {
     event.preventDefault()
     
     // Validate that image is required
-    if (!formData.profilePic) {
-      showToast('Please upload profile picture before submitting.', 'error')
+    if (!formData.profilePic || !formData.profilePic.trim()) {
+      showToast('Profile picture is required. Please upload an image before submitting.', 'error')
       setUploadModalOpen(true)
       return
     }
@@ -249,7 +249,9 @@ export const AboutYouPage = () => {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50/70 p-6 text-center">
-            <p className="mb-3 text-sm font-medium text-slate-600">Profile picture</p>
+            <p className="mb-3 text-sm font-medium text-slate-600">
+              Profile picture <span className="text-red-500">*</span>
+            </p>
             {formData.profilePic ? (
               <>
                 <img src={formData.profilePic} alt="Profile" className="mx-auto h-48 w-full rounded-2xl object-cover" />

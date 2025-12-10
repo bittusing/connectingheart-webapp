@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { PencilIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useMyProfileData } from '../hooks/useMyProfileData'
 import { useUserProfile } from '../hooks/useUserProfile'
+import { useLookup } from '../hooks/useLookup'
+import { useCountryLookup } from '../hooks/useCountryLookup'
 import { getGenderPlaceholder } from '../utils/imagePlaceholders'
 import { Button } from '../components/common/Button'
 import { showToast } from '../utils/toast'
@@ -91,6 +93,8 @@ export const MyProfilePage = () => {
   const navigate = useNavigate()
   const { profile, loading, error, refetch } = useMyProfileData()
   const { profile: userProfile, refetch: refetchUserProfile } = useUserProfile()
+  const { fetchStates, fetchCities } = useLookup()
+  const { countries: countryOptions } = useCountryLookup()
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadPreview, setUploadPreview] = useState<string>('')
@@ -98,6 +102,13 @@ export const MyProfilePage = () => {
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [uploadingPhotoId, setUploadingPhotoId] = useState<string | null>(null)
   const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null)
+  
+  // Labels for horoscope place of birth
+  const [placeOfBirthLabels, setPlaceOfBirthLabels] = useState<{
+    countryLabel?: string
+    stateLabel?: string
+    cityLabel?: string
+  }>({})
 
   const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'https://backend.prod.connectingheart.co/api').replace(/\/$/, '')
 
@@ -108,6 +119,57 @@ export const MyProfilePage = () => {
       }
     }
   }, [uploadPreview])
+
+  // Fetch labels for horoscope place of birth
+  useEffect(() => {
+    const fetchPlaceOfBirthLabels = async () => {
+      if (!profile?.horoscope) return
+
+      const { countryOfBirth, stateOfBirth, cityOfBirth } = profile.horoscope
+      const labels: { countryLabel?: string; stateLabel?: string; cityLabel?: string } = {}
+
+      // Fetch country label
+      if (countryOfBirth && countryOptions.length > 0) {
+        const country = countryOptions.find((c) => c.value === countryOfBirth)
+        if (country) {
+          labels.countryLabel = country.label
+        }
+      }
+
+      // Fetch state label
+      if (countryOfBirth && stateOfBirth) {
+        try {
+          const stateOptions = await fetchStates(countryOfBirth)
+          const state = stateOptions.find((s) => s.value === stateOfBirth)
+          if (state) {
+            labels.stateLabel = state.label
+          }
+        } catch (error) {
+          console.error('Error fetching state label:', error)
+        }
+      }
+
+      // Fetch city label
+      if (stateOfBirth && cityOfBirth) {
+        try {
+          const cityOptions = await fetchCities(stateOfBirth)
+          const city = cityOptions.find((c) => c.value === cityOfBirth)
+          if (city) {
+            labels.cityLabel = city.label
+          }
+        } catch (error) {
+          console.error('Error fetching city label:', error)
+        }
+      }
+
+      setPlaceOfBirthLabels(labels)
+    }
+
+    if (profile && countryOptions.length > 0) {
+      fetchPlaceOfBirthLabels()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.horoscope?.countryOfBirth, profile?.horoscope?.stateOfBirth, profile?.horoscope?.cityOfBirth, countryOptions.length])
 
   if (loading) {
     return (
@@ -808,22 +870,22 @@ export const MyProfilePage = () => {
           />
           <DetailRow
             label="Family Status"
-            value={profile.family.familyStatus || 'Not Filled'}
+            value={enriched.familyStatusLabel || 'Not Filled'}
             isNotFilled={!profile.family.familyStatus}
           />
           <DetailRow
             label="Family Type"
-            value={profile.family.familyType || 'Not Filled'}
+            value={enriched.familyTypeLabel || 'Not Filled'}
             isNotFilled={!profile.family.familyType}
           />
           <DetailRow
             label="Family Values"
-            value={profile.family.familyValues || 'Not Filled'}
+            value={enriched.familyValuesLabel || 'Not Filled'}
             isNotFilled={!profile.family.familyValues}
           />
           <DetailRow
             label="Family Income"
-            value={profile.family.familyIncome ? incomeMap[profile.family.familyIncome] || String(profile.family.familyIncome) : 'Not Filled'}
+            value={enriched.familyIncomeLabel || 'Not Filled'}
             isNotFilled={!profile.family.familyIncome}
           />
           <DetailRow
@@ -930,8 +992,12 @@ export const MyProfilePage = () => {
           />
           <DetailRow
             label="Place Of Birth"
-            value={profile.horoscope.placeOfBirth || 'Not Filled'}
-            isNotFilled={!profile.horoscope.placeOfBirth}
+            value={
+              [placeOfBirthLabels.cityLabel, placeOfBirthLabels.stateLabel, placeOfBirthLabels.countryLabel]
+                .filter(Boolean)
+                .join(', ') || 'Not Filled'
+            }
+            isNotFilled={!profile.horoscope.cityOfBirth && !profile.horoscope.stateOfBirth && !profile.horoscope.countryOfBirth}
           />
           <DetailRow
             label="Time of Birth"

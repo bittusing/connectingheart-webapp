@@ -13,40 +13,6 @@ import type { LookupOption } from '../types/api'
 
 type PickerField = 'rashi' | 'nakshatra' | 'manglik' | 'horoscope' | 'countryOfBirth' | 'stateOfBirth' | 'cityOfBirth'
 
-// Helper component for standard select (used for Country, State, City)
-const SelectInput = ({
-  label,
-  value,
-  placeholder,
-  options,
-  onChange,
-  disabled,
-}: {
-  label: string
-  value: string
-  placeholder: string
-  options: LookupOption[]
-  onChange: (value: string) => void
-  disabled?: boolean
-}) => (
-  <label className="space-y-1">
-    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</span>
-    <select
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      disabled={disabled}
-      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:disabled:bg-slate-700 dark:disabled:text-slate-500"
-    >
-      <option value="">{placeholder}</option>
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  </label>
-)
-
 export const EditHoroscopePage = () => {
   const navigate = useNavigate()
   const api = useApiClient()
@@ -225,6 +191,12 @@ export const EditHoroscopePage = () => {
         return manglikOptions.map((opt) => opt.label)
       case 'horoscope':
         return horoscopeOptions.map((opt) => opt.label)
+      case 'countryOfBirth':
+        return countryOptions.map((opt) => opt.label)
+      case 'stateOfBirth':
+        return states.map((opt) => opt.label)
+      case 'cityOfBirth':
+        return cities.map((opt) => opt.label)
       default:
         return []
     }
@@ -261,6 +233,47 @@ export const EditHoroscopePage = () => {
       }
       case 'horoscope': {
         const selected = horoscopeOptions.find((h) => h.label === label)
+        selectedValue = selected?.value || ''
+        break
+      }
+      case 'countryOfBirth': {
+        const selected = countryOptions.find((c) => c.label === label)
+        selectedValue = selected?.value || ''
+        // Reset state and city when country changes
+        setFormData((prev) => ({
+          ...prev,
+          countryOfBirth: selectedValue,
+          stateOfBirth: '',
+          cityOfBirth: '',
+        }))
+        setDisplayLabels((prev) => ({
+          ...prev,
+          countryOfBirth: selectedLabel,
+          stateOfBirth: '',
+          cityOfBirth: '',
+        }))
+        setActivePicker(null)
+        return
+      }
+      case 'stateOfBirth': {
+        const selected = states.find((s) => s.label === label)
+        selectedValue = selected?.value || ''
+        // Reset city when state changes
+        setFormData((prev) => ({
+          ...prev,
+          stateOfBirth: selectedValue,
+          cityOfBirth: '',
+        }))
+        setDisplayLabels((prev) => ({
+          ...prev,
+          stateOfBirth: selectedLabel,
+          cityOfBirth: '',
+        }))
+        setActivePicker(null)
+        return
+      }
+      case 'cityOfBirth': {
+        const selected = cities.find((c) => c.label === label)
         selectedValue = selected?.value || ''
         break
       }
@@ -371,41 +384,26 @@ export const EditHoroscopePage = () => {
               onClick={() => setActivePicker('nakshatra')}
             />
 
-            <SelectInput
+            <SelectButton
               label="Country Of Birth"
-              value={formData.countryOfBirth}
+              value={displayLabels.countryOfBirth}
               placeholder="Select Country Of Birth"
-              options={countryOptions}
-              onChange={(value) => {
-                const selectedCountry = countryOptions.find((opt) => opt.value === value)
-                setFormData((prev) => ({ ...prev, countryOfBirth: value }))
-                setDisplayLabels((prev) => ({ ...prev, countryOfBirth: selectedCountry?.label || value }))
-              }}
+              onClick={() => setActivePicker('countryOfBirth')}
             />
 
-            <SelectInput
+            <SelectButton
               label="State Of Birth"
-              value={formData.stateOfBirth}
+              value={displayLabels.stateOfBirth}
               placeholder="Select State Of Birth"
-              options={states}
-              onChange={(value) => {
-                const selectedState = states.find((opt) => opt.value === value)
-                setFormData((prev) => ({ ...prev, stateOfBirth: value }))
-                setDisplayLabels((prev) => ({ ...prev, stateOfBirth: selectedState?.label || value }))
-              }}
+              onClick={() => setActivePicker('stateOfBirth')}
               disabled={!formData.countryOfBirth}
             />
 
-            <SelectInput
+            <SelectButton
               label="City Of Birth"
-              value={formData.cityOfBirth}
+              value={displayLabels.cityOfBirth}
               placeholder="Select City Of Birth"
-              options={cities}
-              onChange={(value) => {
-                const selectedCity = cities.find((opt) => opt.value === value)
-                setFormData((prev) => ({ ...prev, cityOfBirth: value }))
-                setDisplayLabels((prev) => ({ ...prev, cityOfBirth: selectedCity?.label || value }))
-              }}
+              onClick={() => setActivePicker('cityOfBirth')}
               disabled={!formData.stateOfBirth}
             />
 
@@ -441,7 +439,17 @@ export const EditHoroscopePage = () => {
       </form>
 
       <SelectModal
-        title={activePicker ? `Select ${activePicker.charAt(0).toUpperCase() + activePicker.slice(1)}` : ''}
+        title={
+          activePicker
+            ? activePicker === 'countryOfBirth'
+              ? 'Select Country Of Birth'
+              : activePicker === 'stateOfBirth'
+                ? 'Select State Of Birth'
+                : activePicker === 'cityOfBirth'
+                  ? 'Select City Of Birth'
+                  : `Select ${activePicker.charAt(0).toUpperCase() + activePicker.slice(1)}`
+            : ''
+        }
         options={getPickerOptions()}
         isOpen={activePicker !== null}
         selected={getSelectedLabel()}

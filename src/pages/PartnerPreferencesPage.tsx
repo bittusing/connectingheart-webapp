@@ -250,11 +250,11 @@ export const PartnerPreferencesPage = () => {
     setSubmitting(true)
     try {
       const payload = buildPayload(formState)
-      if (Object.keys(payload).length === 0) {
-        showToast('Please select at least one preference before continuing.', 'error')
-        setSubmitting(false)
-        return
-      }
+      // if (Object.keys(payload).length === 0) {
+      //   showToast('Please select at least one preference before continuing.', 'error')
+      //   setSubmitting(false)
+      //   return
+      // }
 
       const response = await patch<PartnerPreferencePayload, PartnerPreferenceApiResponse>(
         'preference',

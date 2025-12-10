@@ -17,7 +17,7 @@ export const AuthCard = ({
     <div className="glass-panel w-full max-w-xl space-y-8">
       <div className="space-y-2 text-center">
         <p className="pill mx-auto w-fit text-sm text-brand-600">
-          Secure & private
+          Connecting Heart
         </p>
         <h1 className="font-display text-3xl font-semibold text-slate-900 dark:text-white">
           {title}
