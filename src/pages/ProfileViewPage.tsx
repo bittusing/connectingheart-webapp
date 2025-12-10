@@ -102,20 +102,29 @@ export const ProfileViewPage = () => {
     pendingAction,
   } = useProfileActions()
   
-  // Check if user came from acceptance page or interestsent page
+  // Check if user came from acceptance page, interestsent page, or theydeclined page
   const [isFromAcceptance, setIsFromAcceptance] = useState(false)
   const [isFromInterestSent, setIsFromInterestSent] = useState(false)
+  const [isFromTheyDeclined, setIsFromTheyDeclined] = useState(false)
   
   useEffect(() => {
     // Check location state first (most reliable)
     if (location.state?.from === 'acceptance') {
       setIsFromAcceptance(true)
       setIsFromInterestSent(false)
+      setIsFromTheyDeclined(false)
       return
     }
     if (location.state?.from === 'interestsent') {
       setIsFromInterestSent(true)
       setIsFromAcceptance(false)
+      setIsFromTheyDeclined(false)
+      return
+    }
+    if (location.state?.from === 'theydeclined') {
+      setIsFromTheyDeclined(true)
+      setIsFromAcceptance(false)
+      setIsFromInterestSent(false)
       return
     }
     // Fallback: check referrer
@@ -124,6 +133,7 @@ export const ProfileViewPage = () => {
         const referrerUrl = new URL(document.referrer)
         setIsFromAcceptance(referrerUrl.pathname.includes('/acceptance'))
         setIsFromInterestSent(referrerUrl.pathname.includes('/interestsent'))
+        setIsFromTheyDeclined(referrerUrl.pathname.includes('/theydeclined'))
       } catch {
         // Invalid URL, ignore
       }
@@ -1437,10 +1447,11 @@ export const ProfileViewPage = () => {
         {renderMatchDetails()}
       </div>
 
-      {/* Fixed Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-700 bg-slate-900 shadow-lg dark:border-slate-700 lg:left-[280px]">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-1.5 px-2 py-2.5 sm:gap-2 sm:px-4 sm:py-3">
-          {isFromAcceptance ? (
+      {/* Fixed Action Bar - Hide if coming from theydeclined route */}
+      {!isFromTheyDeclined && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-700 bg-slate-900 shadow-lg dark:border-slate-700 lg:left-[280px]">
+          <div className="mx-auto flex max-w-7xl items-center justify-center gap-1.5 px-2 py-2.5 sm:gap-2 sm:px-4 sm:py-3">
+            {isFromAcceptance ? (
             // Custom buttons for acceptance page
             <>
               <button
@@ -1529,6 +1540,7 @@ export const ProfileViewPage = () => {
           )}
         </div>
       </div>
+      )}
 
       <ConfirmModal
         open={isUnlockModalOpen}

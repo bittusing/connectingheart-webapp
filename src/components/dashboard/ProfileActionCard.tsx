@@ -67,14 +67,17 @@ export const ProfileActionCard = ({
 
   const handleCardClick = () => {
     // Navigate to profile view page using profile id
-    // Check if we're on acceptance page or interestsent page by checking current pathname
+    // Check if we're on acceptance page, interestsent page, or theydeclined page by checking current pathname
     const isFromAcceptance = window.location.pathname.includes('/acceptance')
     const isFromInterestSent = window.location.pathname.includes('/interestsent')
+    const isFromTheyDeclined = window.location.pathname.includes('/theydeclined')
     navigate(`/dashboard/profile/${profile.id}`, { 
       state: isFromAcceptance 
         ? { from: 'acceptance' } 
         : isFromInterestSent 
         ? { from: 'interestsent' } 
+        : isFromTheyDeclined
+        ? { from: 'theydeclined' }
         : undefined 
     })
   }
