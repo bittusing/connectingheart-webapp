@@ -106,11 +106,8 @@ export const transformProfileDetailV1 = (data: ProfileDetailData): ProfileViewDa
     data.miscellaneous.country
   )
 
-  // Format income - already a string in new API
-  const income = data.career.income || 'Not specified'
-  
   // Format family income - convert number to string if needed
-  const familyIncome = data.family.familyIncome
+  const familyIncome = data.family?.familyIncome
     ? typeof data.family.familyIncome === 'number'
       ? `Rs. ${data.family.familyIncome} Lakh`
       : data.family.familyIncome
@@ -133,6 +130,8 @@ export const transformProfileDetailV1 = (data: ProfileDetailData): ProfileViewDa
     dateOfBirth: data.critical.dob || '',
     maritalStatus: data.critical.maritalStatus || '',
     caste: data.basic.cast || '',
+    motherTongue: data.basic.motherTongue || data.miscellaneous.motherTongue || '',
+    religion: data.basic.religion || data.miscellaneous.religion || '',
     aboutMe: data.about.description || '',
     profileManagedBy: data.about.managedBy || '',
     bodyType: data.about.bodyType || '',
@@ -141,19 +140,19 @@ export const transformProfileDetailV1 = (data: ProfileDetailData): ProfileViewDa
     disability: data.about.disability || '',
 
     // Education & career
-    school: data.education.school || '',
-    qualification: data.education.qualification || '',
-    otherUGDegree: data.education.otherUGDegree || '',
-    aboutEducation: data.education.aboutEducation || '',
-    aboutCareer: data.career.aboutMyCareer || '',
-    employedIn: data.career.employed_in || '',
-    occupation: data.career.occupation || '',
-    organisationName: data.career.organisationName || '',
-    interestedInSettlingAbroad: formatYesNo(data.career.interestedInSettlingAbroad),
-    income,
+    school: data.education?.school || '',
+    qualification: data.education?.qualification || '',
+    otherUGDegree: data.education?.otherUGDegree || '',
+    aboutEducation: data.education?.aboutEducation || '',
+    aboutCareer: data.career?.aboutMyCareer || '',
+    employedIn: data.career?.employed_in || '',
+    occupation: data.career?.occupation || '',
+    organisationName: data.career?.organisationName || '',
+    interestedInSettlingAbroad: formatYesNo(data.career?.interestedInSettlingAbroad),
+    income: data.career?.income || 'Not specified',
 
     // Family details
-    familyDetails: {
+    familyDetails: data.family ? {
       familyStatus: data.family.familyStatus || '',
       familyType: data.family.familyType || '',
       familyValues: data.family.familyValues || '',
@@ -168,19 +167,22 @@ export const transformProfileDetailV1 = (data: ProfileDetailData): ProfileViewDa
       familyBasedOutOf: data.family.familyBasedOutOf || '',
       gothra: data.family.gothra || '',
       livingWithParents: formatYesNo(data.family.livingWithParents),
-    },
+    } : undefined,
 
     // Kundali details
-    kundaliDetails: {
+    kundaliDetails: data.kundali ? {
       rashi: data.kundali.rashi || '',
       nakshatra: data.kundali.nakshatra || '',
-      timeOfBirth: dateofBirthWithTime(data?.kundali?.tob),
+      timeOfBirth: dateofBirthWithTime(data.kundali.tob),
       manglik: data.kundali.manglik || '',
       horoscope: data.kundali.horoscope || '',
-    },
+      city: data.kundali.city || '',
+      state: data.kundali.state || '',
+      country: data.kundali.country || '',
+    } : undefined,
 
     // Lifestyle data
-    lifestyleData: {
+    lifestyleData: data.lifeStyleData ? {
       dietaryHabits: data.lifeStyleData.dietaryHabits || '',
       drinkingHabits: data.lifeStyleData.drinkingHabits || '',
       smokingHabits: data.lifeStyleData.smokingHabits || '',
@@ -200,7 +202,7 @@ export const transformProfileDetailV1 = (data: ProfileDetailData): ProfileViewDa
       ownACar: formatYesNo(data.lifeStyleData.ownACar),
       favMusic: toArray(data.lifeStyleData.favMusic),
       foodICook: formatYesNo(data.lifeStyleData.foodICook),
-    },
+    } : undefined,
 
     // Match details
     matchDetails: {

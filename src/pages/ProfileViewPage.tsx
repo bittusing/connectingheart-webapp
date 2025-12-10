@@ -17,6 +17,7 @@ import { useProfileDetail } from '../hooks/useProfileDetail'
 import { useProfileActions } from '../hooks/useProfileActions'
 import { useUnlockProfile } from '../hooks/useUnlockProfile'
 import { useUserProfile } from '../hooks/useUserProfile'
+import { useLookup } from '../hooks/useLookup'
 import { Toast } from '../components/common/Toast'
 import { ConfirmModal } from '../components/forms/ConfirmModal'
 import { getGenderPlaceholder } from '../utils/imagePlaceholders'
@@ -89,6 +90,7 @@ export const ProfileViewPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { profile, loading, error, refetch } = useProfileDetail(id)
   const { profile: currentUserProfile } = useUserProfile()
+  const { lookupData, fetchLookup } = useLookup()
   const {
     sendInterest,
     unsendInterest,
@@ -397,6 +399,14 @@ export const ProfileViewPage = () => {
     }
   }
 
+  // Fetch lookup data when profile loads - MUST be before early returns
+  useEffect(() => {
+    if (profile) {
+      fetchLookup()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -421,18 +431,42 @@ export const ProfileViewPage = () => {
     )
   }
 
-  const profilePlaceholder = getGenderPlaceholder(profile.gender)
+  const profilePlaceholder = getGenderPlaceholder(profile?.gender)
   const viewerPlaceholder = getGenderPlaceholder(currentUserProfile?.gender)
 
-  // Determine pronouns based on profile's gender
-  // If profile is male (M), use "He/His", if female (F), use "She/Her"
-  const isProfileMale = profile.gender === 'M'
-  const pronouns = {
-    subject: isProfileMale ? 'He' : 'She',
-    object: isProfileMale ? 'Him' : 'Her',
-    possessive: isProfileMale ? 'His' : 'Her',
-    reflexive: isProfileMale ? 'Him' : 'Her',
+  // Helper function to get lookup label
+  const getLookupLabel = (field: string, value: string | undefined): string => {
+    if (!value || !lookupData) return value || ''
+    
+    const fieldMap: Record<string, any[]> = {
+      motherTongue: lookupData.motherTongue || [],
+      religion: lookupData.religion || [],
+      familyStatus: lookupData.familyStatus || [],
+      familyValues: lookupData.familyValues || [],
+      familyType: lookupData.familyType || [],
+      familyIncome: lookupData.income || [],
+    }
+    
+    const options = fieldMap[field] || []
+    const option = options.find((opt: any) => opt.value === value || opt.label === value)
+    return option?.label || value
   }
+
+  // Use gender-neutral language instead of pronouns
+  const pronouns = {
+    subject: 'They',
+    object: 'Them',
+    possessive: 'Their',
+    reflexive: 'Themselves',
+  }
+
+  // Get enriched labels for display (only if profile exists)
+  const motherTongueLabel = profile ? getLookupLabel('motherTongue', profile.motherTongue) : ''
+  const religionLabel = profile ? getLookupLabel('religion', profile.religion) : ''
+  const familyStatusLabel = profile ? getLookupLabel('familyStatus', profile.familyDetails?.familyStatus) : ''
+  const familyValuesLabel = profile ? getLookupLabel('familyValues', profile.familyDetails?.familyValues) : ''
+  const familyTypeLabel = profile ? getLookupLabel('familyType', profile.familyDetails?.familyType) : ''
+  const familyIncomeLabel = profile ? getLookupLabel('familyIncome', profile.familyDetails?.familyIncome) : ''
 
   const renderBasicDetails = () => (
     <div ref={basicSectionRef} className="space-y-6">
@@ -497,6 +531,32 @@ export const ProfileViewPage = () => {
             <div>
               <p className="text-sm font-medium text-slate-900 dark:text-white">Marital Status</p>
               <p className="text-sm text-slate-600 dark:text-slate-400">{profile.maritalStatus}</p>
+            </div>
+          </div>
+        )}
+        {motherTongueLabel && (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">Mother Tongue</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{motherTongueLabel}</p>
+            </div>
+          </div>
+        )}
+        {religionLabel && (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white">Religion</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{religionLabel}</p>
             </div>
           </div>
         )}
@@ -746,11 +806,16 @@ export const ProfileViewPage = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
-                {family.familyType} from {family.familyBasedOutOf}
+                {familyTypeLabel || family.familyType} from {family.familyBasedOutOf}
               </p>
-              {family.familyValues && (
+              {familyValuesLabel && (
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                  {family.familyValues}
+                  {familyValuesLabel}
+                </p>
+              )}
+              {familyStatusLabel && (
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  {familyStatusLabel}
                 </p>
               )}
               {family.gothra && (
@@ -778,7 +843,7 @@ export const ProfileViewPage = () => {
               {siblingsInfo.length > 0 && (
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                   {siblingsInfo.join(' & ')}
-                  {family.familyIncome && ` • Earns ${family.familyIncome}`}
+                  {familyIncomeLabel && ` • Family Income: ${familyIncomeLabel}`}
                 </p>
               )}
             </div>
@@ -819,7 +884,7 @@ export const ProfileViewPage = () => {
     return (
       <div ref={kundaliSectionRef} className="space-y-8">
         {/* Kundali & Astro Section */}
-        {(kundali?.rashi || kundali?.nakshatra || kundali?.timeOfBirth || kundali?.manglik || kundali?.horoscope) && (
+        {(kundali?.rashi || kundali?.nakshatra || kundali?.timeOfBirth || kundali?.manglik || kundali?.horoscope || kundali?.city || kundali?.state || kundali?.country) && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Kundali & Astro</h3>
             {kundali?.timeOfBirth ? (
@@ -832,6 +897,12 @@ export const ProfileViewPage = () => {
                 <p className="text-sm text-slate-600 dark:text-slate-400">{kundali?.timeOfBirth || ''}</p>
               </div>
             ) : null}
+            {(kundali?.city || kundali?.state || kundali?.country) && (
+              <InfoRow 
+                label="Place Of Birth" 
+                value={[kundali.city, kundali.state, kundali.country].filter(Boolean).join(', ')} 
+              />
+            )}
             {kundali?.rashi && <InfoRow label="Rashi" value={kundali.rashi} />}
             {kundali?.nakshatra && <InfoRow label="Nakshatra" value={kundali.nakshatra} />}
             {kundali?.manglik && <InfoRow label="Manglik" value={kundali.manglik} />}
@@ -1207,6 +1278,17 @@ export const ProfileViewPage = () => {
     )
   }
 
+
+  // Safety checks before accessing profile properties
+  if (!profile) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <p className="text-sm text-slate-600 dark:text-slate-400">Profile not available</p>
+        </div>
+      </div>
+    )
+  }
 
   const currentImage = profile.allProfilePics?.[currentImageIndex] || { url: profile.avatar, id: 'primary' }
   const hasMultipleImages = (profile.allProfilePics?.length || 0) > 1

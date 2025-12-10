@@ -33,9 +33,14 @@ export const useProfileDetail = (profileId: string | undefined): UseProfileDetai
 
       if (response.code === 'CH200' && response.status === 'success' && response.data) {
         const apiData = response.data
-        // Transform directly without lookup calls - all data is already formatted
-        const transformedProfile = transformProfileDetailV1(apiData)
-        setProfile(transformedProfile)
+        try {
+          // Transform directly without lookup calls - all data is already formatted
+          const transformedProfile = transformProfileDetailV1(apiData)
+          setProfile(transformedProfile)
+        } catch (transformError) {
+          console.error('Error transforming profile data:', transformError)
+          throw new Error('Failed to process profile data')
+        }
       } else {
         throw new Error('Failed to fetch profile details')
       }

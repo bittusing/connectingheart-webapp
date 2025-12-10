@@ -14,6 +14,8 @@ export type ProfileViewData = {
   dateOfBirth?: string
   maritalStatus?: string
   caste?: string
+  motherTongue?: string
+  religion?: string
   aboutMe?: string
   profileManagedBy?: string
   bodyType?: string
@@ -60,6 +62,9 @@ export type ProfileViewData = {
     rashi?: string
     nakshatra?: string
     timeOfBirth?: string
+    city?: string
+    state?: string
+    country?: string
   }
 
   // Match Details

@@ -12,6 +12,8 @@ export type ProfileDetailData = {
     city: string
     heartsId: number
     gender?: string
+    motherTongue?: string
+    religion?: string
     profilePic: Array<{
       s3Link: string
       id: string
@@ -30,6 +32,8 @@ export type ProfileDetailData = {
     state?: string
     city?: string
     country?: string
+    motherTongue?: string
+    religion?: string
   }
   critical: {
     dob?: string
