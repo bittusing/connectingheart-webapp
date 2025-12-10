@@ -59,7 +59,7 @@ export const DashboardBannerSlider = ({ slides, autoPlayInterval = 6000 }: Dashb
           <img
             src={slide.image}
             alt={slide.title ?? 'Heartfulness celebration'}
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full object-cover object-center md:object-top"
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/70 via-slate-900/40 to-transparent" />

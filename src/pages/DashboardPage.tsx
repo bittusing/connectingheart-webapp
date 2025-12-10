@@ -50,6 +50,11 @@ export const DashboardPage = () => {
   const celebrationSlides = useMemo(
     () => [
       {
+        image: '/banner11.jpg',
+        title: 'Heartfulness Celebrations',
+        description: 'Blessed unions guided by love, grace, and shared purpose.',
+      },
+      {
         image: '/banner1.jpg',
         title: 'Heartfulness Weddings',
         description: 'Blessed unions guided by love, grace, and shared purpose.',
