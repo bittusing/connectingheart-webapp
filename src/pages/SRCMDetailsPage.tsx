@@ -345,6 +345,7 @@ export const SRCMDetailsPage = () => {
             onChange={(event) => setFormData((prev) => ({ ...prev, preceptorName: event.target.value }))}
           />
           <TextInput
+            type="number"
             label="Preceptor's Mobile Number"
             placeholder="Enter preceptor's mobile number"
             required
