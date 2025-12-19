@@ -5,20 +5,21 @@ type OtpModalProps = {
   open: boolean
   onClose: () => void
   onVerify: (otp: string) => void
+  initialOtp?: string
 }
 
-export const OtpModal = ({ open, onClose, onVerify }: OtpModalProps) => {
+export const OtpModal = ({ open, onClose, onVerify, initialOtp }: OtpModalProps) => {
   const [otp, setOtp] = useState('')
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (open) {
-      setOtp('')
+      setOtp(initialOtp || '')
       setError(null)
       setTimeout(() => inputRef.current?.focus(), 100)
     }
-  }, [open])
+  }, [open, initialOtp])
 
   if (!open) return null
 

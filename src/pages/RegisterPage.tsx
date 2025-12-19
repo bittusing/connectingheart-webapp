@@ -95,7 +95,7 @@ export const RegisterPage = () => {
   const [basic, setBasic] = useState({
     fullName: '',
     email: '',
-    countryCode: '+91',
+    countryCode: '',
     phone: '',
     password: '',
     confirmPassword: '',
@@ -109,6 +109,7 @@ export const RegisterPage = () => {
   const [countryCodeModalOpen, setCountryCodeModalOpen] = useState(false)
   const [showAlert, setShowAlert] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
+  const [autoOtp, setAutoOtp] = useState('')
 
   const handleBasicSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -141,8 +142,13 @@ export const RegisterPage = () => {
       setOtpLoading(true)
       const response = await generateOtp(phoneNumber, extension)
       if (response.status === 'success') {
+        // Auto-fill OTP if country code is not +91 and OTP is returned in response
+        if (extension !== '+91' && response.otp) {
+          setAutoOtp(String(response.otp))
+        } else {
+          setAutoOtp('')
+        }
         // Show alert instead of directly opening OTP modal
-        // const fullPhoneNumber = `${extension}${phoneNumber}`
         setAlertMessage(`For any assistance, please WhatsApp/Call: +91 9450312512`)
         setShowAlert(true)
         showToast('OTP sent to your mobile number', 'success')
@@ -307,9 +313,11 @@ export const RegisterPage = () => {
                 <button
                   type="button"
                   onClick={() => setCountryCodeModalOpen(true)}
-                  className="flex min-w-[100px] items-center justify-between rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
+                  className="flex min-w-[100px] items-center justify-between rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-pink-500"
                 >
-                  <span>{basic.countryCode || '+91'}</span>
+                  <span className={basic.countryCode ? 'text-slate-900' : 'text-slate-400'}>
+                    {basic.countryCode || 'Select Country Code'}
+                  </span>
                   <span className="text-slate-300">⌄</span>
                 </button>
                 <input
@@ -392,8 +400,10 @@ export const RegisterPage = () => {
         onClose={() => {
           setOtpModalOpen(false)
           setOtpLoading(false)
+          setAutoOtp('')
         }}
         onVerify={handleOtpVerify}
+        initialOtp={autoOtp}
       />
       {countryCodeModalOpen && (
         <SelectModal

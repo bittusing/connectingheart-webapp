@@ -7,6 +7,8 @@ type ApiResponse<T = Record<string, unknown>> = {
   message?: string
   data?: T
   token?: string
+  otp?: number
+  isOTPPopup?: boolean
 }
 
 type GenerateOtpPayload = {
