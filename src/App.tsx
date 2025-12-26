@@ -65,6 +65,7 @@ function App() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="policy" element={<PolicyPage />} />
+        <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="under-verification" element={<VerificationPendingPage />} />
       </Route>
       <Route element={<ProtectedRoute />}>
