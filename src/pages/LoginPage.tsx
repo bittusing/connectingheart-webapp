@@ -150,7 +150,7 @@ export const LoginPage = () => {
         />
         <AuthCard
           title="Log in to your dashboard"
-          subtitle="Continue where you left off. APIs will plug into this form once backend routes go live."
+          subtitle="Sign in to access your Connecting Hearts dashboard."
           footer={
             <>
               New here?{' '}
@@ -165,7 +165,7 @@ export const LoginPage = () => {
               label="Mobile number"
               type="number"
               required
-              placeholder="+91 90000 00000"
+              placeholder="90000 00000"
               value={phoneNumber}
               onChange={(event) => setMobile(event.target.value)}
             />
