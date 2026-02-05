@@ -22,14 +22,19 @@ export const useSocket = () => {
       auth: {
         token: `Bearer ${token}`
       },
-      transports: ['websocket'], // Force websocket only (faster than polling)
-      upgrade: false, // Don't upgrade from polling to websocket
+      // Try websocket first, fallback to polling if websocket fails
+      transports: ['websocket', 'polling'],
+      upgrade: true, // Allow upgrade from polling to websocket
       reconnection: true,
-      reconnectionDelay: 500, // Faster reconnection
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
       reconnectionAttempts: 10,
-      timeout: 10000,
-      forceNew: true, // Always create new connection
-      autoConnect: true
+      timeout: 20000, // Longer timeout for production
+      forceNew: true,
+      autoConnect: true,
+      // Production-specific settings
+      secure: SOCKET_URL.startsWith('https'), // Use secure connection for HTTPS
+      rejectUnauthorized: false // Allow self-signed certificates (remove in production if using valid SSL)
     })
 
     newSocket.on('connect', () => {
@@ -53,6 +58,11 @@ export const useSocket = () => {
     newSocket.on('connect_error', (error) => {
       console.error('❌ Socket connection error:', error.message)
       console.error('Full error:', error)
+      console.error('🔍 Debug Info:')
+      console.error('  - Socket URL:', SOCKET_URL)
+      console.error('  - Token exists:', !!token)
+      console.error('  - Error type:', error.type)
+      console.error('  - Error description:', error.description)
       setIsConnected(false)
     })
 
