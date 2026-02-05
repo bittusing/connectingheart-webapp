@@ -165,8 +165,13 @@ export const AcceptancePage = () => {
     }
   }
 
-  const handleChat = () => {
-    showToast('Chat Coming Soon', 'success')
+  const handleChat = (profileId: string) => {
+    const profile = profiles.find(p => p.id === profileId)
+    if (profile) {
+      navigate(`/dashboard/chat/${profileId}?name=${encodeURIComponent(profile.name)}`)
+    } else {
+      showToast('Profile not found', 'error')
+    }
   }
 
   return (

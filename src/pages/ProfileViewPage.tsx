@@ -20,6 +20,7 @@ import { useUserProfile } from '../hooks/useUserProfile'
 import { useLookup } from '../hooks/useLookup'
 import { Toast } from '../components/common/Toast'
 import { ConfirmModal } from '../components/forms/ConfirmModal'
+import { ChatButton } from '../components/chat/ChatButton'
 import { getGenderPlaceholder } from '../utils/imagePlaceholders'
 
 
@@ -308,10 +309,6 @@ export const ProfileViewPage = () => {
         err instanceof Error ? err.message.replace('API ', '') || 'Unable to update ignore state.' : 'Unable to update.'
       showToast(message, 'error')
     }
-  }
-
-  const handleChat = async () => {
-    showToast('Chat Coming Soon', 'success')
   }
 
   const handleDeclined = async () => {
@@ -1475,14 +1472,14 @@ export const ProfileViewPage = () => {
                 <PhoneIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="leading-tight">Contact</span>
               </button>
-              <button
-                onClick={handleChat}
+              <ChatButton
+                userId={profileClientId}
+                userName={profile.name || 'User'}
                 className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 sm:px-3 sm:py-2.5 sm:text-xs"
-                aria-label="Chat"
               >
                 <ChatBubbleLeftRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="leading-tight">Chat</span>
-              </button>
+              </ChatButton>
             </>
           ) : (
             // Default buttons for other pages
@@ -1528,14 +1525,14 @@ export const ProfileViewPage = () => {
                 <NoSymbolIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="leading-tight">{isIgnorePending ? 'Please wait...' : isIgnored ? 'Undo Ignore' : 'Ignore'}</span>
               </button>
-              <button
-                onClick={handleChat}
+              <ChatButton
+                userId={profileClientId}
+                userName={profile.name || 'User'}
                 className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl bg-slate-800 px-2 py-2 text-[10px] font-semibold text-white transition-all hover:bg-slate-700 active:scale-95 sm:px-3 sm:py-2.5 sm:text-xs"
-                aria-label="Chat"
               >
                 <ChatBubbleLeftRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="leading-tight">Chat</span>
-              </button>
+              </ChatButton>
             </>
           )}
         </div>

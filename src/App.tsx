@@ -51,6 +51,8 @@ import { EditFamilyPage } from './pages/EditFamilyPage'
 import { EditContactPage } from './pages/EditContactPage'
 import { EditHoroscopePage } from './pages/EditHoroscopePage'
 import { EditLifestylePage } from './pages/EditLifestylePage'
+import { ChatListPage } from './pages/ChatListPage'
+import { ChatPage } from './pages/ChatPage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { RootRedirect } from './routes/RootRedirect'
 
@@ -103,6 +105,8 @@ function App() {
         <Route path="dashboard/edithoroscope" element={<EditHoroscopePage />} />
         <Route path="dashboard/editlifestyle" element={<EditLifestylePage />} />
           <Route path="dashboard/profile/:id" element={<ProfileViewPage />} />
+          <Route path="dashboard/chats" element={<ChatListPage />} />
+          <Route path="dashboard/chat/:userId" element={<ChatPage />} />
           <Route path="dashboard/membership" element={<MembershipPage />} />
           <Route path="dashboard/security" element={<ChangePasswordPage />} />
           <Route path="dashboard/delete" element={<DeleteProfilePage />} />

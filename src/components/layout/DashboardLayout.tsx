@@ -8,6 +8,7 @@ import {
   SparklesIcon,
   UserGroupIcon,
   CreditCardIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { DashboardSidebar } from '../dashboard/DashboardSidebar'
@@ -67,7 +68,7 @@ export const DashboardLayout = () => {
 
   const mobileNavItems = [
     { label: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    { label: 'Search', href: '/dashboard/search', icon: MagnifyingGlassIcon },
+    { label: 'Messages', href: '/dashboard/chats', icon: ChatBubbleLeftRightIcon },
     { label: 'Daily Picks', href: '/dashboard/recommendations', icon: SparklesIcon },
     { label: 'Profiles', href: '/dashboard/profiles', icon: UserGroupIcon },
     { label: 'Membership', href: '/dashboard/membership', icon: CreditCardIcon },
