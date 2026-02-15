@@ -279,7 +279,7 @@ export const FamilyDetailsPage = () => {
 
       if (response.status === 'success' || response.code === 'CH200') {
         showToast('Family details updated successfully', 'success')
-        await updateLastActiveScreen('partnerpreferences')
+        await updateLastActiveScreen('aboutyou')
         const userResponse = await api.get<GetUserResponse>('auth/getUser')
         if (userResponse.status === 'success' && userResponse.data?.screenName) {
           const screenName = userResponse.data.screenName.toLowerCase()
@@ -289,14 +289,14 @@ export const FamilyDetailsPage = () => {
             socialdetails: '/dashboard/socialdetails',
             srcmdetails: '/dashboard/srcmdetails',
             familydetails: '/dashboard/familydetails',
-            partnerpreferences: '/dashboard/partnerpreferences',
+            // partnerpreferences: '/dashboard/partnerpreferences',
             aboutyou: '/dashboard/aboutyou',
             dashboard: '/dashboard',
           }
-          const route = routeMap[screenName] || '/dashboard/partnerpreferences'
+          const route = routeMap[screenName] || '/dashboard/aboutyou'
           navigate(route, { replace: true })
         } else {
-          navigate('/dashboard/partnerpreferences', { replace: true })
+          navigate('/dashboard/aboutyou', { replace: true })
         }
       } else {
         showToast(response.message || 'Failed to update family details', 'error')

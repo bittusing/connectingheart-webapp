@@ -182,37 +182,34 @@ export const SRCMDetailsPage = () => {
     setSubmitting(true)
 
     try {
-      // Payload format: {"srcmIdNumber":"565465","preceptorsName":"dinesh","preceptorsContactNumber":9315857918,"preceptorsEmail":"abc@gmail.com","srcmIdFilename":"1764149608296-blob"}
+      // Only submit SRCM ID Number and Photo (required fields)
       const payload: {
-        srcmIdNumber?: string
-        preceptorsName?: string
-        preceptorsContactNumber?: string | number
-        preceptorsEmail?: string
-        satsangCenter?: string
-        srcmIdFilename?: string
-      } = {}
+        srcmIdNumber: string
+        srcmIdFilename: string
+        // Optional fields (commented out for now)
+        // preceptorsName?: string
+        // preceptorsContactNumber?: string | number
+        // preceptorsEmail?: string
+        // satsangCenter?: string
+      } = {
+        srcmIdNumber: formData.srcmIdNumber,
+        srcmIdFilename: formData.idProofName, // fileName from upload
+      }
 
-      if (formData.srcmIdNumber) {
-        payload.srcmIdNumber = formData.srcmIdNumber
-      }
-      if (formData.preceptorName) {
-        payload.preceptorsName = formData.preceptorName
-      }
-      if (formData.preceptorMobile) {
-        // Convert to number if it's a valid number string
-        const mobileNum = formData.preceptorMobile.replace(/\D/g, '')
-        payload.preceptorsContactNumber = mobileNum ? Number(mobileNum) : formData.preceptorMobile
-      }
-      if (formData.preceptorEmail) {
-        payload.preceptorsEmail = formData.preceptorEmail
-      }
-      if (formData.satsangCenter) {
-        payload.satsangCenter = formData.satsangCenter
-      }
-      // Extract fileName from idProofName (stored during upload)
-      if (formData.idProofName) {
-        payload.srcmIdFilename = formData.idProofName
-      }
+      // Optional fields - uncomment when needed
+      // if (formData.preceptorName) {
+      //   payload.preceptorsName = formData.preceptorName
+      // }
+      // if (formData.preceptorMobile) {
+      //   const mobileNum = formData.preceptorMobile.replace(/\D/g, '')
+      //   payload.preceptorsContactNumber = mobileNum ? Number(mobileNum) : formData.preceptorMobile
+      // }
+      // if (formData.preceptorEmail) {
+      //   payload.preceptorsEmail = formData.preceptorEmail
+      // }
+      // if (formData.satsangCenter) {
+      //   payload.satsangCenter = formData.satsangCenter
+      // }
 
       const response = await api.patch<typeof payload, UpdateResponse>('srcmDetails/updateSrcmDetails', payload)
 
@@ -251,10 +248,15 @@ export const SRCMDetailsPage = () => {
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault()
     
-    // Validate that image is required
+    // Validate required fields: Photo and SRCM ID Number
     if (!formData.idProofData) {
-      showToast('Please upload SRCM ID Proof image before submitting.', 'error')
+      showToast('Please upload SRCM ID Proof image', 'error')
       setUploadModalOpen(true)
+      return
+    }
+    
+    if (!formData.srcmIdNumber.trim()) {
+      showToast('Please enter SRCM / Heartfulness ID Number', 'error')
       return
     }
     
@@ -285,7 +287,9 @@ export const SRCMDetailsPage = () => {
 
         <form className="mt-8 space-y-5" onSubmit={handleFormSubmit}>
           <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50/70 p-6 text-center">
-            <p className="mb-3 text-sm font-medium text-slate-600">SRCM ID Proof</p>
+            <p className="mb-3 text-sm font-medium text-slate-600">
+              SRCM ID Proof <span className="text-pink-500">*</span>
+            </p>
             {formData.idProofData ? (
               <>
                 <img
@@ -330,7 +334,9 @@ export const SRCMDetailsPage = () => {
             value={formData.srcmIdNumber}
             onChange={(event) => setFormData((prev) => ({ ...prev, srcmIdNumber: event.target.value }))}
           />
-          <TextInput
+          
+          {/* Hidden fields - not required for now */}
+          {/* <TextInput
             label="Satsang center name / city"
             placeholder="Enter Satsang center name or city"
             required
@@ -358,7 +364,7 @@ export const SRCMDetailsPage = () => {
             placeholder="Enter preceptor's email"
             value={formData.preceptorEmail}
             onChange={(event) => setFormData((prev) => ({ ...prev, preceptorEmail: event.target.value }))}
-          />
+          /> */}
 
           <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
             <button

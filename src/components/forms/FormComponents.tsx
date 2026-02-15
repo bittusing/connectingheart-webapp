@@ -6,24 +6,29 @@ export const ToggleGroup = ({
   options,
   value,
   onChange,
+  required,
 }: {
   label: string
   value: string
   options: string[]
   onChange: (value: string) => void
+  required?: boolean
 }) => (
   <div className="space-y-3">
-    <p className="text-sm font-medium text-slate-700">{label}</p>
+    <p className="text-sm font-medium text-slate-700">
+      {label}
+      {required && <span className="ml-1 text-pink-500">*</span>}
+    </p>
     <div className="flex flex-wrap gap-3">
       {options.map((option) => (
         <button
           type="button"
           key={option}
           onClick={() => onChange(option)}
-          className={`rounded-full border px-4 py-2 text-sm font-medium ${
+          className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
             value === option
               ? 'border-pink-500 bg-pink-50 text-pink-600'
-              : 'border-slate-200 text-slate-500'
+              : 'border-slate-200 text-slate-500 hover:border-pink-200'
           }`}
         >
           {option}

@@ -76,7 +76,7 @@ export const PersonalDetailsPage = () => {
   const { fetchLookup, fetchCountries, fetchStates, fetchCities, lookupData } = useLookup()
 
   const [formData, setFormData] = useState({
-    gender: 'Female',
+    gender: '', // No default selection
     dob: '',
     height: '',
     country: '',
@@ -211,7 +211,7 @@ export const PersonalDetailsPage = () => {
     if (profile) {
       setFormData((prev) => ({
         ...prev,
-        gender: profile.gender || 'Female',
+        gender: profile.gender || '', // Don't set default if no gender in profile
         // Map other fields from profile if available
       }))
     }
@@ -435,6 +435,13 @@ export const PersonalDetailsPage = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+    
+    // Validate required fields
+    if (!formData.gender) {
+      showToast('Please select your gender', 'error')
+      return
+    }
+    
     setSubmitting(true)
 
     try {
@@ -474,7 +481,6 @@ export const PersonalDetailsPage = () => {
         haveChildren: formData.haveChildren,
         castNoBar: formData.castNoBar,
       }
-
       if (formData.education.qualification) {
         payload.education = {
           qualification: formData.education.qualification,
@@ -580,6 +586,7 @@ export const PersonalDetailsPage = () => {
                 value={formData.gender}
                 options={['Male', 'Female']}
                 onChange={(value) => setFormData((prev) => ({ ...prev, gender: value }))}
+                required
               />
               <div className="grid gap-4 md:grid-cols-2">
                 {/* altest 18 years old */}
