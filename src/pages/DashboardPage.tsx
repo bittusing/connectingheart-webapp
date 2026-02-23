@@ -46,7 +46,7 @@ export const DashboardPage = () => {
           }
         }
       } catch (error) {
-        console.error('Error checking KYC status:', error)
+        console.error('Error checking Aadhar status:', error)
       } finally {
         setCheckingKyc(false)
       }

@@ -88,7 +88,7 @@ export const KYCModal = ({ open, onClose, onSuccess }: KYCModalProps) => {
 
       if (response.status === 'success') {
         setOtpModalOpen(false)
-        showToast(response.message || 'KYC verification completed successfully!', 'success')
+        showToast(response.message || 'Aadhar verification completed successfully!', 'success')
         
         // Reset form
         setAadhaarNumber('')
@@ -123,7 +123,7 @@ export const KYCModal = ({ open, onClose, onSuccess }: KYCModalProps) => {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-pink-100">
               <ShieldCheckIcon className="h-8 w-8 text-pink-600" />
             </div>
-            <h2 className="mt-4 text-2xl font-bold text-slate-900">Complete KYC Verification</h2>
+            <h2 className="mt-4 text-2xl font-bold text-slate-900">Complete Aadhar Verification</h2>
             <p className="mt-2 text-sm text-slate-600">
               Verify your identity using Aadhaar to access all features
             </p>
