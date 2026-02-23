@@ -14,6 +14,13 @@ type ToastMessage = {
   variant: 'success' | 'error'
 }
 
+type ForgotPasswordResponse = {
+  code: string
+  status: string
+  message: string
+  otp?: string | number // OTP might be returned for non-Indian numbers
+}
+
 export const ForgotPasswordPage = () => {
   const api = useApiClient()
   const navigate = useNavigate()
@@ -24,6 +31,7 @@ export const ForgotPasswordPage = () => {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false)
   const [forgotPasswordToken, setForgotPasswordToken] = useState<string | null>(null)
   const [originalToken, setOriginalToken] = useState<string | null>(null)
+  const [autoOtp, setAutoOtp] = useState('')
 
   const showToast = (message: string, variant: 'success' | 'error') => {
     const id = globalThis.crypto?.randomUUID() ?? `${Date.now()}`
@@ -43,14 +51,23 @@ export const ForgotPasswordPage = () => {
     setStatus('loading')
     try {
       // Call forgetPassword API
-      const response = await api.get<{ code: string; status: string; message: string }>(
+      const response = await api.get<ForgotPasswordResponse>(
         `auth/forgetPassword/${phoneNumber}`,
       )
 
       if (response.status === 'success') {
         setStatus('success')
         showToast(response.message || 'OTP sent successfully!', 'success')
+        
+        // Auto-fill OTP if OTP is returned in response
+        if (response.otp) {
+          setAutoOtp(String(response.otp))
+        } else {
+          setAutoOtp('')
+        }
+        
         setOtpModalOpen(true)
+        
       } else {
         throw new Error(response.message || 'Failed to send OTP')
       }
@@ -75,6 +92,7 @@ export const ForgotPasswordPage = () => {
         setForgotPasswordToken(response.token)
         setOtpModalOpen(false)
         setPasswordModalOpen(true)
+        setAutoOtp('') // Clear auto OTP after verification
         showToast(response.message || 'OTP verified successfully!', 'success')
       } else {
         throw new Error(response.message || 'Invalid OTP')
@@ -176,8 +194,12 @@ export const ForgotPasswordPage = () => {
       {/* OTP Verification Modal */}
       <OtpModal
         open={otpModalOpen}
-        onClose={() => setOtpModalOpen(false)}
+        onClose={() => {
+          setOtpModalOpen(false)
+          setAutoOtp('')
+        }}
         onVerify={handleVerifyOtp}
+        initialOtp={autoOtp}
       />
 
       {/* Set New Password Modal */}
