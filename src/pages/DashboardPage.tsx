@@ -1,17 +1,60 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { DashboardHero } from '../components/dashboard/DashboardHero'
 import { SectionRail } from '../components/dashboard/SectionRail'
 import { StatsGrid } from '../components/dashboard/StatsGrid'
 import { useUserProfile } from '../hooks/useUserProfile'
 import { useJustJoinedCount } from '../hooks/useJustJoinedCount'
 import { useAcceptanceCount } from '../hooks/useAcceptanceCount'
+import { useApiClient } from '../hooks/useApiClient'
 import { statTiles } from '../data/dashboardContent'
 import { DashboardBannerSlider } from '../components/dashboard/DashboardBannerSlider'
+import { KYCModal } from '../components/forms/KYCModal'
+
+type GetUserResponse = {
+  code: string
+  status: string
+  message: string
+  data: {
+    _id: string
+    kycStatus?: 'pending' | 'verified' | 'failed'
+    countryCode?: string
+    [key: string]: any
+  }
+}
 
 export const DashboardPage = () => {
+  const api = useApiClient()
   const { profile } = useUserProfile()
   const { count: justJoinedCount, loading: justJoinedLoading } = useJustJoinedCount()
   const { count: acceptanceCount, loading: acceptanceLoading } = useAcceptanceCount()
+  
+  const [kycModalOpen, setKycModalOpen] = useState(false)
+  const [checkingKyc, setCheckingKyc] = useState(true)
+
+  // Check KYC status on mount
+  useEffect(() => {
+    const checkKycStatus = async () => {
+      try {
+        const response = await api.get<GetUserResponse>('auth/getUser')
+        
+        if (response.status === 'success' && response.data) {
+          const { kycStatus, countryCode } = response.data
+          
+          // Only show KYC modal for Indian users (+91) who haven't verified
+          if (countryCode === '+91' && kycStatus !== 'verified') {
+            setKycModalOpen(true)
+          }
+        }
+      } catch (error) {
+        console.error('Error checking KYC status:', error)
+      } finally {
+        setCheckingKyc(false)
+      }
+    }
+
+    checkKycStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const completionPercentage =
     profile && 'isVerified' in profile && profile.isVerified ? 100 : 80
@@ -79,6 +122,17 @@ export const DashboardPage = () => {
       <DashboardBannerSlider slides={celebrationSlides} />
       <StatsGrid tiles={tilesWithCounts} />
       <SectionRail />
+      
+      {/* KYC Verification Modal */}
+      <KYCModal
+        open={kycModalOpen}
+        onClose={() => setKycModalOpen(false)}
+        onSuccess={() => {
+          setKycModalOpen(false)
+          // Optionally reload page or update state
+          window.location.reload()
+        }}
+      />
     </div>
   )
 }

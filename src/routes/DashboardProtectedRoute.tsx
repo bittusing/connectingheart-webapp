@@ -42,6 +42,7 @@ export const DashboardProtectedRoute = () => {
             personaldetails: '/dashboard/personaldetails',
             careerdetails: '/dashboard/careerdetails',
             socialdetails: '/dashboard/socialdetails',
+            kycverification: '/dashboard/kycverification',
             srcmdetails: '/dashboard/srcmdetails',
             familydetails: '/dashboard/familydetails',
             partnerpreferences: '/dashboard/partnerpreferences',

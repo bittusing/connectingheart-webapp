@@ -52,6 +52,7 @@ import { EditContactPage } from './pages/EditContactPage'
 import { EditHoroscopePage } from './pages/EditHoroscopePage'
 import { EditLifestylePage } from './pages/EditLifestylePage'
 import { ChatListPage } from './pages/ChatListPage'
+import { KYCVerificationPage } from './pages/KYCVerificationPage'
 import { ChatPage } from './pages/ChatPage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { RootRedirect } from './routes/RootRedirect'
@@ -75,6 +76,7 @@ function App() {
         <Route path="dashboard/personaldetails" element={<PersonalDetailsPage />} />
         <Route path="dashboard/careerdetails" element={<CareerDetailsPage />} />
         <Route path="dashboard/socialdetails" element={<SocialDetailsPage />} />
+        <Route path="dashboard/kycverification" element={<KYCVerificationPage />} />
         <Route path="dashboard/srcmdetails" element={<SRCMDetailsPage />} />
         <Route path="dashboard/familydetails" element={<FamilyDetailsPage />} />
         <Route path="dashboard/partnerpreferences" element={<PartnerPreferencesPage />} />

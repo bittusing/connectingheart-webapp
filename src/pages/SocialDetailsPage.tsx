@@ -74,6 +74,7 @@ export const SocialDetailsPage = () => {
             personaldetails: '/dashboard/personaldetails',
             careerdetails: '/dashboard/careerdetails',
             socialdetails: '/dashboard/socialdetails',
+            kycverification: '/dashboard/kycverification',
             srcmdetails: '/dashboard/srcmdetails',
             familydetails: '/dashboard/familydetails',
             partnerpreferences: '/dashboard/partnerpreferences',
@@ -125,7 +126,7 @@ export const SocialDetailsPage = () => {
 
       if (response.status === 'success' || response.code === 'CH200') {
         showToast('Social details updated successfully', 'success')
-        await updateLastActiveScreen('srcmdetails')
+        await updateLastActiveScreen('kycverification')
         const userResponse = await api.get<GetUserResponse>('auth/getUser')
         if (userResponse.status === 'success' && userResponse.data?.screenName) {
           const screenName = userResponse.data.screenName.toLowerCase()
@@ -133,16 +134,17 @@ export const SocialDetailsPage = () => {
             personaldetails: '/dashboard/personaldetails',
             careerdetails: '/dashboard/careerdetails',
             socialdetails: '/dashboard/socialdetails',
+            kycverification: '/dashboard/kycverification',
             srcmdetails: '/dashboard/srcmdetails',
             familydetails: '/dashboard/familydetails',
             partnerpreferences: '/dashboard/partnerpreferences',
             aboutyou: '/dashboard/aboutyou',
             dashboard: '/dashboard',
           }
-          const route = routeMap[screenName] || '/dashboard/srcmdetails'
+          const route = routeMap[screenName] || '/dashboard/kycverification'
           navigate(route, { replace: true })
         } else {
-          navigate('/dashboard/srcmdetails', { replace: true })
+          navigate('/dashboard/kycverification', { replace: true })
         }
       } else {
         showToast(response.message || 'Failed to update social details', 'error')
