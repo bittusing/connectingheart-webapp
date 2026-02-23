@@ -166,13 +166,13 @@ export const KYCModal = ({ open, onClose, onSuccess }: KYCModalProps) => {
             />
 
             <div className="flex gap-3 pt-2">
-              <button
+              {/* <button
                 type="button"
                 onClick={onClose}
                 className="flex-1 rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50"
               >
                 Skip for now
-              </button>
+              </button> */}
               <Button
                 type="submit"
                 size="lg"
