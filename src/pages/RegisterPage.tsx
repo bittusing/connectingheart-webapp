@@ -386,6 +386,13 @@ export const RegisterPage = () => {
               />
               I agree to terms and conditions
             </label>
+            <p className="text-xs text-slate-500">
+              By registering, you agree to our{' '}
+              <Link to="/privacy-policy" className="text-pink-500 underline">
+                Privacy Policy
+              </Link>
+              . Please review it before creating your account.
+            </p>
             <Button type="submit" size="lg" fullWidth disabled={loading || otpLoading}>
               {loading || otpLoading ? 'Please wait...' : 'Register now'}
             </Button>

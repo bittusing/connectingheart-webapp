@@ -105,6 +105,29 @@ const securityHighlights: string[] = [
   'Industry-standard safeguards mitigate unauthorized access; however, no system is completely impenetrable given the nature of the internet.',
 ]
 
+const childSafetyContent: DetailList[] = [
+  {
+    title: 'Age Restriction',
+    description: 'This platform is strictly intended for individuals 18 years of age or older. We do not knowingly collect or process personal information from minors.',
+  },
+  {
+    title: 'No Minor Participation',
+    description: 'If we discover that a user is under 18: The account will be immediately suspended or terminated, all associated data will be deleted, and preventive measures will be taken to restrict further access.',
+  },
+  {
+    title: 'Monitoring and Reporting',
+    description: 'We encourage users to report profiles suspected to belong to minors, any form of exploitation or abuse, and suspicious or unsafe behavior. Reports can be submitted via the platform or by emailing: connectinghearts.helpdesk@gmail.com',
+  },
+  {
+    title: 'Zero Tolerance Policy',
+    description: 'We maintain a strict zero-tolerance policy toward child exploitation, abuse or harassment involving minors, and any illegal activities. Violations will result in immediate account termination and reporting to appropriate law enforcement authorities.',
+  },
+  {
+    title: 'Parental Concerns',
+    description: 'If you believe a minor has shared personal data on our platform, please contact us immediately. We will promptly investigate and remove such information.',
+  },
+]
+
 export const PrivacyPolicyPage = () => {
   return (
     <section className="space-y-8">
@@ -216,6 +239,21 @@ export const PrivacyPolicyPage = () => {
       </article>
 
       <article className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Child Safety and Protection</h2>
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          Connecting Hearts is committed to maintaining a safe and secure environment, especially for the protection of minors.
+        </p>
+        <div className="space-y-3">
+          {childSafetyContent.map((item) => (
+            <div key={item.title}>
+              <p className="font-semibold text-slate-900 dark:text-white">{item.title}</p>
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{item.description}</p>
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <article className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-white">How long we keep your information</h2>
         <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
           We retain personal information only for as long as you maintain an account and as required by applicable laws.
@@ -224,6 +262,19 @@ export const PrivacyPolicyPage = () => {
         </p>
         <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
           Aggregated insights may be used to improve our services, but they no longer identify you personally.
+        </p>
+      </article>
+
+      <article className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Contact Us</h2>
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          If you have any questions about this Privacy Policy or how your data is handled, please contact:
+        </p>
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          📧{' '}
+          <a className="text-pink-600 underline dark:text-pink-400" href="mailto:connectinghearts.helpdesk@gmail.com">
+            connectinghearts.helpdesk@gmail.com
+          </a>
         </p>
       </article>
     </section>
