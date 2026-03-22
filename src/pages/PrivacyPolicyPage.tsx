@@ -6,7 +6,7 @@ type DetailList = {
 const collectedInformation: DetailList[] = [
   {
     description:
-      'Connecting Hearts, an advertising-led matchmaking platform, requests personal details so we can publish your profile and deliver tailored recommendations. By using the service you consent to the collection, processing, and sharing of this information in line with this policy.',
+      'Abhyasi Matrimony, an advertising-led matchmaking platform, requests personal details so we can publish your profile and deliver tailored recommendations. By using the service you consent to the collection, processing, and sharing of this information in line with this policy.',
   },
   {
     title: 'Information you submit',
@@ -137,13 +137,13 @@ export const PrivacyPolicyPage = () => {
         </h1>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
           Your privacy matters to us. This policy explains what we collect, how we use it, and the
-          controls you have while using Connecting Hearts.
+          controls you have while using Abhyasi Matrimony.
         </p>
       </header>
 
       <article className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-          What information does Connecting Hearts collect?
+          What information does Abhyasi Matrimony collect?
         </h2>
         <div className="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
           {collectedInformation.map((item) => (
@@ -241,7 +241,7 @@ export const PrivacyPolicyPage = () => {
       <article className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Child Safety and Protection</h2>
         <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-          Connecting Hearts is committed to maintaining a safe and secure environment, especially for the protection of minors.
+          Abhyasi Matrimony is committed to maintaining a safe and secure environment, especially for the protection of minors.
         </p>
         <div className="space-y-3">
           {childSafetyContent.map((item) => (
